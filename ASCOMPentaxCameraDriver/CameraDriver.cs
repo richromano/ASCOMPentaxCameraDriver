@@ -1015,13 +1015,19 @@ namespace ASCOM.PentaxKP
             int width = _bmp.Width;
             int height = _bmp.Height;
 
+            //Format32BppArgb Given X and Y coordinates,  the address of the first element in the pixel is Scan0+(y * stride)+(x*4).
+            //This Points to the blue byte. The following three bytes contain the green, red and alpha bytes.
+
+            //Format24BppRgb Given X and Y coordinates, the address of the first element in the pixel is Scan0+(y*Stride)+(x*3). 
+            //This points to the blue byte which is followed by the green and the red.
+
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
-                    _cameraImageArray[x, y, 0] = Marshal.ReadByte(ptr, (stride * y) + (3 * x));
-                    _cameraImageArray[x, y, 1] = Marshal.ReadByte(ptr + 1, (stride * y) + (3 * x));
-                    _cameraImageArray[x, y, 2] = Marshal.ReadByte(ptr + 2, (stride * y) + (3 * x));
+                    _cameraImageArray[x, y, 0] = Marshal.ReadByte(ptr, (stride * y) + (4 * x));
+                    _cameraImageArray[x, y, 1] = Marshal.ReadByte(ptr + 1, (stride * y) + (4 * x));
+                    _cameraImageArray[x, y, 2] = Marshal.ReadByte(ptr + 2, (stride * y) + (4 * x));
                 }
             }
 

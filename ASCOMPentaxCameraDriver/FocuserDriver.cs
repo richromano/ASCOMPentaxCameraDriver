@@ -298,7 +298,7 @@ namespace ASCOM.PentaxKP
             get
             {
                 DriverCommon.LogFocuserMessage("MaxIncrement Get", focuserSteps.ToString());
-                return 20;// DriverCommon.Camera.GetFocusLimit(); // Maximum change in one move
+                return 200;// DriverCommon.Camera.GetFocusLimit(); // Maximum change in one move
             }
         }
 
@@ -307,7 +307,7 @@ namespace ASCOM.PentaxKP
             get
             {
                 DriverCommon.LogFocuserMessage("MaxStep Get", focuserSteps.ToString());
-                return 200;// DriverCommon.Camera.GetFocusLimit(); // Maximum extent of the focuser, so position range is 0 to 10,000
+                return 10000;// DriverCommon.Camera.GetFocusLimit(); // Maximum extent of the focuser, so position range is 0 to 10,000
             }
         }
 
