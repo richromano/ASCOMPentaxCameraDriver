@@ -1,0 +1,2140 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ASCOM.DriverAccess</name>
+    </assembly>
+    <members>
+        <member name="T:ASCOM.DriverAccess.AscomDriver">
+            <summary>
+            Base class for ASCOM driver access toolkit device classes. This class contains the methods common to all devices
+            so that they can be maintained in just one place.
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.AscomDriver.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.AscomDriver.#ctor(System.String)">
+            <summary>
+            Creates a new instance of the <see cref="T:ASCOM.DriverAccess.AscomDriver"/> class.
+            </summary>
+            <param name="deviceProgId">The prog id. of the device being created.</param>
+        </member>
+        <member name="M:ASCOM.DriverAccess.AscomDriver.Dispose">
+            <summary>
+            This method is a "clean-up" method that is primarily of use to drivers that are written in languages such as C# and VB.NET where resource clean-up is initially managed by the language's 
+            runtime garbage collection mechanic. Driver authors should take care to ensure that a client or runtime calling Dispose() does not adversely affect other connected clients.
+            Applications should not call this method.
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.AscomDriver.Dispose(System.Boolean)">
+            <summary>
+            Disposes of managed and unmanaged resources
+            </summary>
+            <param name="disposing">True to dispose of managed resources, false to dispose of unmanaged resources</param>
+        </member>
+        <member name="P:ASCOM.DriverAccess.AscomDriver.HasConnectAndDeviceState">
+            <summary>
+            Returns <see langword="true"/> if the device has a Platform 7 or later interface that supports Connect / Disconnect and DeviceState
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.AscomDriver.MemberFactory">
+            <summary>
+            Returns the member factory created for this device for use by the device class
+            </summary>
+            <value>The member factory object.</value>
+        </member>
+        <member name="P:ASCOM.DriverAccess.AscomDriver.DriverInterfaceVersion">
+            <summary>
+            Return the driver interface version number
+            </summary>
+            <returns>The driver's interface version</returns>
+            <remarks>
+            This method reads the interface version on the first call and caches it, returning the cached value on subsequent calls.
+            It also handles interface version 1 drivers that don't have InterfaceVersion properties
+            </remarks>
+        </member>
+        <member name="M:ASCOM.DriverAccess.AscomDriver.Connect">
+            <summary>
+            Connect to the device asynchronously
+            </summary>
+            <exception cref="T:ASCOM.DriverException">An error occurred that is not described by one of the more specific ASCOM exceptions. Include sufficient detail in the message text to enable the issue to be accurately diagnosed by someone other than yourself.</exception> 
+            <remarks><p style="color:red"><b>This is a mandatory method and must not throw a <see cref="T:ASCOM.MethodNotImplementedException"/>.</b></p></remarks>
+        </member>
+        <member name="M:ASCOM.DriverAccess.AscomDriver.Disconnect">
+            <summary>
+            Disconnect from the device asynchronously
+            </summary>
+            <exception cref="T:ASCOM.DriverException">An error occurred that is not described by one of the more specific ASCOM exceptions. Include sufficient detail in the message text to enable the issue to be accurately diagnosed by someone other than yourself.</exception> 
+            <remarks><p style="color:red"><b>This is a mandatory method and must not throw a <see cref="T:ASCOM.MethodNotImplementedException"/>.</b></p></remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.AscomDriver.Connecting">
+            <summary>
+            Returns True while the device is undertaking an asynchronous connect or disconnect operation.
+            </summary>
+            <exception cref="T:ASCOM.DriverException">An error occurred that is not described by one of the more specific ASCOM exceptions. Include sufficient detail in the message text to enable the issue to be accurately diagnosed by someone other than yourself.</exception> 
+            <remarks><p style="color:red"><b>This is a mandatory property and must not throw a <see cref="T:ASCOM.PropertyNotImplementedException"/>.</b></p></remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.AscomDriver.DeviceState">
+            <summary>
+            Returns the device's operational state in a single call.
+            </summary>
+            <exception cref="T:ASCOM.NotConnectedException">If the device is not connected</exception>
+            <exception cref="T:ASCOM.DriverException">An error occurred that is not described by one of the more specific ASCOM exceptions. Include sufficient detail in the message text to enable the issue to be accurately diagnosed by someone other than yourself.</exception> 
+            <remarks>
+            <p style="color:red"><b>This is a mandatory property and must not throw a <see cref="T:ASCOM.PropertyNotImplementedException"/>.</b></p>
+            <para><b>Devices</b></para>
+            <para>Devices must return all operational values that are definitively known but can omit entries where values are unknown.
+            Devices must not throw exceptions / return errors when values are not known.</para>
+            <para>An empty list must be returned if no values are known.</para>
+            <para><b>Client Applications</b></para>
+            <para>
+            Applications must expect that, from time to time, some operational state values may not be present in the device response and must be prepared to handle “missing” values.
+            </para>
+            <para><b>Further Information</b></para>
+            <para>See <conceptualLink target="320982e4-105d-46d8-b5f9-efce3f4dafd4"/> for further information on how to implement DeviceState, which properties to include, and the implementation support provided by the Platform.</para>
+            </remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.AscomDriver.Connected">
+            <summary>
+            Set True to connect to the device hardware. Set False to disconnect from the device hardware.
+            You can also read the property to check whether it is connected. This reports the current hardware state.
+            </summary>
+            <value><c>true</c> if connected to the hardware; otherwise, <c>false</c>.</value>
+            <exception cref="T:ASCOM.DriverException">An error occurred that is not described by one of the more specific ASCOM exceptions. The device did not successfully complete the request.</exception> 
+            <remarks>
+            <p style="color:red"><b>Must be implemented</b></p>Do not use a NotConnectedException here. That exception is for use in other methods that require a connection in order to succeed.
+            <para>The Connected property sets and reports the state of connection to the device hardware.
+            For a hub this means that Connected will be true when the first driver connects and will only be set to false
+            when all drivers have disconnected.  A second driver may find that Connected is already true and
+            setting Connected to false does not report Connected as false.  This is not an error because the physical state is that the
+            hardware connection is still true.</para>
+            <para>Multiple calls setting Connected to true or false will not cause an error.</para>
+            </remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.AscomDriver.Description">
+            <summary>
+            Returns a description of the device, such as manufacturer and model number. Any ASCII characters may be used. 
+            </summary>
+            <value>The description.</value>
+            <exception cref="T:ASCOM.NotConnectedException">If the device is not connected</exception>
+            <exception cref="T:ASCOM.DriverException">An error occurred that is not described by one of the more specific ASCOM exceptions. The device did not successfully complete the request.</exception> 
+            <remarks>
+            <p style="color:red"><b>Must be implemented, must not throw a PropertyNotImplementedException.</b></p> 
+            <para>The description length must be a maximum of 64 characters so that it can be used in FITS image headers, which are limited to 80 characters including the header name.</para>
+            </remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.AscomDriver.DriverInfo">
+            <summary>
+            Descriptive and version information about this ASCOM driver.
+            </summary>
+            <exception cref="T:ASCOM.DriverException">An error occurred that is not described by one of the more specific ASCOM exceptions. The device did not successfully complete the request.</exception> 
+            <remarks>
+            <p style="color:red"><b>Must be implemented</b></p> This string may contain line endings and may be hundreds to thousands of characters long.
+            It is intended to display detailed information on the ASCOM driver, including version and copyright data.
+            See the <see cref="P:ASCOM.DriverAccess.AscomDriver.Description" /> property for information on the device itself.
+            To get the driver version in a parse-able string, use the <see cref="P:ASCOM.DriverAccess.AscomDriver.DriverVersion" /> property.
+            </remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.AscomDriver.DriverVersion">
+            <summary>
+            A string containing only the major and minor version of the driver.
+            </summary>
+            <exception cref="T:ASCOM.DriverException">An error occurred that is not described by one of the more specific ASCOM exceptions. The device did not successfully complete the request.</exception> 
+            <remarks>
+            <p style="color:red"><b>Must be implemented</b></p> This must be in the form "n.n".
+            It should not to be confused with the <see cref="P:ASCOM.DriverAccess.AscomDriver.InterfaceVersion" /> property, which is the version of this specification supported by the driver.
+            </remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.AscomDriver.InterfaceVersion">
+            <summary>
+            The interface version number that this device supports.
+            </summary>
+            <exception cref="T:ASCOM.DriverException">An error occurred that is not described by one of the more specific ASCOM exceptions. The device did not successfully complete the request.</exception> 
+            <remarks><p style="color:red"><b>Must be implemented</b></p> Clients can detect legacy V1 drivers by trying to read this property.
+            If the driver raises an error, it is a V1 driver. V1 did not specify this property. A driver may also return a value of 1. 
+            In other words, a raised error or a return value of 1 indicates that the driver is a V1 driver.
+            </remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.AscomDriver.Name">
+            <summary>
+            The short name of the driver, for display purposes
+            </summary>
+            <exception cref="T:ASCOM.DriverException">An error occurred that is not described by one of the more specific ASCOM exceptions. The device did not successfully complete the request.</exception> 
+            <remarks>
+            <p style="color:red"><b>Must be implemented</b></p>
+            </remarks>
+        </member>
+        <member name="M:ASCOM.DriverAccess.AscomDriver.SetupDialog">
+            <summary>
+            Launches a configuration dialogue box for the driver.  The call will not return
+            until the user clicks OK or cancel manually.
+            </summary>
+            <exception cref="T:ASCOM.DriverException">An error occurred that is not described by one of the more specific ASCOM exceptions. The device did not successfully complete the request.</exception> 
+            <remarks><p style="color:red"><b>Must be implemented</b></p> </remarks>
+        </member>
+        <member name="M:ASCOM.DriverAccess.AscomDriver.Action(System.String,System.String)">
+            <summary>Invokes the specified device-specific custom action.</summary>
+            <param name="ActionName">A well known name agreed by interested parties that represents the action to be carried out.</param>
+            <param name="ActionParameters">List of required parameters or an <see cref="F:System.String.Empty">Empty String</see> if none are required.</param>
+            <returns>A string response. The meaning of returned strings is set by the driver author.
+            <para>Suppose filter wheels start to appear with automatic wheel changers; new actions could be <c>QueryWheels</c> and <c>SelectWheel</c>. The former returning a formatted list
+            of wheel names and the second taking a wheel name and making the change, returning appropriate values to indicate success or failure.</para>
+            </returns>
+            <exception cref="T:ASCOM.MethodNotImplementedException">Thrown if no actions are supported.</exception>
+            <exception cref="T:ASCOM.ActionNotImplementedException">It is intended that the <see cref="P:ASCOM.DriverAccess.AscomDriver.SupportedActions"/> method will inform clients of driver capabilities, but the driver must still throw 
+            an <see cref="T:ASCOM.ActionNotImplementedException"/> exception  if it is asked to perform an action that it does not support.</exception>
+            <exception cref="T:ASCOM.NotConnectedException">If the device is not connected</exception>
+            <exception cref="T:ASCOM.DriverException">An error occurred that is not described by one of the more specific ASCOM exceptions. The device did not successfully complete the request.</exception> 
+            <remarks>
+            <p style="color:red"><b>Must be implemented.</b></p>
+            <para>Action names are case insensitive, so SelectWheel, selectwheel and SELECTWHEEL all refer to the same action.</para>
+            <para>The names of all supported actions must be returned in the <see cref="P:ASCOM.DriverAccess.AscomDriver.SupportedActions" /> property.</para>
+            </remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.AscomDriver.SupportedActions">
+            <summary>Returns the list of custom action names supported by this driver.</summary>
+            <value>An ArrayList of strings (SafeArray collection) containing the names of supported actions.</value>
+            <exception cref="T:ASCOM.NotConnectedException">If the device is not connected</exception>
+            <exception cref="T:ASCOM.DriverException">An error occurred that is not described by one of the more specific ASCOM exceptions. The device did not successfully complete the request.</exception> 
+            <remarks>
+            <p style="color:red"><b>Must be implemented</b></p>
+            <para>This method must return an empty <see cref="T:System.Collections.ArrayList" /> if no actions are supported. Do not throw a <see cref="T:ASCOM.PropertyNotImplementedException" />.</para>
+            <para>SupportedActions is a "discovery" mechanism that enables clients to know which Actions a device supports without having to exercise the Actions themselves. This mechanism is necessary because there could be
+            people / equipment safety issues if actions are called unexpectedly or out of a defined process sequence.
+            It follows from this that SupportedActions must return names that match the spelling of Action names exactly, without additional descriptive text. However, returned names may use any casing
+            because the <see cref="M:ASCOM.DriverAccess.AscomDriver.Action(System.String,System.String)" /> ActionName parameter is case insensitive.</para>
+            </remarks>
+        </member>
+        <member name="M:ASCOM.DriverAccess.AscomDriver.CommandBlind(System.String,System.Boolean)">
+            <summary>
+            Transmits an arbitrary string to the device and does not wait for a response.
+            Optionally, protocol framing characters may be added to the string before transmission.
+            </summary>
+            <param name="Command">The literal command string to be transmitted.</param>
+            <param name="Raw">
+            if set to <c>true</c> the string is transmitted 'as-is'.
+            If set to <c>false</c> then protocol framing characters may be added prior to transmission.
+            </param>
+            <exception cref="T:ASCOM.MethodNotImplementedException">If the method is not implemented</exception>
+            <exception cref="T:ASCOM.NotConnectedException">If the device is not connected</exception>
+            <exception cref="T:ASCOM.DriverException">An error occurred that is not described by one of the more specific ASCOM exceptions. The device did not successfully complete the request.</exception> 
+            <remarks><p style="color:red"><b>May throw a NotImplementedException.</b></p>
+            <para>The CommandXXX methods are a historic mechanic that provides clients with direct and unimpeded access to change device hardware configuration. While highly enabling for clients, this mechanic is inherently risky
+            because clients can fundamentally change hardware operation without the driver being aware that a change is taking / has taken place.</para>
+            <para>The newer Action / SupportedActions mechanic provides discrete, named, functions that can deliver any functionality required.They do need driver authors to make provision for them within the 
+            driver, but this approach is much lower risk than using the CommandXXX methods because it enables the driver to resolve conflicts between standard device interface commands and extended commands 
+            provided as Actions.The driver is always aware of what is happening and can adapt more effectively to client needs.</para>
+            </remarks>
+        </member>
+        <member name="M:ASCOM.DriverAccess.AscomDriver.CommandBool(System.String,System.Boolean)">
+            <summary>
+            Transmits an arbitrary string to the device and waits for a boolean response.
+            Optionally, protocol framing characters may be added to the string before transmission.
+            </summary>
+            <param name="Command">The literal command string to be transmitted.</param>
+            <param name="Raw">
+            if set to <c>true</c> the string is transmitted 'as-is'.
+            If set to <c>false</c> then protocol framing characters may be added prior to transmission.
+            </param>
+            <returns>
+            Returns the interpreted boolean response received from the device.
+            </returns>
+            <exception cref="T:ASCOM.MethodNotImplementedException">If the method is not implemented</exception>
+            <exception cref="T:ASCOM.NotConnectedException">If the device is not connected</exception>
+            <exception cref="T:ASCOM.DriverException">An error occurred that is not described by one of the more specific ASCOM exceptions. The device did not successfully complete the request.</exception> 
+            <remarks><p style="color:red"><b>May throw a NotImplementedException.</b></p>
+            <para>The CommandXXX methods are a historic mechanic that provides clients with direct and unimpeded access to change device hardware configuration. While highly enabling for clients, this mechanic is inherently risky
+            because clients can fundamentally change hardware operation without the driver being aware that a change is taking / has taken place.</para>
+            <para>The newer Action / SupportedActions mechanic provides discrete, named, functions that can deliver any functionality required.They do need driver authors to make provision for them within the 
+            driver, but this approach is much lower risk than using the CommandXXX methods because it enables the driver to resolve conflicts between standard device interface commands and extended commands 
+            provided as Actions.The driver is always aware of what is happening and can adapt more effectively to client needs.</para>
+            </remarks>
+        </member>
+        <member name="M:ASCOM.DriverAccess.AscomDriver.CommandString(System.String,System.Boolean)">
+            <summary>
+            Transmits an arbitrary string to the device and waits for a string response.
+            Optionally, protocol framing characters may be added to the string before transmission.
+            </summary>
+            <param name="Command">The literal command string to be transmitted.</param>
+            <param name="Raw">
+            if set to <c>true</c> the string is transmitted 'as-is'.
+            If set to <c>false</c> then protocol framing characters may be added prior to transmission.
+            </param>
+            <returns>
+            Returns the string response received from the device.
+            </returns>
+            <exception cref="T:ASCOM.MethodNotImplementedException">If the method is not implemented</exception>
+            <exception cref="T:ASCOM.NotConnectedException">If the device is not connected</exception>
+            <exception cref="T:ASCOM.DriverException">An error occurred that is not described by one of the more specific ASCOM exceptions. The device did not successfully complete the request.</exception> 
+            <remarks><p style="color:red"><b>May throw a NotImplementedException.</b></p>
+            <para>The CommandXXX methods are a historic mechanic that provides clients with direct and unimpeded access to change device hardware configuration. While highly enabling for clients, this mechanic is inherently risky
+            because clients can fundamentally change hardware operation without the driver being aware that a change is taking / has taken place.</para>
+            <para>The newer Action / SupportedActions mechanic provides discrete, named, functions that can deliver any functionality required.They do need driver authors to make provision for them within the 
+            driver, but this approach is much lower risk than using the CommandXXX methods because it enables the driver to resolve conflicts between standard device interface commands and extended commands 
+            provided as Actions.The driver is always aware of what is happening and can adapt more effectively to client needs.</para>
+            </remarks>
+        </member>
+        <member name="T:ASCOM.DriverAccess.Camera">
+            <summary>
+            Implements a camera class to access any registered ASCOM Camera
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Camera.#ctor(System.String)">
+            <summary>
+            Creates an instance of the camera class.
+            </summary>
+            <param name="cameraId">The ProgID for the camera</param>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Camera.Choose(System.String)">
+            <summary>
+            The Choose() method returns the DriverID of the selected driver.
+            Choose() allows you to optionally pass the DriverID of a "current" driver,
+            and the corresponding camera type is pre-selected in the Chooser///s list.
+            In this case, the OK button starts out enabled (lit-up); the assumption is that the pre-selected driver has already been configured.
+            </summary>
+            <param name="cameraId">Optional DriverID of the previously selected camera that is to be the pre-selected camera in the list.</param>
+            <returns>
+            The DriverID of the user selected camera. Null if the dialogue is cancelled.
+            </returns>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.CameraDeviceState">
+            <summary>
+            Camera device state
+            </summary>
+            <remarks>
+            <para>See <conceptualLink target="320982e4-105d-46d8-b5f9-efce3f4dafd4"/> for further information on using the class returned by this property.</para>
+            </remarks>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Camera.AbortExposure">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.BinX">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.BinY">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.CCDTemperature">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.CameraState">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.CameraXSize">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.CameraYSize">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.CanAbortExposure">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.CanAsymmetricBin">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.CanGetCoolerPower">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.CanPulseGuide">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.CanSetCCDTemperature">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.CanStopExposure">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.CoolerOn">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.CoolerPower">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.ElectronsPerADU">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.FullWellCapacity">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.HasShutter">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.HeatSinkTemperature">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.ImageArray">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.ImageArrayVariant">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.ImageReady">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.IsPulseGuiding">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.LastExposureDuration">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.LastExposureStartTime">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.MaxADU">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.MaxBinX">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.MaxBinY">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.NumX">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.NumY">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.PixelSizeX">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.PixelSizeY">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Camera.PulseGuide(ASCOM.DeviceInterface.GuideDirections,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.SetCCDTemperature">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Camera.StartExposure(System.Double,System.Boolean)">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.StartX">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.StartY">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Camera.StopExposure">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.BayerOffsetX">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.BayerOffsetY">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.CanFastReadout">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.ExposureMax">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.ExposureMin">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.ExposureResolution">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.FastReadout">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.Gain">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.GainMax">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.GainMin">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.Gains">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.PercentCompleted">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.ReadoutMode">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.ReadoutModes">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.SensorName">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.SensorType">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.Offset">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.OffsetMax">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.OffsetMin">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.Offsets">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Camera.SubExposureDuration">
+            <inheritdoc/>
+        </member>
+        <member name="T:ASCOM.DriverAccess.CoverCalibrator">
+            <summary>
+            Provides universal access to CoverCalibrator drivers
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.CoverCalibrator.#ctor(System.String)">
+            <summary>
+            Creates a CoverCalibrator object with the given ProgID
+            </summary>
+            <param name="coverCalibratorId">ProgID of the CoverCalibrator device to be accessed.</param>
+        </member>
+        <member name="M:ASCOM.DriverAccess.CoverCalibrator.Choose(System.String)">
+            <summary>
+            Brings up the ASCOM Chooser Dialogue to choose a CoverCalibrator
+            </summary>
+            <param name="coverCalibratorId">CoverCalibrator ProgID for default or null for None</param>
+            <returns>ProgID for chosen CoverCalibrator or null for none</returns>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CoverCalibrator.CoverCalibratorState">
+            <summary>
+            CoverCalibrator device state
+            <remarks>
+            <para>See <conceptualLink target="320982e4-105d-46d8-b5f9-efce3f4dafd4"/> for further information on using the class returned by this property.</para>
+            </remarks>
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CoverCalibrator.CoverState">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.CoverCalibrator.OpenCover">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.CoverCalibrator.CloseCover">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.CoverCalibrator.HaltCover">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CoverCalibrator.CalibratorState">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CoverCalibrator.Brightness">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CoverCalibrator.MaxBrightness">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.CoverCalibrator.CalibratorOn(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.CoverCalibrator.CalibratorOff">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CoverCalibrator.CalibratorChanging">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CoverCalibrator.CoverMoving">
+            <inheritdoc/>
+        </member>
+        <member name="T:ASCOM.DriverAccess.CameraDeviceState">
+            <summary>
+            Class that presents the device's operation state as a set of nullable properties
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.CameraDeviceState.#ctor">
+            <summary>
+            Create a new CameraDeviceState instance
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.CameraDeviceState.#ctor(ASCOM.DeviceInterface.IStateValueCollection,System.Object)">
+            <summary>
+            Create a new CameraDeviceState instance from the device's DeviceState response.
+            </summary>
+            <param name="deviceStateArrayList">The device's DeviceState response.</param>
+            <param name="TL">Debug TraceLogger instance. The type of this parameter is Object - see remarks.</param>
+            <remarks>This class supports .NET Framework 3.5, 4.x and .NET Standard 2.0. In order to avoid use of dynamic and inclusion of projects or packages that define the TraceLogger
+            component, the TL parameter is typed as an object and a reflection method is used to call the LogMessage member.</remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CameraDeviceState.CameraState">
+            <summary>
+            The device's CameraState
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CameraDeviceState.CCDTemperature">
+            <summary>
+            The device's CCDTemperature
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CameraDeviceState.CoolerPower">
+            <summary>
+            The device's CoolerPower
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CameraDeviceState.HeatSinkTemperature">
+            <summary>
+            The device's HeatSinkTemperature
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CameraDeviceState.ImageReady">
+            <summary>
+            The device's ImageReady property
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CameraDeviceState.IsPulseGuiding">
+            <summary>
+            The device's IsPulseGuiding property
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CameraDeviceState.PercentCompleted">
+            <summary>
+            The device's PercentCompleted property
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CameraDeviceState.TimeStamp">
+            <summary>
+            The time at which the state was recorded
+            </summary>
+        </member>
+        <member name="T:ASCOM.DriverAccess.CoverCalibratorState">
+            <summary>
+            Class that presents the device's operation state as a set of nullable properties
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.CoverCalibratorState.#ctor">
+            <summary>
+            Create a new CoverCalibratorState instance
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.CoverCalibratorState.#ctor(ASCOM.DeviceInterface.IStateValueCollection,System.Object)">
+            <summary>
+            Create a new CoverCalibratorState instance from the device's DeviceState response.
+            </summary>
+            <param name="deviceStateArrayList">The device's DeviceState response.</param>
+            <param name="TL">Debug TraceLogger instance. The type of this parameter is Object - see remarks.</param>
+            <remarks>This class supports .NET Framework 3.5, 4.x and .NET Standard 2.0. In order to avoid use of dynamic and inclusion of projects or packages that define the TraceLogger
+            component, the TL parameter is typed as an object and a reflection method is used to call the LogMessage member.</remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CoverCalibratorState.Brightness">
+            <summary>
+            The device's Brightness
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CoverCalibratorState.CalibratorState">
+            <summary>
+            The device's CalibratorState
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CoverCalibratorState.CoverState">
+            <summary>
+            The device's CoverState
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CoverCalibratorState.CalibratorChanging">
+            <summary>
+            The device's CalibratorChanging state
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CoverCalibratorState.CoverMoving">
+            <summary>
+            The device's CoverMoving state
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.CoverCalibratorState.TimeStamp">
+            <summary>
+            The time at which the state was recorded
+            </summary>
+        </member>
+        <member name="T:ASCOM.DriverAccess.DomeState">
+            <summary>
+            Class that presents the device's operation state as a set of nullable properties
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.DomeState.#ctor">
+            <summary>
+            Create a new DomeState instance
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.DomeState.#ctor(ASCOM.DeviceInterface.IStateValueCollection,System.Object)">
+            <summary>
+            Create a new DomeState instance from the device's DeviceState response.
+            </summary>
+            <param name="deviceStateArrayList">The device's DeviceState response.</param>
+            <param name="TL">Debug TraceLogger instance. The type of this parameter is Object - see remarks.</param>
+            <remarks>This class supports .NET Framework 3.5, 4.x and .NET Standard 2.0. In order to avoid use of dynamic and inclusion of projects or packages that define the TraceLogger
+            component, the TL parameter is typed as an object and a reflection method is used to call the LogMessage member.</remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.DomeState.Altitude">
+            <summary>
+            Dome altitude
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.DomeState.AtHome">
+            <summary>
+            Dome is at home
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.DomeState.AtPark">
+            <summary>
+            Dome is parked
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.DomeState.Azimuth">
+            <summary>
+            Dome azimuth
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.DomeState.ShutterStatus">
+            <summary>
+            Dome shutter state
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.DomeState.Slewing">
+            <summary>
+            Dome is slewing
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.DomeState.TimeStamp">
+            <summary>
+            The time at which the state was recorded
+            </summary>
+        </member>
+        <member name="T:ASCOM.DriverAccess.FilterWheelState">
+            <summary>
+            Class that presents the device's operation state as a set of nullable properties
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.FilterWheelState.#ctor">
+            <summary>
+            Create a new FilterWheelState instance
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.FilterWheelState.#ctor(ASCOM.DeviceInterface.IStateValueCollection,System.Object)">
+            <summary>
+            Create a new FilterWheelState instance from the device's DeviceState response.
+            </summary>
+            <param name="deviceStateArrayList">The device's DeviceState response.</param>
+            <param name="TL">Debug TraceLogger instance. The type of this parameter is Object - see remarks.</param>
+            <remarks>This class supports .NET Framework 3.5, 4.x and .NET Standard 2.0. In order to avoid use of dynamic and inclusion of projects or packages that define the TraceLogger
+            component, the TL parameter is typed as an object and a reflection method is used to call the LogMessage member.</remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.FilterWheelState.Position">
+            <summary>
+            FilterWheel position
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.FilterWheelState.TimeStamp">
+            <summary>
+            The time at which the state was recorded
+            </summary>
+        </member>
+        <member name="T:ASCOM.DriverAccess.FocuserState">
+            <summary>
+            Class that presents the device's operation state as a set of nullable properties
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.FocuserState.#ctor">
+            <summary>
+            Create a new FocuserState instance
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.FocuserState.#ctor(ASCOM.DeviceInterface.IStateValueCollection,System.Object)">
+            <summary>
+            Create a new FocuserState instance from the device's DeviceState response.
+            </summary>
+            <param name="deviceStateArrayList">The device's DeviceState response.</param>
+            <param name="TL">Debug TraceLogger instance. The type of this parameter is Object - see remarks.</param>
+            <remarks>This class supports .NET Framework 3.5, 4.x and .NET Standard 2.0. In order to avoid use of dynamic and inclusion of projects or packages that define the TraceLogger
+            component, the TL parameter is typed as an object and a reflection method is used to call the LogMessage member.</remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.FocuserState.IsMoving">
+            <summary>
+            Focuser IsMoving state
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.FocuserState.Position">
+            <summary>
+            Focuser position
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.FocuserState.Temperature">
+            <summary>
+            Focuser temperature
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.FocuserState.TimeStamp">
+            <summary>
+            The time at which the state was recorded
+            </summary>
+        </member>
+        <member name="T:ASCOM.DriverAccess.ObservingConditionsState">
+            <summary>
+            Class that presents the device's operation state as a set of nullable properties
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.ObservingConditionsState.#ctor">
+            <summary>
+            Create a new ObservingConditionsState instance
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.ObservingConditionsState.#ctor(ASCOM.DeviceInterface.IStateValueCollection,System.Object)">
+            <summary>
+            Create a new ObservingConditionsState instance from the device's DeviceState response.
+            </summary>
+            <param name="deviceStateArrayList">The device's DeviceState response.</param>
+            <param name="TL">Debug TraceLogger instance. The type of this parameter is Object - see remarks.</param>
+            <remarks>This class supports .NET Framework 3.5, 4.x and .NET Standard 2.0. In order to avoid use of dynamic and inclusion of projects or packages that define the TraceLogger
+            component, the TL parameter is typed as an object and a reflection method is used to call the LogMessage member.</remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditionsState.CloudCover">
+            <summary>
+            Telescope altitude
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditionsState.DewPoint">
+            <summary>
+            Telescope is at home
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditionsState.Humidity">
+            <summary>
+            Telescope is parked
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditionsState.Pressure">
+            <summary>
+            Telescope azimuth
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditionsState.RainRate">
+            <summary>
+            Telescope declination
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditionsState.SkyBrightness">
+            <summary>
+            Telescope is pulse guiding
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditionsState.SkyQuality">
+            <summary>
+            Telescope right ascension
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditionsState.SkyTemperature">
+            <summary>
+            Telescope pointing state
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditionsState.StarFWHM">
+            <summary>
+            Telescope sidereal time
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditionsState.Temperature">
+            <summary>
+            Telescope is slewing
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditionsState.WindDirection">
+            <summary>
+            Telescope  is tracking
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditionsState.WindGust">
+            <summary>
+            Telescope UTC date and time
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditionsState.WindSpeed">
+            <summary>
+            Telescope UTC date and time
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditionsState.TimeStamp">
+            <summary>
+            The time at which the state was recorded
+            </summary>
+        </member>
+        <member name="T:ASCOM.DriverAccess.RotatorState">
+            <summary>
+            Class that presents the device's operation state as a set of nullable properties
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.RotatorState.#ctor">
+            <summary>
+            Create a new RotatorState instance
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.RotatorState.#ctor(ASCOM.DeviceInterface.IStateValueCollection,System.Object)">
+            <summary>
+            Create a new RotatorState instance from the device's DeviceState response.
+            </summary>
+            <param name="deviceStateArrayList">The device's DeviceState response.</param>
+            <param name="TL">Debug TraceLogger instance. The type of this parameter is Object - see remarks.</param>
+            <remarks>This class supports .NET Framework 3.5, 4.x and .NET Standard 2.0. In order to avoid use of dynamic and inclusion of projects or packages that define the TraceLogger
+            component, the TL parameter is typed as an object and a reflection method is used to call the LogMessage member.</remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.RotatorState.IsMoving">
+            <summary>
+            Rotator is moving state
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.RotatorState.Position">
+            <summary>
+            Rotator position
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.RotatorState.MechanicalPosition">
+            <summary>
+            Rotator mechanical position
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.RotatorState.TimeStamp">
+            <summary>
+            The time at which the state was recorded
+            </summary>
+        </member>
+        <member name="T:ASCOM.DriverAccess.SafetyMonitorState">
+            <summary>
+            Class that presents the device's operation state as a set of nullable properties
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.SafetyMonitorState.#ctor">
+            <summary>
+            Create a new FocuserState instance
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.SafetyMonitorState.#ctor(ASCOM.DeviceInterface.IStateValueCollection,System.Object)">
+            <summary>
+            Create a new FocuserState instance from the device's DeviceState response.
+            </summary>
+            <param name="deviceStateArrayList">The device's DeviceState response.</param>
+            <param name="TL">Debug TraceLogger instance. The type of this parameter is Object - see remarks.</param>
+            <remarks>This class supports .NET Framework 3.5, 4.x and .NET Standard 2.0. In order to avoid use of dynamic and inclusion of projects or packages that define the TraceLogger
+            component, the TL parameter is typed as an object and a reflection method is used to call the LogMessage member.</remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.SafetyMonitorState.IsSafe">
+            <summary>
+            Focuser IsMoving state
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.SafetyMonitorState.TimeStamp">
+            <summary>
+            The time at which the state was recorded
+            </summary>
+        </member>
+        <member name="T:ASCOM.DriverAccess.TelescopeState">
+            <summary>
+            Class that presents the device's operation state as a set of nullable properties
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.TelescopeState.#ctor">
+            <summary>
+            Create a new TelescopeState instance
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.TelescopeState.#ctor(ASCOM.DeviceInterface.IStateValueCollection,System.Object)">
+            <summary>
+            Create a new TelescopeState instance from the device's DeviceState response.
+            </summary>
+            <param name="deviceStateArrayList">The device's DeviceState response.</param>
+            <param name="TL">Debug TraceLogger instance. The type of this parameter is Object - see remarks.</param>
+            <remarks>This class supports .NET Framework 3.5, 4.x and .NET Standard 2.0. In order to avoid use of dynamic and inclusion of projects or packages that define the TraceLogger
+            component, the TL parameter is typed as an object and a reflection method is used to call the LogMessage member.</remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.TelescopeState.Altitude">
+            <summary>
+            Telescope altitude
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.TelescopeState.AtHome">
+            <summary>
+            Telescope is at home
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.TelescopeState.AtPark">
+            <summary>
+            Telescope is parked
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.TelescopeState.Azimuth">
+            <summary>
+            Telescope azimuth
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.TelescopeState.Declination">
+            <summary>
+            Telescope declination
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.TelescopeState.IsPulseGuiding">
+            <summary>
+            Telescope is pulse guiding
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.TelescopeState.RightAscension">
+            <summary>
+            Telescope right ascension
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.TelescopeState.SideOfPier">
+            <summary>
+            Telescope pointing state
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.TelescopeState.SiderealTime">
+            <summary>
+            Telescope sidereal time
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.TelescopeState.Slewing">
+            <summary>
+            Telescope is slewing
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.TelescopeState.Tracking">
+            <summary>
+            Telescope  is tracking
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.TelescopeState.UTCDate">
+            <summary>
+            Telescope UTC date and time
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.TelescopeState.TimeStamp">
+            <summary>
+            The time at which the state was recorded
+            </summary>
+        </member>
+        <member name="T:ASCOM.DriverAccess.VideoState">
+            <summary>
+            Class that presents the device's operation state as a set of nullable properties
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.VideoState.#ctor">
+            <summary>
+            Create a new VideoState instance
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.VideoState.#ctor(ASCOM.DeviceInterface.IStateValueCollection,System.Object)">
+            <summary>
+            Create a new VideoState instance from the device's DeviceState response.
+            </summary>
+            <param name="deviceStateArrayList">The device's DeviceState response.</param>
+            <param name="TL">Debug TraceLogger instance. The type of this parameter is Object - see remarks.</param>
+            <remarks>This class supports .NET Framework 3.5, 4.x and .NET Standard 2.0. In order to avoid use of dynamic and inclusion of projects or packages that define the TraceLogger
+            component, the TL parameter is typed as an object and a reflection method is used to call the LogMessage member.</remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.VideoState.CameraState">
+            <summary>
+            Focuser IsMoving state
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.VideoState.TimeStamp">
+            <summary>
+            The time at which the state was recorded
+            </summary>
+        </member>
+        <member name="T:ASCOM.DriverAccess.Dome">
+            <summary>
+            Provides universal access to ASCOM Dome drivers
+            </summary>
+            <remarks>
+            <para>
+            This interface can be used to control most types of observatory structure, including domes (with or without a controllable shutter), clamshells and roll off roofs.
+            </para>
+            <para><b>Dome Coordinates</b></para>
+            <para>
+            The azimuth and shutter altitude coordinates within this interface refer to positioning of the dome itself and are not sky coordinates from the perspective of the observing device. 
+            Mount geometry and pier location often mean that the observing device is not located at the centre point of a hemispherical dome and this results in the dome needing to be positioned at different coordinates
+            than those of the mount in order to expose the required part of the sky to the observing device.
+            </para>
+            <para>
+            Calculating the required dome position is not the responsibility of the dome driver, this must be done by the client application or by an intermediary hub such as the Device Hub. The coordinates sent 
+            to the dome driver must be those required to position the dome slit in the correct position after allowing for the geometry of the mount.
+            </para>
+            <para><b>Dome Slaving</b></para>
+            <para>
+            A dome is said to be slaved when its azimuth and shutter altitude are controlled by a "behind the scenes" controller that knows the required telescope observing coordinates and that can calculate the 
+            required dome position after allowing for mount geometry, observing device orientation etc. When slaved and in operational use most of the dome interface methods are of little relevance 
+            apart from the shutter control methods.
+            </para>
+            <para><b>How to use the Dome interface to implement a Roll-off Roof or Clamshell</b></para>
+            <para>
+            A roll off roof or clamshell is implemented using the shutter control as the roof. The properties and methods should be implemented as follows:
+            </para>
+            <list type="bullet">
+            <item>
+            <see cref="M:ASCOM.DriverAccess.Dome.OpenShutter" /> and <see cref="M:ASCOM.DriverAccess.Dome.CloseShutter" /> open and close the roof
+            </item>
+            <item>
+            <see cref="P:ASCOM.DriverAccess.Dome.CanFindHome" />, <see cref="P:ASCOM.DriverAccess.Dome.CanPark" />, <see cref="P:ASCOM.DriverAccess.Dome.CanSetAltitude" />,
+            <see cref="P:ASCOM.DriverAccess.Dome.CanSetAzimuth" />, <see cref="P:ASCOM.DriverAccess.Dome.CanSetPark" />, <see cref="P:ASCOM.DriverAccess.Dome.CanSlave" /> and
+            <see cref="P:ASCOM.DriverAccess.Dome.CanSyncAzimuth" /> all return <see langword="false" />.
+            </item>
+            <item><see cref="P:ASCOM.DriverAccess.Dome.CanSetShutter" /> returns <see langword="true" />.</item>
+            <item><see cref="P:ASCOM.DriverAccess.Dome.ShutterStatus" /> should be implemented.</item>
+            <item>
+            <see cref="M:ASCOM.DriverAccess.Dome.AbortSlew" /> should stop the roof or shutter.
+            </item>
+            <item>
+            <see cref="M:ASCOM.DriverAccess.Dome.FindHome" />, <see cref="M:ASCOM.DriverAccess.Dome.Park" />, <see cref="M:ASCOM.DriverAccess.Dome.SetPark" />,
+            <see cref="M:ASCOM.DriverAccess.Dome.SlewToAltitude(System.Double)" />, <see cref="M:ASCOM.DriverAccess.Dome.SlewToAzimuth(System.Double)" /> and
+            <see cref="M:ASCOM.DriverAccess.Dome.SyncToAzimuth(System.Double)" /> all throw <see cref="T:ASCOM.MethodNotImplementedException" />
+            </item>
+            <item>
+            <see cref="P:ASCOM.DriverAccess.Dome.Altitude" /> and <see cref="P:ASCOM.DriverAccess.Dome.Azimuth" /> throw  <see cref="T:ASCOM.PropertyNotImplementedException" />
+            </item>
+            </list>
+            </remarks>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Dome.#ctor(System.String)">
+            <summary>
+            Constructor for Dome class. Creates a Dome based on the ProgID in the DomeID string.
+            </summary>
+            <param name="domeId">The progID of the dome to be instantiated</param>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Dome.Choose(System.String)">
+            <summary>
+            Shows the ASCOM Chooser to select a Dome.
+            </summary>
+            <param name="domeId">Prog ID of the default dome to select. Null if no default is to be set.</param>
+            <returns>The Prog ID of the Dome chosen, or Null if no dome is chose, or the dialog is canceled.</returns>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Dome.DomeState">
+            <summary>
+            Dome device state
+            </summary>
+            <remarks>
+            <para>See <conceptualLink target="320982e4-105d-46d8-b5f9-efce3f4dafd4"/> for further information on using the class returned by this property.</para>
+            </remarks>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Dome.AbortSlew">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Dome.Altitude">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Dome.AtHome">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Dome.AtPark">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Dome.Azimuth">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Dome.CanFindHome">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Dome.CanPark">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Dome.CanSetAltitude">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Dome.CanSetAzimuth">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Dome.CanSetPark">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Dome.CanSetShutter">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Dome.CanSlave">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Dome.CanSyncAzimuth">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Dome.CloseShutter">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Dome.FindHome">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Dome.OpenShutter">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Dome.Park">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Dome.SetPark">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Dome.ShutterStatus">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Dome.Slaved">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Dome.Slewing">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Dome.SlewToAltitude(System.Double)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Dome.SlewToAzimuth(System.Double)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Dome.SyncToAzimuth(System.Double)">
+            <inheritdoc/>
+        </member>
+        <member name="T:ASCOM.DriverAccess.FilterWheel">
+            <summary>
+            Provides universal access to FilterWheel drivers
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.FilterWheel.#ctor(System.String)">
+            <summary>
+            Creates a FilterWheel object with the given Prog ID
+            </summary>
+            <param name="filterWheelId">ProgID of the filterwheel device to be accessed.</param>
+        </member>
+        <member name="M:ASCOM.DriverAccess.FilterWheel.Choose(System.String)">
+            <summary>
+            Brings up the ASCOM Chooser Dialogue to choose a FilterWheel
+            </summary>
+            <param name="filterWheelId">FilterWheel Prog ID for default or null for None</param>
+            <returns>Prog ID for chosen FilterWheel or null for none</returns>
+        </member>
+        <member name="P:ASCOM.DriverAccess.FilterWheel.FilterWheelState">
+            <summary>
+            FilterWheel device state
+            </summary>
+            <remarks>
+            <para>See <conceptualLink target="320982e4-105d-46d8-b5f9-efce3f4dafd4"/> for further information on using the class returned by this property.</para>
+            </remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.FilterWheel.FocusOffsets">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.FilterWheel.Names">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.FilterWheel.Position">
+            <inheritdoc/>
+        </member>
+        <member name="T:ASCOM.DriverAccess.Focuser">
+            <summary>
+            Provides universal access to Focuser drivers
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Focuser.#ctor(System.String)">
+            <summary>
+            Creates a focuser object with the given Prog ID
+            </summary>
+            <param name="focuserId">ProgID of the focuser device to be accessed.</param>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Focuser.Choose(System.String)">
+            <summary>
+            Brings up the ASCOM Chooser Dialogue to choose a Focuser
+            </summary>
+            <param name="focuserId">Focuser Prog ID for default or null for None</param>
+            <returns>Prog ID for chosen focuser or null for none</returns>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Focuser.FocuserState">
+            <summary>
+            Focuser device state
+            </summary>
+            <remarks>
+            <para>See <conceptualLink target="320982e4-105d-46d8-b5f9-efce3f4dafd4"/> for further information on using the class returned by this property.</para>
+            </remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Focuser.Absolute">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Focuser.Halt">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Focuser.IsMoving">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Focuser.Link">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Focuser.MaxIncrement">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Focuser.MaxStep">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Focuser.Move(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Focuser.Position">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Focuser.StepSize">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Focuser.TempComp">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Focuser.TempCompAvailable">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Focuser.Temperature">
+            <inheritdoc/>
+        </member>
+        <member name="T:ASCOM.DriverAccess.MemberFactory">
+            <summary>
+            A factory class to access any registered driver members
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.MemberFactory.#ctor(System.String,ASCOM.Utilities.TraceLogger)">
+            <summary>
+            Constructor, creates an instance of the of the ASCOM driver using the given TraceLogger
+            
+            </summary> 
+            <param name="progId">The program ID of the driver</param>
+            <param name="ascomDriverTraceLogger">The supplied TraceLogger instance in which to log activity</param>
+        </member>
+        <member name="P:ASCOM.DriverAccess.MemberFactory.GetLateBoundObject">
+            <summary>
+            Returns the instance of the driver
+            </summary> 
+            <returns>object</returns>
+        </member>
+        <member name="P:ASCOM.DriverAccess.MemberFactory.IsComObject">
+            <summary>
+            Returns true is the driver is COM based
+            </summary> 
+            <returns>object</returns>
+        </member>
+        <member name="P:ASCOM.DriverAccess.MemberFactory.GetObjType">
+            <summary>
+            Returns the driver type
+            </summary> 
+            <returns>type</returns>
+        </member>
+        <member name="P:ASCOM.DriverAccess.MemberFactory.GetInterfaces">
+            <summary>
+            Returns a list of supported interfaces
+            </summary> 
+            <returns>type</returns>
+        </member>
+        <member name="M:ASCOM.DriverAccess.MemberFactory.Dispose">
+            <summary>
+            Dispose the late-bound interface, if needed. Will release it via COM
+            if it is a COM object, else if native .NET will just dereference it
+            for GC.
+            </summary>
+            <returns>nothing</returns>
+        </member>
+        <member name="M:ASCOM.DriverAccess.MemberFactory.CallMember(System.Int32,System.String,System.Type[],System.Object[])">
+            <summary>
+            Calls a method on an object dynamically. 
+            
+            parameterTypes must match the parameters and in the same order.
+            </summary> 
+            <param name="memberCode">1-GetProperty, 2-SetProperty, 3-Method</param>
+            <param name="memberName">The member name to call as a string</param>
+            <param name="parameterTypes">Array of parameter types in order</param> 
+            <param name="parms">Array of parameters in order</param>
+            <exception cref="T:ASCOM.PropertyNotImplementedException"></exception>
+            <exception cref="T:ASCOM.MethodNotImplementedException"></exception>
+            <returns>object</returns>
+        </member>
+        <member name="M:ASCOM.DriverAccess.MemberFactory.CheckDotNetExceptions(System.String,System.Exception)">
+            <summary>
+            Checks for ASCOM exceptions returned as inner exceptions of TargetInvocationException. When new ASCOM exceptions are created 
+            they must be added to this method. They will then be used in all three cases of Property Get, Property Set and Method call. 
+            </summary>
+            <param name="memberName">The name of the invoked member</param>
+            <param name="e">The thrown TargetInvocationException including the inner exception</param>
+        </member>
+        <member name="T:ASCOM.DriverAccess.ObservingConditions">
+            <summary>
+            Provides universal access to ObservingConditions drivers.
+            Defines the IObservingConditions Interface. This interface provides a limited set of values that are useful
+            for astronomical purposes for things such as determining if it is safe to open or operate the observing system,
+            for recording astronomical data or determining refraction corrections.
+            </summary>
+            <remarks>It is NOT intended as a general purpose environmental sensor system.
+            The <see cref="M:ASCOM.DeviceInterface.IObservingConditionsV2.Action(System.String,System.String)">Action</see> method and 
+            <see cref="P:ASCOM.DeviceInterface.IObservingConditionsV2.SupportedActions">SupportedActions</see> property 
+            can be used to add driver-specific sensors.
+            </remarks>
+        </member>
+        <member name="M:ASCOM.DriverAccess.ObservingConditions.#ctor(System.String)">
+            <summary>
+            Creates an ObservingConditions object with the given Prog ID
+            </summary>
+            <param name="observingConditionsId">ProgID of the device to be accessed.</param>
+        </member>
+        <member name="M:ASCOM.DriverAccess.ObservingConditions.Choose(System.String)">
+            <summary>
+            Brings up the ASCOM Chooser Dialogue to choose an ObservingConditions driver.
+            </summary>
+            <param name="observingConditionsId">ObservingConditions Prog ID for default or null for None</param>
+            <returns>Prog ID for chosen ObservingConditions or null for none</returns>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditions.ObservingConditionsState">
+            <summary>
+            ObservingConditions device state
+            </summary>
+            <remarks>
+            <para>See <conceptualLink target="320982e4-105d-46d8-b5f9-efce3f4dafd4"/> for further information on using the class returned by this property.</para>
+            </remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditions.AveragePeriod">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditions.CloudCover">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditions.DewPoint">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditions.Humidity">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditions.Pressure">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditions.RainRate">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditions.SkyBrightness">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditions.SkyQuality">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditions.StarFWHM">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditions.SkyTemperature">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditions.Temperature">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditions.WindDirection">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditions.WindGust">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.ObservingConditions.WindSpeed">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.ObservingConditions.TimeSinceLastUpdate(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.ObservingConditions.SensorDescription(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.ObservingConditions.Refresh">
+            <inheritdoc/>
+        </member>
+        <member name="T:ASCOM.DriverAccess.Rotator">
+            <summary>
+            Provides universal access to Rotator drivers
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Rotator.#ctor(System.String)">
+            <summary>
+            Creates a rotator object with the given ProgID
+            </summary>
+            <param name="rotatorId">ProgID of the rotator to be accessed.</param>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Rotator.Choose(System.String)">
+            <summary>
+            Brings up the ASCOM Chooser Dialogue to choose a Rotator
+            </summary>
+            <param name="rotatorId">Rotator ProgID for default or null for None</param>
+            <returns>ProgID for chosen Rotator or null for none</returns>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Rotator.RotatorState">
+            <summary>
+            Rotator device state
+            </summary>
+            <remarks>
+            <para>See <conceptualLink target="320982e4-105d-46d8-b5f9-efce3f4dafd4"/> for further information on using the class returned by this property.</para>
+            </remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Rotator.CanReverse">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Rotator.Halt">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Rotator.IsMoving">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Rotator.Move(System.Single)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Rotator.MoveAbsolute(System.Single)">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Rotator.Position">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Rotator.Reverse">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Rotator.StepSize">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Rotator.TargetPosition">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Rotator.MechanicalPosition">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Rotator.Sync(System.Single)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Rotator.MoveMechanical(System.Single)">
+            <inheritdoc/>
+        </member>
+        <member name="T:ASCOM.DriverAccess.SafetyMonitor">
+            <summary>
+            Provides universal access to SafetyMonitor drivers
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.SafetyMonitor.#ctor(System.String)">
+            <summary>
+            Creates a SafetyMonitor object with the given Prog ID
+            </summary>
+            <param name="safetyMonitorId">ProgID of the device to be accessed.</param>
+        </member>
+        <member name="M:ASCOM.DriverAccess.SafetyMonitor.Choose(System.String)">
+            <summary>
+            Brings up the ASCOM Chooser Dialogue to choose a SafetyMonitor
+            </summary>
+            <param name="safetyMonitorId">SafetyMonitor Prog ID for default or null for None</param>
+            <returns>Prog ID for chosen SafetyMonitor or null for none</returns>
+        </member>
+        <member name="P:ASCOM.DriverAccess.SafetyMonitor.SafetyMonitorState">
+            <summary>
+            SafetyMonitor device state
+            </summary>
+            <remarks>
+            <para>See <conceptualLink target="320982e4-105d-46d8-b5f9-efce3f4dafd4"/> for further information on using the class returned by this property.</para>
+            </remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.SafetyMonitor.IsSafe">
+            <inheritdoc/>
+        </member>
+        <member name="T:ASCOM.DriverAccess.Switch">
+            <summary>
+            Defines the ISwitchV2 Interface
+            </summary>
+            <remarks>
+            <para>The Switch interface is used to define a number of 'switch devices'. A switch device can be used to control something, such as a power switch
+            or may be used to sense the state of something, such as a limit switch.</para>
+            <para>This SwitchV2 interface is an extension of the original Switch interface.  The changes allow devices to have more than two states and
+            to distinguish between devices that are writeable and those that are read only.</para>
+            <para><b>Compatibility between Switch and SwitchV2 interfaces:</b></para>
+            <list type="bullet"><item>Switch devices that implemented the original Switch interface and
+            client applications that use the original interface will still work together.</item>
+            <item>Client applications that implement the original
+            Switch interface should still work with drivers that implement the new interface.</item>
+            <item>Client applications that use the new features in this interface
+            will not work with drivers that do not implement the new interface.</item>
+            </list>
+            <para>Each device has a CanWrite method, this is true if it can be written to or false if the device can only be read.</para>
+            <para>The new MinSwitchValue, MaxSwitchValue and SwitchStep methods are used to define the range and values that a device can handle.
+            This also defines the number of different values - states - that a device can have, from two for a traditional on-off switch, through
+            those with a small number of states to those which have many states.</para>
+            <para>The SetSwitchValue and GetSwitchValue methods are used to set and get the value of a device as a double.</para>
+            <para>There is no fundamental difference between devices with different numbers of states.</para>
+            <para><b>Naming Conventions</b></para>
+            <para>Each device handled by a Switch is known as a device or switch device for general cases,
+            a controller device if it can alter the state of the device and a sensor device if it can only be read.</para>
+            <para>For convenience devices are referred to as Boolean if the device can only have two states, and multi-state if it can have more than two values.
+            <b>These are treated the same in the interface definition</b>.</para>
+            </remarks>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Switch.#ctor(System.String)">
+            <summary>
+            Creates a Switch object with the given Prog ID
+            </summary>
+            <param name="switchId">ProgID of the Switch device to be accessed.</param>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Switch.Choose(System.String)">
+            <summary>
+            Brings up the ASCOM Chooser Dialogue to choose a Switch
+            </summary>
+            <param name="switchId">FilterWheel Prog ID for default or null for None</param>
+            <returns>Prog ID for chosen Switch or null for none</returns>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Switch.MaxSwitch">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Switch.GetSwitchName(System.Int16)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Switch.SetSwitchName(System.Int16,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Switch.GetSwitchDescription(System.Int16)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Switch.CanWrite(System.Int16)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Switch.GetSwitch(System.Int16)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Switch.SetSwitch(System.Int16,System.Boolean)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Switch.MaxSwitchValue(System.Int16)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Switch.MinSwitchValue(System.Int16)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Switch.SwitchStep(System.Int16)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Switch.GetSwitchValue(System.Int16)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Switch.SetSwitchValue(System.Int16,System.Double)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Switch.SetAsync(System.Int16,System.Boolean)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Switch.SetAsyncValue(System.Int16,System.Double)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Switch.CanAsync(System.Int16)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Switch.StateChangeComplete(System.Int16)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Switch.CancelAsync(System.Int16)">
+            <inheritdoc/>
+        </member>
+        <member name="T:ASCOM.DriverAccess.Telescope">
+            <summary>
+            Implements a telescope class to access any registered ASCOM telescope
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.#ctor(System.String)">
+            <summary>
+            Creates an instance of the telescope class.
+            </summary>
+            <param name="telescopeId">The ProgID for the telescope</param>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.Choose(System.String)">
+            <summary>
+            The Choose() method returns the DriverID of the selected driver.
+            Choose() allows you to optionally pass the DriverID of a "current" driver (you probably save this in the registry),
+            and the corresponding telescope type is pre-selected in the Chooser's list.
+            In this case, the OK button starts out enabled (lit-up); the assumption is that the pre-selected driver has already been configured. 
+            </summary>
+            <param name="telescopeId">Optional DriverID of the previously selected telescope that is to be the pre-selected telescope in the list. </param>
+            <returns>The DriverID of the user selected telescope. Null if the dialogue is cancelled.</returns>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.TelescopeState">
+            <summary>
+            State response from the device
+            </summary>
+            <remarks>
+            <para>See <conceptualLink target="320982e4-105d-46d8-b5f9-efce3f4dafd4"/> for further information on using the class returned by this property.</para>
+            </remarks>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.AbortSlew">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.AlignmentMode">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.Altitude">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.ApertureArea">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.ApertureDiameter">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.AtHome">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.AtPark">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.AxisRates(ASCOM.DeviceInterface.TelescopeAxes)">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.Azimuth">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.CanFindHome">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.CanMoveAxis(ASCOM.DeviceInterface.TelescopeAxes)">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.CanPark">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.CanPulseGuide">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.CanSetDeclinationRate">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.CanSetGuideRates">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.CanSetPark">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.CanSetPierSide">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.CanSetRightAscensionRate">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.CanSetTracking">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.CanSlew">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.CanSlewAltAz">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.CanSlewAltAzAsync">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.CanSlewAsync">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.CanSync">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.CanSyncAltAz">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.CanUnpark">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.Declination">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.DeclinationRate">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.DestinationSideOfPier(System.Double,System.Double)">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.DoesRefraction">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.EquatorialSystem">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.FindHome">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.FocalLength">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.GuideRateDeclination">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.GuideRateRightAscension">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.IsPulseGuiding">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.MoveAxis(ASCOM.DeviceInterface.TelescopeAxes,System.Double)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.Park">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.PulseGuide(ASCOM.DeviceInterface.GuideDirections,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.RightAscension">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.RightAscensionRate">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.SetPark">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.SideOfPier">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.SiderealTime">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.SiteElevation">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.SiteLatitude">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.SiteLongitude">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.SlewSettleTime">
+            <summary>
+            Specifies a post-slew settling time (sec.).
+            </summary>
+            <exception cref="T:ASCOM.PropertyNotImplementedException">If the property is not implemented.</exception>
+            <exception cref="T:ASCOM.InvalidValueException">If an invalid settle time is set.</exception>
+            <exception cref="T:ASCOM.NotConnectedException">If the device is not connected</exception>
+            <exception cref="T:ASCOM.DriverException">An error occurred that is not described by one of the more specific ASCOM exceptions. The device did not successfully complete the request.</exception>
+            <remarks>
+            Adds additional time to slew operations. Slewing methods will not return, 
+            and the <see cref="P:ASCOM.DriverAccess.Telescope.Slewing" /> property will not become False, until the slew completes and the SlewSettleTime has elapsed.
+            This feature (if supported) may be used with mounts that require extra settling time after a slew. 
+            </remarks>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.SlewToAltAz(System.Double,System.Double)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.SlewToAltAzAsync(System.Double,System.Double)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.SlewToCoordinates(System.Double,System.Double)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.SlewToCoordinatesAsync(System.Double,System.Double)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.SlewToTarget">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.SlewToTargetAsync">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.Slewing">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.SyncToAltAz(System.Double,System.Double)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.SyncToCoordinates(System.Double,System.Double)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.SyncToTarget">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.TargetDeclination">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.TargetRightAscension">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.Tracking">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.TrackingRate">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.TrackingRates">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Telescope.UTCDate">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Telescope.Unpark">
+            <inheritdoc/>
+        </member>
+        <member name="T:ASCOM.DriverAccess._Rate">
+            <summary>
+            Describes a range of rates supported by the MoveAxis() method (degrees/per second)
+            These are contained within the AxisRates collection. They serve to describe one or more supported ranges of rates of motion about a mechanical axis. 
+            It is possible that the Rate.Maximum and Rate.Minimum properties will be equal. In this case, the Rate object expresses a single discrete rate. 
+            Both the Rate.Maximum and Rate.Minimum properties are always expressed in units of degrees per second. 
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess._Rate.Maximum">
+            <summary>
+            The maximum rate (degrees per second)
+            This must always be a positive number. It indicates the maximum rate in either direction about the axis. 
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess._Rate.Minimum">
+            <summary>
+            The minimum rate (degrees per second)
+            This must always be a positive number. It indicates the maximum rate in either direction about the axis. 
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess._Rate.Dispose">
+            <summary>
+            Dispose the late-bound interface, if needed. Will release it via COM
+            if it is a COM object, else if native .NET will just dereference it
+            for GC.
+            </summary>
+        </member>
+        <member name="T:ASCOM.DriverAccess.TrackingRates">
+            <summary>
+             Late bound TrackingRates implementation
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.TrackingRates.#ctor(System.Type,System.Object,ASCOM.Utilities.TraceLogger)">
+            <summary>
+            TrackingRates constructor
+            </summary>
+            <param name="objTypeScope">The type of the supplied object</param>
+            <param name="objScopeLateBound">The object representing the telescope device</param>
+            <param name="TraceLog">A pointer to a trace logger in which to record trace information</param>
+        </member>
+        <member name="P:ASCOM.DriverAccess.TrackingRates.Item(System.Int32)">
+            <summary>
+            Return a drive rate given its index
+            </summary>
+            <param name="index">Index position of the item</param>
+            <returns>Integer DriveRate enum value</returns>
+        </member>
+        <member name="M:ASCOM.DriverAccess.TrackingRates.GetEnumerator">
+            <summary>
+            Returns an enumerator for the driverates object
+            </summary>
+            <returns>IEnumerator object</returns>
+        </member>
+        <member name="P:ASCOM.DriverAccess.TrackingRates.Count">
+            <summary>
+            Returns the number of driverates supported by the telescope 
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.TrackingRates.Dispose">
+            <summary>
+            Disposes of this object
+            </summary>
+        </member>
+        <member name="T:ASCOM.DriverAccess.AxisRates">
+            <summary>
+            A collection of rates at which the telescope may be moved about the specified axis by the <see cref="M:ASCOM.DeviceInterface.ITelescopeV4.MoveAxis(ASCOM.DeviceInterface.TelescopeAxes,System.Double)" /> method.
+            This is only used if the telescope interface version is 2 or 3
+            </summary>
+            <remarks><para>See the description of the <see cref="M:ASCOM.DeviceInterface.ITelescopeV4.MoveAxis(ASCOM.DeviceInterface.TelescopeAxes,System.Double)" /> method for more information.</para>
+            <para>This method must return an empty collection if <see cref="M:ASCOM.DeviceInterface.ITelescopeV4.MoveAxis(ASCOM.DeviceInterface.TelescopeAxes,System.Double)" /> is not supported.</para>
+            <para>The values used in <see cref="T:ASCOM.DeviceInterface.IRate" /> members must be non-negative; forward and backward motion is achieved by the application
+            applying an appropriate sign to the returned <see cref="T:ASCOM.DeviceInterface.IRate" /> values in the <see cref="M:ASCOM.DeviceInterface.ITelescopeV4.MoveAxis(ASCOM.DeviceInterface.TelescopeAxes,System.Double)" /> command.</para>
+            </remarks>
+        </member>
+        <member name="M:ASCOM.DriverAccess.AxisRates.#ctor">
+            <summary>
+            Creates an empty AxisRates object
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.AxisRates.Add(System.Double,System.Double)">
+            <summary>
+            Adds a new rate to the collection
+            </summary>
+            <param name="Minimum">The minimum value of this rate range</param>
+            <param name="Maximum">The maximum value of this rate range</param>
+        </member>
+        <member name="P:ASCOM.DriverAccess.AxisRates.Current">
+            <summary>
+            Returns the current value of the collection
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.AxisRates.MoveNext">
+            <summary>
+            Moves the pointer to the next element
+            </summary>
+            <returns>True if the Current will return a valid value</returns>
+        </member>
+        <member name="M:ASCOM.DriverAccess.AxisRates.Reset">
+            <summary>
+            Resets the enumerator to its initial position before the first element
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.AxisRates.Count">
+            <summary>
+            Returns the number of rate objects in the collection
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.AxisRates.Dispose">
+            <summary>
+            Disposes of any external resources acquired by the object
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.AxisRates.GetEnumerator">
+            <summary>
+            Returns an enumerator to provide access to the collection members
+            </summary>
+            <returns>IEnumerator object</returns>
+        </member>
+        <member name="P:ASCOM.DriverAccess.AxisRates.Item(System.Int32)">
+            <summary>
+            Return information about the rates at which the telescope may be moved about the specified axis by the <see cref="M:ASCOM.DriverAccess.Telescope.MoveAxis(ASCOM.DeviceInterface.TelescopeAxes,System.Double)" /> method.
+            </summary>
+            <param name="index">The axis about which rate information is desired</param>
+            <value>Collection of Rate objects describing the supported rates of motion that can be supplied to the <see cref="M:ASCOM.DriverAccess.Telescope.MoveAxis(ASCOM.DeviceInterface.TelescopeAxes,System.Double)" /> method for the specified axis.</value>
+            <returns>Collection of Rate objects </returns>
+            <remarks><para>The (symbolic) values for Index (<see cref="T:ASCOM.DeviceInterface.TelescopeAxes" />) are:</para>
+            <bl>
+            <li><see cref="F:ASCOM.DeviceInterface.TelescopeAxes.axisPrimary"/> 0 Primary axis (e.g., Hour Angle or Azimuth)</li>
+            <li><see cref="F:ASCOM.DeviceInterface.TelescopeAxes.axisSecondary"/> 1 Secondary axis (e.g., Declination or Altitude)</li>
+            <li><see cref="F:ASCOM.DeviceInterface.TelescopeAxes.axisTertiary"/> 2 Tertiary axis (e.g. imager rotator/de-rotator)</li> 
+            </bl>
+            </remarks>
+        </member>
+        <member name="T:ASCOM.DriverAccess.Rate">
+            <summary>
+            Describes a range of rates supported by the <see cref="M:ASCOM.DriverAccess.Telescope.MoveAxis(ASCOM.DeviceInterface.TelescopeAxes,System.Double)" /> method (degrees/per second)
+            These are contained within an <see cref="T:ASCOM.DriverAccess.AxisRates" /> collection and serve to describe one or more supported ranges of rates of motion about a mechanical axis. 
+            It is possible that the <see cref="P:ASCOM.DriverAccess.Rate.Maximum" /> and <see cref="P:ASCOM.DriverAccess.Rate.Minimum" /> properties will be equal. In this case, the <see cref="T:ASCOM.DriverAccess.Rate" /> object expresses a single discrete rate. 
+            Both the <see cref="P:ASCOM.DriverAccess.Rate.Minimum" />  and <see cref="P:ASCOM.DriverAccess.Rate.Maximum" />  properties are always expressed in units of degrees per second.
+            This is only using for Telescope InterfaceVersions 2 and later.
+            </summary>
+            <remarks>Values used must be non-negative and are scalar values. You do not need to supply complementary negative rates for each positive 
+            rate that you specify. Movement in both directions is achieved by the application applying an appropriate positive or negative sign to the 
+            rate when it is used in the <see cref="M:ASCOM.DriverAccess.Telescope.MoveAxis(ASCOM.DeviceInterface.TelescopeAxes,System.Double)" /> command.</remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Rate.Maximum">
+            <summary>
+            The maximum rate (degrees per second)
+            This must always be a positive number. It indicates the maximum rate in either direction about the axis. 
+            </summary>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Rate.Minimum">
+            <summary>
+            The minimum rate (degrees per second)
+            This must always be a positive number. It indicates the maximum rate in either direction about the axis. 
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Rate.Dispose">
+            <summary>
+            Disposes of any external resources acquired by the rate object
+            </summary>
+        </member>
+        <member name="T:ASCOM.DriverAccess.Video">
+            <summary>
+            Defines the IVideo Interface. - NOW DEPRECATED, ONLY RETAINED FOR BACKWARD COMPATIBILITY
+            </summary>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Video.#ctor(System.String)">
+            <summary>
+            Creates a Video object with the given Prog ID
+            </summary>
+            <param name="videoId">ProgID of the Video to be accessed.</param>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Video.Choose(System.String)">
+            <summary>
+            Brings up the ASCOM Chooser Dialogue to choose a Video device
+            </summary>
+            <param name="videoId">Video Prog ID for default or null for None</param>
+            <returns>Prog ID for chosen Video or null for none</returns>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.VideoState">
+            <summary>
+            VideoState device state
+            </summary>
+            <remarks>
+            <para>See <conceptualLink target="320982e4-105d-46d8-b5f9-efce3f4dafd4"/> for further information on using the class returned by this property.</para>
+            </remarks>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.VideoCaptureDeviceName">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.ExposureMax">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.ExposureMin">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.FrameRate">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.SupportedIntegrationRates">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.IntegrationRate">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.LastVideoFrame">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.SensorName">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.SensorType">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.Width">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.Height">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.PixelSizeX">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.PixelSizeY">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.BitDepth">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.VideoCodec">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.VideoFileFormat">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.VideoFramesBufferSize">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Video.StartRecordingVideoFile(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Video.StopRecordingVideoFile">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.CameraState">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.GainMax">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.GainMin">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.Gain">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.Gains">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.GammaMax">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.GammaMin">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.Gamma">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.Gammas">
+            <inheritdoc/>
+        </member>
+        <member name="P:ASCOM.DriverAccess.Video.CanConfigureDeviceProperties">
+            <inheritdoc/>
+        </member>
+        <member name="M:ASCOM.DriverAccess.Video.ConfigureDeviceProperties">
+            <inheritdoc/>
+        </member>
+    </members>
+</doc>
