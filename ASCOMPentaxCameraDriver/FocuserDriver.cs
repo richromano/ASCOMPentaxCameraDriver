@@ -33,6 +33,7 @@ using ASCOM.Astrometry.AstroUtils;
 using ASCOM.Utilities;
 using ASCOM.DeviceInterface;
 using System.Collections;
+using System.Threading;
 
 namespace ASCOM.PentaxKP
 {
@@ -248,15 +249,16 @@ namespace ASCOM.PentaxKP
 
         #region IFocuser Implementation
 
-//        private int focuserPosition = 0; // Class level variable to hold the current focuser position
-        private const int focuserSteps = 2;
+        private int focuserPosition = 10000; // Class level variable to hold the current focuser position
+        private int rezero = 0;
+//        private const int focuserSteps = 10000;
 
         public bool Absolute
         {
             get
             {
                 DriverCommon.LogFocuserMessage("Absolute Get", true.ToString());
-                return false;
+                return true;
             }
         }
 
@@ -297,7 +299,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                DriverCommon.LogFocuserMessage("MaxIncrement Get", focuserSteps.ToString());
+                DriverCommon.LogFocuserMessage("MaxIncrement Get", "200");
                 return 200;// DriverCommon.Camera.GetFocusLimit(); // Maximum change in one move
             }
         }
@@ -306,7 +308,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                DriverCommon.LogFocuserMessage("MaxStep Get", focuserSteps.ToString());
+                DriverCommon.LogFocuserMessage("MaxStep Get", "10000");
                 return 10000;// DriverCommon.Camera.GetFocusLimit(); // Maximum extent of the focuser, so position range is 0 to 10,000
             }
         }
@@ -314,9 +316,26 @@ namespace ASCOM.PentaxKP
         public void Move(int Position)
         {
             DriverCommon.LogFocuserMessage("Move", Position.ToString());
+            if (rezero<=0)
+            {
+                focuserPosition = 10000;
+                DriverCommon.m_camera.Focus(-10000);
+                Thread.Sleep(200);
+            }
+
+            if (Position > 10000)
+                Position = 10000;
 
             // Check that m_camera is not null 
-            DriverCommon.m_camera.Focus(Position);
+            DriverCommon.m_camera.Focus(-(Position-focuserPosition));
+            focuserPosition = Position;
+            if (rezero <= 0)
+            {
+                Thread.Sleep(200);
+                rezero = 10;
+            }
+            rezero--;
+
         }
 
         public int Position
@@ -324,8 +343,8 @@ namespace ASCOM.PentaxKP
             get
             {
 //                return DriverCommon.Camera.GetFocus();
-                  throw new ASCOM.PropertyNotImplementedException("StepSize", false);
-//                return focuserPosition; // Return the focuser position
+//                  throw new ASCOM.PropertyNotImplementedException("StepSize", false);
+                return focuserPosition; // Return the focuser position
             }
         }
 
