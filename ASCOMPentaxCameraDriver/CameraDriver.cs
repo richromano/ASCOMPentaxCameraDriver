@@ -150,7 +150,12 @@ namespace ASCOM.PentaxKP
             imagesToProcess = new Queue<string>();
             bitmapsToProcess = new Queue<BitmapImage>();
             m_gains = new ArrayList();
-            m_gains.Add("ISO200");
+            m_gains.Add("ISO 100");
+            m_gains.Add("ISO 200");
+            m_gains.Add("ISO 400");
+            m_gains.Add("ISO 800");
+            m_gains.Add("ISO 1600");
+            m_gains.Add("ISO 3200");
 
             DriverCommon.ReadProfile(); // Read device configuration from the ASCOM Profile store
 
@@ -299,6 +304,8 @@ namespace ASCOM.PentaxKP
                                     {
                                         DriverCommon.LogCameraMessage(setting.Name,setting.Value.ToString());
                                     }
+
+                                    Gain = gainIndex;
                                 }
                                 else
                                 {
@@ -667,6 +674,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
+            // Maximum exposure time
                 //using (new SerializedAccess(this, "get_ExposureMax", true))
                 {
                     DriverCommon.LogCameraMessage("", "get_ExposureMax");
@@ -679,10 +687,11 @@ namespace ASCOM.PentaxKP
         {
             get
             {
+            // Minimum exposure time
                 //using (new SerializedAccess(this, "get_ExposureMin", true))
                 {
                     DriverCommon.LogCameraMessage("", "get_ExposureMin");
-                    return 0.001;
+                    return 0.001/5.0;
 				}
             }
         }
@@ -694,7 +703,7 @@ namespace ASCOM.PentaxKP
                 //using (new SerializedAccess(this, "get_ExposureResolution", true))
                 {
                     DriverCommon.LogCameraMessage("", "get_ExposureResolution");
-                    return 0.001;
+                    return 0.001/5.0;
 				}
             }
         }
@@ -751,26 +760,7 @@ namespace ASCOM.PentaxKP
                 using (new DriverCommon.SerializedAccess("get_Gain"))
                 {
                     DriverCommon.LogCameraMessage("", "get_Gain");
-                    // Fix if connected
-                    if (Connected)
-                    {
-                        return gainIndex;
-/*                        if (DriverCommon.Settings.AllowISOAdjust && DriverCommon.Camera.Gains.Count > 0)
-                        {
-                            short gainIndex = DriverCommon.Camera.GainIndex;
-                            DriverCommon.LogCameraMessage("Gain Get", gainIndex.ToString());
-
-                            return gainIndex;
-                        }
-                        else
-                        {
-                            throw new ASCOM.PropertyNotImplementedException("Gains property is not enabled, see driver settings dialog");
-                        }*/
-                    }
-                    else
-                    {
-                        throw new ASCOM.NotConnectedException("Camera must be connected to retrieve gain");
-                    }
+                    return gainIndex;
 				}
             }
 
@@ -778,25 +768,37 @@ namespace ASCOM.PentaxKP
             {
                using (new DriverCommon.SerializedAccess("set_Gain"))
                 {
-                    DriverCommon.LogCameraMessage("", "set_Gain");
-                    if (Connected)
+                    // Check connected
+                    DriverCommon.LogCameraMessage("", "set_Gain "+value.ToString());
+                    gainIndex = value;
+                    if (gainIndex < 0)
+                        gainIndex = 0;
+                    if (gainIndex > 5)
+                        gainIndex = 5;
+                    using (new DriverCommon.SerializedAccess("get_Gain"))
                     {
-                        gainIndex = value;
-                        /*if (DriverCommon.Settings.AllowISOAdjust && DriverCommon.Camera.Gains.Count > 0)
+                        // Can I set this any time? Fix
+                        if (DriverCommon.m_camera != null)
                         {
-                            DriverCommon.Camera.GainIndex = value;
-                            DriverCommon.LogCameraMessage("Gain Set", value.ToString());
+                            ISO iso = new ISO();
+                            if(gainIndex==0)
+                                iso = ISO.ISO100;
+                            if (gainIndex == 1)
+                                iso = ISO.ISO200;
+                            if (gainIndex == 2)
+                                iso = ISO.ISO400;
+                            if (gainIndex == 3)
+                                iso = ISO.ISO800;
+                            if (gainIndex == 4)
+                                iso = ISO.ISO1600;
+                            if (gainIndex == 5)
+                                iso = ISO.ISO3200;
+                            DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { iso });
                         }
                         else
-                        {
-                            throw new ASCOM.PropertyNotImplementedException("Gains property is not enabled, see driver settings dialog");
-                        }*/
+                            throw new ASCOM.PropertyNotImplementedException("GainMax", false);
                     }
-                    else
-                    {
-                        throw new ASCOM.NotConnectedException("Camera must be connected to retrieve gain");
-                    }
-				}
+                }
             }
         }
 
@@ -804,9 +806,10 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                using (new DriverCommon.SerializedAccess("get_GainMax"))
+//                using (new DriverCommon.SerializedAccess("get_GainMax"))
                 {
                     DriverCommon.LogCameraMessage("", "get_GainMax");
+//                    return 5;
                     throw new ASCOM.PropertyNotImplementedException("GainMax", false);
 				}
             }
@@ -819,6 +822,7 @@ namespace ASCOM.PentaxKP
                 using (new DriverCommon.SerializedAccess("get_GainMin"))
                 {
                     DriverCommon.LogCameraMessage("", "get_GainMin");
+//                    return 0;
                     throw new ASCOM.PropertyNotImplementedException("GainMin", true);
 				}
             }
@@ -828,30 +832,10 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-               using (new DriverCommon.SerializedAccess("get_Gains"))
+//               using (new DriverCommon.SerializedAccess("get_Gains"))
                {
                     DriverCommon.LogCameraMessage("", "get_Gains");
-                    if (Connected)
-                    {
-                        return m_gains;
-/*                        ArrayList gains = DriverCommon.Camera.Gains;
-
-                        if (DriverCommon.Settings.AllowISOAdjust && gains.Count > 0)
-                        {
-
-                            DriverCommon.LogCameraMessage("Gains Get", String.Format("Size = {0}", gains.Count));
-
-                            return gains;
-                        }
-                        else
-                        {
-                            throw new ASCOM.PropertyNotImplementedException("Gains property is not enabled, see driver settings dialog");
-                        }*/
-                    }
-                    else
-                    {
-                        throw new ASCOM.NotConnectedException("Camera must be connected to get list of available gains");
-                    }
+                    return m_gains;
             	}
             }
         }
@@ -1563,6 +1547,8 @@ namespace ASCOM.PentaxKP
  
         public void StartExposure(double Duration, bool Light)
         {
+            // Light or dark frame
+            // Fix it!!!!!
            if(LastSetFastReadout)
             {
                 //No need to start exposure
@@ -1574,12 +1560,246 @@ namespace ASCOM.PentaxKP
             {
                 DriverCommon.LogCameraMessage("", "StartExposure()");
 
-                /*if (Duration < 0.0)
+                if (Duration < 0.0)
                 {
                     throw new InvalidValueException("StartExposure", "Duration", ">= 0");
                 }
 
-                if (StartX + NumX > DriverCommon.Camera.Mode.ImageWidthPixels)
+                ShutterSpeed shutterSpeed;
+                shutterSpeed = ShutterSpeed.SS1_24000;
+                if (Duration > 1.0/20000.0-0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_20000;
+                if (Duration > 1.0 / 16000.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_16000;
+                if (Duration > 1.0 / 12800.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_12800;
+                if (Duration > 1.0 / 12000.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_12000;
+                if (Duration > 1.0 / 10000.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_10000;
+                if (Duration > 1.0 / 8000.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_8000;
+                if (Duration > 1.0 / 6400.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_6400;
+                if (Duration > 1.0 / 6000.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_6000;
+                if (Duration > 1.0 / 5000.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_5000;
+                if (Duration > 1.0 / 4000.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_4000;
+                if (Duration > 1.0 / 3200.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_3200;
+                if (Duration > 1.0 / 3000.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_3000;
+                if (Duration > 1.0 / 2500.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_2500;
+                if (Duration > 1.0 / 2000.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_2000;
+                if (Duration > 1.0 / 1600.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_1600;
+                if (Duration > 1.0 / 1500.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_1500;
+                if (Duration > 1.0 / 1250.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_1250;
+                if (Duration > 1.0 / 1000.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_1000;
+                if (Duration > 1.0 / 800.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_800;
+                if (Duration > 1.0 / 750.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_750;
+                if (Duration > 1.0 / 640.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_640;
+                if (Duration > 1.0 / 500.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_500;
+                if (Duration > 1.0 / 400.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_400;
+                if (Duration > 1.0 / 350.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_350;
+                if (Duration > 1.0 / 320.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_320;
+                if (Duration > 1.0 / 250.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_250;
+                if (Duration > 1.0 / 200.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_200;
+                if (Duration > 1.0 / 180.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_180;
+                if (Duration > 1.0 / 160.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_160;
+                if (Duration > 1.0 / 125.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_125;
+                if (Duration > 1.0 / 100.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_100;
+                if (Duration > 1.0 / 90.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_90;
+                if (Duration > 1.0 / 80.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_80;
+                if (Duration > 1.0 / 60.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_60;
+                if (Duration > 1.0 / 50.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_50;
+                if (Duration > 1.0 / 45.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_45;
+                if (Duration > 1.0 / 40.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_40;
+                if (Duration > 1.0 / 30.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_30;
+                if (Duration > 1.0 / 25.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_25;
+                if (Duration > 1.0 / 20.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_20;
+                if (Duration > 1.0 / 15.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_15;
+                if (Duration > 1.0 / 13.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_13;
+                if (Duration > 1.0 / 10.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_10;
+                if (Duration > 1.0 / 8.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_8;
+                if (Duration > 1.0 / 6.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_6;
+                if (Duration > 1.0 / 5.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_5;
+                if (Duration > 1.0 / 4.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_4;
+                if (Duration > 1.0 / 3.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_3;
+                if (Duration > 1.0 / 2.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS1_2;
+                if (Duration > 6.0 / 10.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS6_10;
+                if (Duration > 7.0 / 10.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS7_10;
+                if (Duration > 8.0 / 10.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS8_10;
+                if (Duration > 0.99)
+                    shutterSpeed = ShutterSpeed.SS1;
+                if (Duration > 13.0 / 10.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS13_10;
+                if (Duration > 15.0 / 10.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS15_10;
+                if (Duration > 16.0 / 10.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS16_10;
+                //public static readonly ShutterSpeed SS10_13;
+                //public static readonly ShutterSpeed SS10_16;
+                //public static readonly ShutterSpeed SS10_25;
+                //public static readonly ShutterSpeed SS25_10;
+                //public static readonly ShutterSpeed SS32_10;
+                //public static readonly ShutterSpeed SS3_10;
+                //public static readonly ShutterSpeed SS4_10;
+                //public static readonly ShutterSpeed SS5_10;
+                if (Duration > 1.99)
+                    shutterSpeed = ShutterSpeed.SS2;
+                if (Duration > 2.99)
+                    shutterSpeed = ShutterSpeed.SS3;
+                if (Duration > 3.99)
+                    shutterSpeed = ShutterSpeed.SS4;
+                if (Duration > 4.99)
+                    shutterSpeed = ShutterSpeed.SS5;
+                if (Duration > 5.99)
+                    shutterSpeed = ShutterSpeed.SS6;
+                if (Duration > 7.99)
+                    shutterSpeed = ShutterSpeed.SS8;
+                if (Duration>9.99)
+                       shutterSpeed=ShutterSpeed.SS10;
+                if (Duration > 12.99)
+                    shutterSpeed = ShutterSpeed.SS13;
+                if (Duration > 14.99)
+                    shutterSpeed = ShutterSpeed.SS15;
+                if (Duration > 19.99)
+                    shutterSpeed = ShutterSpeed.SS20;
+                if (Duration > 24.99)
+                    shutterSpeed = ShutterSpeed.SS25;
+                if (Duration > 29.99)
+                    shutterSpeed = ShutterSpeed.SS30;
+                if (Duration > 39.99)
+                    shutterSpeed = ShutterSpeed.SS40;
+                if (Duration > 49.99)
+                    shutterSpeed = ShutterSpeed.SS50;
+                if (Duration > 59.99)
+                    shutterSpeed = ShutterSpeed.SS60;
+                if (Duration > 69.99)
+                    shutterSpeed = ShutterSpeed.SS70;
+                if (Duration > 79.99)
+                    shutterSpeed = ShutterSpeed.SS80;
+                if (Duration > 89.99)
+                    shutterSpeed = ShutterSpeed.SS90;
+                if (Duration > 99.99)
+                    shutterSpeed = ShutterSpeed.SS100;
+                if (Duration > 109.99)
+                    shutterSpeed = ShutterSpeed.SS110;
+                if (Duration > 119.99)
+                    shutterSpeed = ShutterSpeed.SS120;
+                if (Duration > 129.99)
+                    shutterSpeed = ShutterSpeed.SS130;
+                if (Duration > 139.99)
+                    shutterSpeed = ShutterSpeed.SS140;
+                if (Duration > 149.99)
+                    shutterSpeed = ShutterSpeed.SS150;
+                if (Duration > 159.99)
+                    shutterSpeed = ShutterSpeed.SS160;
+                if (Duration > 169.99)
+                    shutterSpeed = ShutterSpeed.SS170;
+                if (Duration > 179.99)
+                    shutterSpeed = ShutterSpeed.SS180;
+                if (Duration > 189.99)
+                    shutterSpeed = ShutterSpeed.SS190;
+                if (Duration > 199.99)
+                    shutterSpeed = ShutterSpeed.SS200;
+                if (Duration > 209.99)
+                    shutterSpeed = ShutterSpeed.SS210;
+                if (Duration > 219.99)
+                    shutterSpeed = ShutterSpeed.SS220;
+                if (Duration > 229.99)
+                    shutterSpeed = ShutterSpeed.SS230;
+                if (Duration > 239.99)
+                    shutterSpeed = ShutterSpeed.SS240;
+                if (Duration > 249.99)
+                    shutterSpeed = ShutterSpeed.SS250;
+                if (Duration > 259.99)
+                    shutterSpeed = ShutterSpeed.SS260;
+                if (Duration > 269.99)
+                    shutterSpeed = ShutterSpeed.SS270;
+                if (Duration > 279.99)
+                    shutterSpeed = ShutterSpeed.SS280;
+                if (Duration > 289.99)
+                    shutterSpeed = ShutterSpeed.SS290;
+                if (Duration > 299.99)
+                    shutterSpeed = ShutterSpeed.SS300;
+                if (Duration > 359.99)
+                    shutterSpeed = ShutterSpeed.SS360;
+                if (Duration > 419.99)
+                    shutterSpeed = ShutterSpeed.SS420;
+                if (Duration > 479.99)
+                    shutterSpeed = ShutterSpeed.SS480;
+                if (Duration > 539.99)
+                    shutterSpeed = ShutterSpeed.SS540;
+                if (Duration > 599.99)
+                    shutterSpeed = ShutterSpeed.SS600;
+                if (Duration > 659.99)
+                    shutterSpeed = ShutterSpeed.SS660;
+                if (Duration > 719.99)
+                    shutterSpeed = ShutterSpeed.SS720;
+                if (Duration > 779.99)
+                    shutterSpeed = ShutterSpeed.SS780;
+                if (Duration > 839.99)
+                    shutterSpeed = ShutterSpeed.SS840;
+                if (Duration > 899.99)
+                    shutterSpeed = ShutterSpeed.SS900;
+                if (Duration > 959.99)
+                    shutterSpeed = ShutterSpeed.SS960;
+                if (Duration > 1019.99)
+                    shutterSpeed = ShutterSpeed.SS1020;
+                if (Duration > 1079.99)
+                    shutterSpeed = ShutterSpeed.SS1080;
+                if (Duration > 1139.99)
+                    shutterSpeed = ShutterSpeed.SS1140;
+                if (Duration > 1199.99)
+                    shutterSpeed = ShutterSpeed.SS1200;
+
+        
+                DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { shutterSpeed });
+
+                /*if (StartX + NumX > DriverCommon.Camera.Mode.ImageWidthPixels)
                 {
                     throw new InvalidValueException("StartExposure", "StartX+NumX", $"<={DriverCommon.Camera.Info.ImageWidthPixels}");
                 }
