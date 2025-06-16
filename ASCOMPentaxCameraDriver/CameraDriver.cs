@@ -298,13 +298,9 @@ namespace ASCOM.PentaxKP
                                 {
                                     DriverCommon.LogCameraMessage("Connected", "Connected. Model: " + DriverCommon.m_camera.Model + ", SerialNumber:" + DriverCommon.m_camera.SerialNumber);
                                     StorageWriting sw = new StorageWriting();
-                                    List<CaptureSetting> swsettings = sw.AvailableSettings;
-
-                                    foreach (CaptureSetting setting in swsettings)
-                                    {
-                                        DriverCommon.LogCameraMessage(setting.Name,setting.Value.ToString());
-                                    }
-
+                                    sw=Ricoh.CameraController.StorageWriting.False;
+                                    DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sw });
+                                    
                                     Gain = gainIndex;
                                 }
                                 else

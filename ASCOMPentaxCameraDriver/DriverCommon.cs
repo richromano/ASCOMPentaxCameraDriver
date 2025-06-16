@@ -216,7 +216,7 @@ namespace ASCOM.PentaxKP
             }
 
             Logger.Enabled = Settings.EnableLogging;
-            Logger.Enabled = true;
+//            Logger.Enabled = true;
 
             Log($"DeviceID:                            {Settings.DeviceId}", "ReadProfile");
             Log($"Default Readout Mode:                {Settings.DefaultReadoutMode}", "ReadProfile");
