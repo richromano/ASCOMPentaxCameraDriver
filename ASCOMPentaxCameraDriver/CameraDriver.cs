@@ -84,9 +84,16 @@ namespace ASCOM.PentaxKP
                                                            //        internal static ConcurrentQueue<String> imagesToProcess;
         internal static Queue<String> imagesToProcess;
         internal static Queue<BitmapImage> bitmapsToProcess;
+        // Index to the current ISO level
         internal short gainIndex=0;
+        // The different ISO levels
         internal ArrayList m_gains;
+
+        // Two output modes 0=6016x4000 standard and 1=720x480 liveview
         internal static int m_readoutmode=0;
+
+        // If saving in raw formate for standard output mode
+        internal static bool m_rawmode = false;
 
         internal Thread cameraThread;
 
@@ -299,8 +306,19 @@ namespace ASCOM.PentaxKP
                                     DriverCommon.LogCameraMessage("Connected", "Connected. Model: " + DriverCommon.m_camera.Model + ", SerialNumber:" + DriverCommon.m_camera.SerialNumber);
                                     StorageWriting sw = new StorageWriting();
                                     sw=Ricoh.CameraController.StorageWriting.False;
+                                    StillImageCaptureFormat sicf = new StillImageCaptureFormat();
+
+                                    sicf = Ricoh.CameraController.StillImageCaptureFormat.JPEG;
+                                    if(m_rawmode)
+                                        sicf = Ricoh.CameraController.StillImageCaptureFormat.DNG;
+                                    StillImageQuality siq = new StillImageQuality();
+                                    siq=Ricoh.CameraController.StillImageQuality.LargeBest;
                                     DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sw });
-                                    
+                                    DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { siq });
+                                    DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sicf });
+                                    // Sleep to let the settings take effect
+                                    Thread.Sleep(1000);
+
                                     Gain = gainIndex;
                                 }
                                 else
@@ -924,6 +942,67 @@ namespace ASCOM.PentaxKP
                 return new Bitmap(bitmap);
             }
         }
+        /*
+        public int[,,] ReadAndDebayerRaw(string fileName)
+        {
+            IntPtr data = LoadRaw(fileName);
+            Logger.WriteTraceMessage("libraw_dcraw_process");
+            NativeMethods.libraw_dcraw_process(data);
+
+            var dataStructure = GetStructure<libraw_data_t>(data);
+            ushort width = dataStructure.sizes.iwidth;
+            ushort height = dataStructure.sizes.iheight;
+
+            var pixels = new int[width, height, 3];
+
+            Parallel.For(0, width * height, rc =>
+            {
+                var r = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8);
+                var g = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8 + 2);
+                var b = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8 + 4);
+
+                int row = rc / width;
+                int col = rc - width * row;
+                //int rowReversed = height - row - 1;
+                pixels[col, row, 0] = b;
+                pixels[col, row, 1] = g;
+                pixels[col, row, 2] = r;
+            });
+
+            /*
+            for (int rc = 0; rc < height * width; rc++)
+            {
+                var r = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8);
+                var g = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8 + 2);
+                var b = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8 + 4);
+
+                int row = rc / width;
+                int col = rc - width * row;
+                //int rowReversed = height - row - 1;
+                pixels[col, row, 0] = b;
+                pixels[col, row, 1] = g;
+                pixels[col, row, 2] = r;
+            }*/
+
+//            NativeMethods.libraw_close(data);
+
+//            return pixels;
+//        }*/
+
+        /* using Sdcb.LibRaw;
+
+ using RawContext r = RawContext.OpenFile(@"C:\a7r3\DSC02653.ARW");
+ r.Unpack();
+ r.DcrawProcess();
+ using ProcessedImage image = r.MakeDcrawMemoryImage();
+ using Bitmap bmp = ProcessedImageToBitmap(image);
+
+     Bitmap ProcessedImageToBitmap(ProcessedImage rgbImage)
+     {
+         rgbImage.SwapRGB();
+         using Bitmap bmp = new Bitmap(rgbImage.Width, rgbImage.Height, rgbImage.Width * 3, System.Drawing.Imaging.PixelFormat.Format24bppRgb, rgbImage.DataPointer);
+         return new Bitmap(bmp);
+     }*/
 
         private object ReadImageFileQuick(string MNewFile)
         {
@@ -1242,7 +1321,9 @@ namespace ASCOM.PentaxKP
                 //using (new SerializedAccess(this, "get_MaxADU"))
                 {
                     DriverCommon.LogCameraMessage("", "get_MaxADU");
-                    int bpp = 8;//(int)DriverCommon.Camera.Info.BitsPerPixel;
+                    int bpp = 8;
+                    if (m_rawmode)
+                        bpp = 14;
                     int maxADU = (1 << bpp) - 1;
 
                     return maxADU;
@@ -1506,27 +1587,24 @@ namespace ASCOM.PentaxKP
                 using (new DriverCommon.SerializedAccess("long running task", false))
                 {
                     m_captureState = Ricoh.CameraController.CaptureState.Executing;
-                    {
-                        DriverCommon.m_camera.StartCapture(false);
-                    }
 
+                    bool sleepReturn = false;
+                    Response response =DriverCommon.m_camera.StartCapture(false);
+
+                    //Console.WriteLine(" result: " + response.Result.ToString() + ((response.Result == Result.Error) ? ", Code: " + response.Errors.First().Code.ToString() + ", Message : " + response.Errors.First().Message : ""));
                     m_captureState = Ricoh.CameraController.CaptureState.Unknown;
 
-                    bool sleepReturn=false;
                     while (DriverCommon.m_camera.Status.CurrentCapture == null)
-                        sleepReturn=_requestTermination.WaitOne(250);
+                       sleepReturn = _requestTermination.WaitOne(250);
 
-                    //                    int i = 0;
                     if (!sleepReturn)
                     {
                         m_captureState = Ricoh.CameraController.CaptureState.Executing;
 
                         while (DriverCommon.m_camera.Status.CurrentCapture.State != Ricoh.CameraController.CaptureState.Complete)
                         {
-                            //                        i++;
                             DriverCommon.LogCameraMessage("long running task", DriverCommon.m_camera.Status.CurrentCapture.State.ToString() + " " + Ricoh.CameraController.CaptureState.Complete.ToString());
                             if (_requestTermination.WaitOne(250))
-                                //                        if (i > 100)
                                 break;
                         }
                         m_captureState = DriverCommon.m_camera.Status.CurrentCapture.State;

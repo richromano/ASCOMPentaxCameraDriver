@@ -50,10 +50,10 @@ namespace ASCOM.PentaxKP
 
             ArrayList modes = device.ReadoutModes;
 
-            device.FastReadout = true;
+            device.FastReadout = false;
 
             Console.WriteLine(device.Gain);
-            device.Gain = 10;
+            device.Gain = 0;
             Console.WriteLine(device.Gains.ToString());
             Console.WriteLine(device.MaxADU.ToString());
 
