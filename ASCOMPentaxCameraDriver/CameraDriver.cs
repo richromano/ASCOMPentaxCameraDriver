@@ -40,6 +40,7 @@ using System.Diagnostics.Tracing;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Drawing.Imaging;
+using ASCOM.DSLR.Classes;
 using System.Collections.Concurrent;
 
 namespace ASCOM.PentaxKP
@@ -84,6 +85,7 @@ namespace ASCOM.PentaxKP
                                                            //        internal static ConcurrentQueue<String> imagesToProcess;
         internal static Queue<String> imagesToProcess;
         internal static Queue<BitmapImage> bitmapsToProcess;
+        private ImageDataProcessor _imageDataProcessor;
         // Index to the current ISO level
         internal short gainIndex=0;
         // The different ISO levels
@@ -93,7 +95,8 @@ namespace ASCOM.PentaxKP
         internal static int m_readoutmode=0;
 
         // If saving in raw formate for standard output mode
-        internal static bool m_rawmode = false;
+        internal static bool m_rawmode = true;
+//        internal static bool m_rawmode = false;
 
         internal Thread cameraThread;
 
@@ -163,6 +166,8 @@ namespace ASCOM.PentaxKP
             m_gains.Add("ISO 800");
             m_gains.Add("ISO 1600");
             m_gains.Add("ISO 3200");
+
+            _imageDataProcessor = new ImageDataProcessor();
 
             DriverCommon.ReadProfile(); // Read device configuration from the ASCOM Profile store
 
@@ -942,67 +947,90 @@ namespace ASCOM.PentaxKP
                 return new Bitmap(bitmap);
             }
         }
-        /*
-        public int[,,] ReadAndDebayerRaw(string fileName)
+
+        private object ReadImageFileRaw(string MNewFile)
         {
-            IntPtr data = LoadRaw(fileName);
-            Logger.WriteTraceMessage("libraw_dcraw_process");
-            NativeMethods.libraw_dcraw_process(data);
+            object result = null;
+            //Bitmap _bmp;
+            int MSensorWidthPx = 6016;
+            int MSensorHeightPx = 4000;
+            int[,,] _cameraImageArray= new int[MSensorWidthPx, MSensorHeightPx, 3]; // Assuming this is declared and initialized elsewhere.
+            int[,] bayerData;//=new int[MSensorHeightPx*2,MSensorHeightPx*2];
 
-            var dataStructure = GetStructure<libraw_data_t>(data);
-            ushort width = dataStructure.sizes.iwidth;
-            ushort height = dataStructure.sizes.iheight;
 
-            var pixels = new int[width, height, 3];
+            // Wait for the file to be closed and available.
+            while (!IsFileClosed(MNewFile)) { }
+            bayerData = _imageDataProcessor.ReadRaw(MNewFile);
 
-            Parallel.For(0, width * height, rc =>
+            int height = 4000;
+            int width = 6016;
+
+            // RGGB
+
+            for (int y = 0; y < height; y++)
             {
-                var r = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8);
-                var g = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8 + 2);
-                var b = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8 + 4);
+                for (int x = 0; x < width; x++)
+                {
+                    int r = 0, g = 0, b = 0;
 
-                int row = rc / width;
-                int col = rc - width * row;
-                //int rowReversed = height - row - 1;
-                pixels[col, row, 0] = b;
-                pixels[col, row, 1] = g;
-                pixels[col, row, 2] = r;
-            });
+                    if (y % 2 == 0) // Even row
+                    {
+                        if (x % 2 == 0) // Even column (Red pixel)
+                        {
+                            r = bayerData[x,y];
+                            g = (bayerData[x + 1, y] +
+                                 bayerData[x, y + 1]) / 2;
+                            b = bayerData[x + 1, y + 1];
+                        }
+                        else // Odd column (Green pixel)
+                        {
+                            g = bayerData[x,y];
+                            if(x==0)
+                                r = bayerData[x + 1, y];
+                            else
+                                r = (bayerData[x - 1, y] +
+                                     bayerData[x + 1, y]) / 2;
+                            b = bayerData[x, y + 1];
+                        }
+                    }
+                    else // Odd row
+                    {
+                        if (x % 2 == 0) // Even column (Green pixel)
+                        {
+                            g = bayerData[x,y];
+                            r = bayerData[x, y - 1];
+                            if(x==0)
+                                b = bayerData[x + 1, y] ;
+                            else
+                                b = (bayerData[x + 1, y] +
+                                     bayerData[x - 1, y]) / 2;
+                        }
+                        else // Odd column (Blue pixel)
+                        {
+                            b = bayerData[x,y];
+                            if(x==0)
+                                g = bayerData[x, y - 1];
+                            else
+                            g = (bayerData[x - 1, y] +
+                                 bayerData[x, y - 1]) / 2;
+                            if (x == 0)
+                                r = 0;
+                            else
+                                r = bayerData[x - 1, y - 1];
+                        }
+                    }
 
-            /*
-            for (int rc = 0; rc < height * width; rc++)
-            {
-                var r = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8);
-                var g = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8 + 2);
-                var b = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8 + 4);
+                    _cameraImageArray[x, y, 0] = b;
+                    _cameraImageArray[x, y, 1] = g;
+                    _cameraImageArray[x, y, 2] = r;
+                }
+            }
 
-                int row = rc / width;
-                int col = rc - width * row;
-                //int rowReversed = height - row - 1;
-                pixels[col, row, 0] = b;
-                pixels[col, row, 1] = g;
-                pixels[col, row, 2] = r;
-            }*/
 
-//            NativeMethods.libraw_close(data);
-
-//            return pixels;
-//        }*/
-
-        /* using Sdcb.LibRaw;
-
- using RawContext r = RawContext.OpenFile(@"C:\a7r3\DSC02653.ARW");
- r.Unpack();
- r.DcrawProcess();
- using ProcessedImage image = r.MakeDcrawMemoryImage();
- using Bitmap bmp = ProcessedImageToBitmap(image);
-
-     Bitmap ProcessedImageToBitmap(ProcessedImage rgbImage)
-     {
-         rgbImage.SwapRGB();
-         using Bitmap bmp = new Bitmap(rgbImage.Width, rgbImage.Height, rgbImage.Width * 3, System.Drawing.Imaging.PixelFormat.Format24bppRgb, rgbImage.DataPointer);
-         return new Bitmap(bmp);
-     }*/
+        //_cameraImageArray = _imageDataProcessor.ReadAndDebayerRaw(MNewFile);
+        result = Resize(_cameraImageArray, 3, StartX, StartY, NumX, NumY);
+            return result;
+        }
 
         private object ReadImageFileQuick(string MNewFile)
         {
@@ -1119,12 +1147,24 @@ namespace ASCOM.PentaxKP
                     if (imagesToProcess.Count != 0)
                     {
                         imageName = imagesToProcess.Dequeue();
-                        DriverCommon.LogCameraMessage("", "Calling ReadImageFileQuick");
-                        result=ReadImageFileQuick(imageName);
-                        return result;
+                        if (imageName.Substring(imageName.Length - 3) == "JPG")
+                        {
+                            DriverCommon.LogCameraMessage("", "Calling ReadImageFileQuick");
+                            result = ReadImageFileQuick(imageName);
+                            return result;
+                        }
+
+                        if (imageName.Substring(imageName.Length - 3) == "DNG")
+                        {
+                            DriverCommon.LogCameraMessage("", "Calling ReadImageFileRAW");
+                            result = ReadImageFileRaw(imageName);
+                            return result;
+                        }
+
+                        throw new ASCOM.PropertyNotImplementedException("ImageArray", false);
                     }
 
-                  throw new ASCOM.PropertyNotImplementedException("ImageArray", false);
+                    throw new ASCOM.PropertyNotImplementedException("ImageArray", false);
 
                     /*object result = null;
 
