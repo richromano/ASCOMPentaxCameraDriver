@@ -28,7 +28,7 @@ namespace ASCOM.DSLR.Classes
             CheckError(NativeMethods.libraw_raw2image(data), "raw2image");
             //Logger.WriteTraceMessage("return");
             // Don't subtract black level as that pushes the histogram right down to the left hand side for dark areas - ie data being lost
-            //            CheckError(NativeMethods.libraw_subtract_black(data), "subtract");
+            CheckError(NativeMethods.libraw_subtract_black(data), "subtract");
 
             return data;
         }
@@ -38,13 +38,7 @@ namespace ASCOM.DSLR.Classes
             if (errorCode != 0)
                 throw new Exception($"LibRaw returned error code {errorCode} when {action}");
         }
-
-        /*public int[,,] ReadAndDebayerRawPentax(string fileName)
-        {
-            IntPtr data = LoadRaw(fileName);
-            //Logger.WriteTraceMessage("libraw_dcraw_process");
-        }*/
-
+        
         public int[,,] ReadAndDebayerRaw(string fileName)
         {
             IntPtr data = LoadRaw(fileName);
@@ -176,6 +170,95 @@ namespace ASCOM.DSLR.Classes
         private void exif_parser_callback(IntPtr context, int tag, int type, int len, uint ord, IntPtr ifp)
         {
 
+        }
+
+
+        public unsafe int[,,] ReadRawPentax(string fileName)
+        {
+            IntPtr data = LoadRaw(fileName);
+            NativeMethods.libraw_dcraw_process(data);
+
+            var dataStructure = GetStructure<libraw_data_t>(data);
+            ushort width = dataStructure.sizes.iwidth;
+            ushort height = dataStructure.sizes.iheight;
+
+            var pixels = new int[width, height, 3];
+
+            for(int rc=0; rc < width * height; rc++)
+            {
+                var r = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8);
+                var g = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8 + 2);
+                var b = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8 + 4);
+
+                int row = rc / width;
+                int col = rc - width * row;
+                //int rowReversed = height - row - 1;
+                pixels[col, row, 0] = b;
+                pixels[col, row, 1] = g;
+                pixels[col, row, 2] = r;
+            };
+
+            /*
+                       var dataStructure = GetStructure<libraw_data_t>(data);
+
+                       var colorsStr = dataStructure.idata.cdesc;
+
+                       if (colorsStr != "RGBG")
+                           throw new NotImplementedException();
+
+                       int xoffs = 0;
+                       int yoffs = 0;
+
+                       string cameraPattern = "";
+                       cameraPattern += colorsStr[NativeMethods.libraw_COLOR(data, 0, 0)];
+                       cameraPattern += colorsStr[NativeMethods.libraw_COLOR(data, 0, 1)];
+                       cameraPattern += colorsStr[NativeMethods.libraw_COLOR(data, 1, 0)];
+                       cameraPattern += colorsStr[NativeMethods.libraw_COLOR(data, 1, 1)];
+
+                       switch (cameraPattern)
+                       {
+                           case "RGGB":
+                               break;
+                           case "GRBG":
+                               xoffs = 1;
+                               break;
+                           case "BGGR":
+                               xoffs = 1;
+                               yoffs = 1;
+                               break;
+                           case "GBRG":
+                               yoffs = 1;
+                               break;
+                           default:
+                               throw new System.NotImplementedException();
+                       }
+
+                       ushort width = dataStructure.sizes.iwidth;
+                       ushort height = dataStructure.sizes.iheight;
+
+                       var pixels = new int[width, height];
+
+                       for(int y=0;y<height-yoffs;y++)
+                       {
+
+                           int i0 = NativeMethods.libraw_COLOR(data, y, 0);
+                           int i1 = NativeMethods.libraw_COLOR(data, y, 1);
+                           ushort* ptr = (ushort*)((byte*)dataStructure.image.ToPointer() + width * 8 * y);
+
+                           for (int x = 0; x < width - xoffs; x += 2)
+                           {
+                               pixels[x + xoffs, y + yoffs] = *(ptr + i0);
+                               ptr += 4;
+                               pixels[x + xoffs + 1, y + yoffs] = *(ptr + i1);
+                               ptr += 4;
+                           }
+
+                       }
+                       */
+
+            NativeMethods.libraw_close(data);
+
+            return pixels;
         }
 
         public unsafe int[,] ReadRaw(string fileName)

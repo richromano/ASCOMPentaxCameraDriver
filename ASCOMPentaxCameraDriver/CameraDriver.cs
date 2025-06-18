@@ -954,22 +954,53 @@ namespace ASCOM.PentaxKP
             //Bitmap _bmp;
             int MSensorWidthPx = 6016;
             int MSensorHeightPx = 4000;
-            int[,,] _cameraImageArray= new int[MSensorWidthPx, MSensorHeightPx, 3]; // Assuming this is declared and initialized elsewhere.
-            int[,] bayerData;//=new int[MSensorHeightPx*2,MSensorHeightPx*2];
+            int[,,] rgbImage= new int[MSensorWidthPx, MSensorHeightPx, 3]; // Assuming this is declared and initialized elsewhere.
+//            int[,] bayerImage;//=new int[MSensorHeightPx*2,MSensorHeightPx*2];
 
 
             // Wait for the file to be closed and available.
             while (!IsFileClosed(MNewFile)) { }
-            bayerData = _imageDataProcessor.ReadRaw(MNewFile);
+            rgbImage = _imageDataProcessor.ReadRawPentax(MNewFile);
 
-            int height = 4000;
+/*            int height = 4000;
             int width = 6016;
 
             // RGGB
 
-            for (int y = 0; y < height; y++)
+            for (int y = 1; y < height - 1; y++)
             {
-                for (int x = 0; x < width; x++)
+                for (int x = 1; x < width - 1; x++)
+                {
+                    if ((y % 2 == 0) && (x % 2 == 1)) // Green pixel (RGGB pattern)
+                    {
+                        rgbImage[x, y, 1] = bayerImage[x, y]; // Green
+                        rgbImage[x, y, 2] = ((bayerImage[x, y-1] + bayerImage[x, y+1]) / 2); // Red
+                        rgbImage[x, y, 0] = ((bayerImage[x-1, y] + bayerImage[x+1, y]) / 2); // Blue
+                    }
+                    else if ((y % 2 == 0) && (x % 2 == 0)) // Red pixel
+                    {
+                        rgbImage[x, y, 2] = bayerImage[x, y]; // Red
+                        rgbImage[x, y, 1] = ((bayerImage[x-1, y] + bayerImage[x+1, y] + bayerImage[x, y-1] + bayerImage[x, y+1]) / 4); // Green
+                        rgbImage[x, y, 0] = ((bayerImage[x - 1, y + 1] + bayerImage[x + 1, y + 1] + bayerImage[x - 1, y - 1] + bayerImage[x + 1, y - 1]) / 4); // Blue
+                    }
+                    else if ((y % 2 == 1) && (x % 2 == 1)) // Blue pixel
+                    {
+                        rgbImage[x, y, 0] = bayerImage[x, y]; // Blue
+                        rgbImage[x, y, 1] = ((bayerImage[x-1, y] + bayerImage[x+1, y] + bayerImage[x, y-1] + bayerImage[x, y+1]) / 4); // Green
+                        rgbImage[x, y, 2] = ((bayerImage[x - 1, y + 1] + bayerImage[x + 1, y + 1] + bayerImage[x - 1, y - 1] + bayerImage[x + 1, y - 1]) / 4); // Red
+                    }
+                    else // Green pixel (RGGB pattern)
+                    {
+                        rgbImage[x, y, 1] = bayerImage[x, y]; // Green
+                        rgbImage[x, y, 2] = ((bayerImage[x-1, y] + bayerImage[x+1, y]) / 2); // Red
+                        rgbImage[x, y, 0] = ((bayerImage[x, y-1] + bayerImage[x, y+1]) / 2); // Blue
+                    }
+                }
+            }
+
+/*            for (int y = 1; y < height-1; y++)
+            {
+                for (int x = 1; x < width-1; x++)
                 {
                     int r = 0, g = 0, b = 0;
 
@@ -1024,11 +1055,11 @@ namespace ASCOM.PentaxKP
                     _cameraImageArray[x, y, 1] = g;
                     _cameraImageArray[x, y, 2] = r;
                 }
-            }
+            }*/
 
 
         //_cameraImageArray = _imageDataProcessor.ReadAndDebayerRaw(MNewFile);
-        result = Resize(_cameraImageArray, 3, StartX, StartY, NumX, NumY);
+        result = Resize(rgbImage, 3, StartX, StartY, NumX, NumY);
             return result;
         }
 
@@ -1363,7 +1394,7 @@ namespace ASCOM.PentaxKP
                     DriverCommon.LogCameraMessage("", "get_MaxADU");
                     int bpp = 8;
                     if (m_rawmode)
-                        bpp = 14;
+                        bpp = 16;
                     int maxADU = (1 << bpp) - 1;
 
                     return maxADU;
