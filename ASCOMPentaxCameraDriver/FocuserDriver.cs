@@ -334,7 +334,7 @@ namespace ASCOM.PentaxKP
                 Thread.Sleep(200);
                 rezero = 10;
             }
-            rezero--;
+            //rezero--;
 
         }
 
