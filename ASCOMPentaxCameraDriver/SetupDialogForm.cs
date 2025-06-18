@@ -48,7 +48,6 @@ namespace ASCOM.PentaxKP
             DriverCommon.Settings.BulbModeTime = short.Parse(textBoxBulbMode.Text.Trim());
             DriverCommon.Settings.AllowISOAdjust = checkBoxAllowISOAdjust.Checked;
             DriverCommon.Settings.UsingCameraLens = checkBoxUsingCameraLens.Checked;
-            DriverCommon.Settings.LensId = comboBoxLenses.SelectedItem != null ? ((Lens)comboBoxLenses.SelectedItem).Id : "";
             DriverCommon.Settings.HandsOffFocus = checkBoxHandsOffFocus.Checked;
         }
 
@@ -100,18 +99,6 @@ namespace ASCOM.PentaxKP
 
             checkBoxUsingCameraLens.Checked = DriverCommon.Settings.UsingCameraLens;
             comboBoxLenses.Enabled = DriverCommon.Settings.UsingCameraLens;
-            LensEnumerator lensEnumerator = new LensEnumerator();
-
-            foreach (Lens lens in lensEnumerator.Lenses)
-            {
-                int id = comboBoxLenses.Items.Add(lens);
-
-                if (lens.Id == DriverCommon.Settings.LensId)
-                {
-                    comboBoxLenses.SelectedIndex = id;
-                }
-            }
-
             buttonFocusTools.Enabled = DriverCommon.Settings.UsingCameraLens;
             checkBoxHandsOffFocus.Checked = DriverCommon.Settings.HandsOffFocus;
             checkBoxHandsOffFocus.Enabled = DriverCommon.Settings.UsingCameraLens;

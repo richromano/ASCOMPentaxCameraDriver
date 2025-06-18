@@ -149,12 +149,9 @@
     <Compile Include="SetupDialogForm.designer.cs">
       <DependentUpon>SetupDialogForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Lens.cs" />
     <Compile Include="PentaxCamera.cs" />
-    <Compile Include="LensEnumerator.cs" />
     <Compile Include="PentaxCameraEnumerator.cs" />
     <Compile Include="PentaxCommon.cs" />
-    <Compile Include="PentaxImage.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="FocusPosition.resx">

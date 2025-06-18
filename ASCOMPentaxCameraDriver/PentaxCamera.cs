@@ -18,7 +18,7 @@ namespace ASCOM.PentaxKP
     {
         private DeviceInfo m_info;
         private CameraDevice camera = null;
-        internal PentaxKPImage m_lastImage = null;
+        //internal PentaxKPImage m_lastImage = null;
         internal CaptureMode m_mode;
         internal ImageMode m_outputMode = ImageMode.RGB;
         internal CameraInfo m_resolutions;
@@ -152,31 +152,6 @@ namespace ASCOM.PentaxKP
             }
         }
 
-        public CameraStates State
-        {
-            get
-            {
-                if (m_lastImage != null)
-                {
-                    switch (m_lastImage.Status)
-                    {
-                        case PentaxKPImage.ImageStatus.Capturing:
-                            return CameraStates.cameraExposing;
-
-                        case PentaxKPImage.ImageStatus.Reading:
-                            return CameraStates.cameraReading;
-
-                        default:
-                            return CameraStates.cameraIdle;
-                    }
-                }
-                else
-                {
-                    return CameraStates.cameraIdle;
-                }
-            }
-        }
-
         public void SetLens(string lensId)
         {
             //SetAttachedLens(m_handle, lensId);
@@ -239,71 +214,6 @@ namespace ASCOM.PentaxKP
 			 }
         }
 
-        public PentaxKPImage StartCapture(double duration, int personality, short readoutMode)
-        {
-            ImageInfo info = new ImageInfo();
-
-            if (m_lastImage != null)
-            {
-                m_lastImage.Cleanup();
-                m_lastImage = null;
-            }
-
-            // 32-bit apps tend to run close to the line of memory
-            // The auto garbage collection tends to fail when we're talking the large files
-            // a 60MP camera can deliver, and an attempt to allocate more than is available doesn't
-            // seem to trigger a collection - so we'll just do it here.
-            // TODO: Make this conditional on 32-bit execution
-            if (!Environment.Is64BitProcess)
-            {
-                GC.Collect();
-            }
-
-            info.Status = STATUS_EXPOSING;
-            info.ImageMode = (uint)m_outputMode;
-            info.ExposureTime = duration;
-
-            if (Mode.Preview)
-            {
-                info.ImageMode = IMAGEMODE_RGB;
-                //GetPreviewImage(m_handle, ref info);
-//                CameraEventListener cameraEventListener = new EventListener();
-//                camera.EventListeners.Add(cameraEventListener);
-//                Response response = camera.StartLiveView();
-
-//                m_lastImage = new PentaxKPImage(camera, info, personality, readoutMode);
-            }
-            else
-            {
-                if (m_bulbMode)
-                {
-                    PropertyValue pv = new PropertyValue();
-                    //SetExposureTime(m_handle, (float)(duration > m_bulbModeTime ? 0 : duration), ref pv);
-                }
-
-                if (m_desiredGain != -1 && Gains.Count > 0)
-                {
-                    //SetPropertyValue(m_handle, PentaxKPCommon.PROPERTY_ISO, UInt32.Parse((string)Gains[m_desiredGain]));
-                }
-
-                m_lastImage = new PentaxKPImage(camera, info, personality, readoutMode);
-                m_lastImage.m_startCaptureResponse = camera.StartCapture();
-                if (m_lastImage.m_startCaptureResponse.Result != Result.OK)
-                    m_lastImage.Status = PentaxKPImage.ImageStatus.Failed;
-            }
-
-            return m_lastImage;
-        }
-
-        public void StopCapture()
-        {
-            if (m_lastImage != null && m_lastImage.Status == PentaxKPImage.ImageStatus.Capturing)
-            {
-                camera.StopCapture();
-                //CancelCapture(m_handle, ref m_lastImage.m_info);
-            }
-        }
-
         public CameraInfo Resolutions
         {
             get
@@ -311,22 +221,6 @@ namespace ASCOM.PentaxKP
                 //GetCameraInfo(m_handle, ref m_resolutions, INFOFLAG_ACTIVE);
 
                 return m_resolutions;
-            }
-        }
-
-        public PentaxKPImage LastImage
-        {
-            get
-            {
-                return m_lastImage;
-            }
-        }
-
-        public Boolean ImageReady
-        {
-            get
-            {
-                return m_lastImage != null && m_lastImage.Status == PentaxKPImage.ImageStatus.Ready;
             }
         }
 
@@ -359,41 +253,6 @@ namespace ASCOM.PentaxKP
             get
             {
                 return (m_resolutions.CameraFlags & CAMERA_SUPPORTS_LIVEVIEW) != 0;
-            }
-        }
-
-        public Boolean PreviewMode
-        {
-            get
-            {
-                return Mode.Preview;
-            }
-
-            set
-            {
-                if (value != Mode.Preview)
-                {
-                    Mode.Preview = value && ((m_resolutions.CameraFlags & CAMERA_SUPPORTS_LIVEVIEW) != 0);
-
-                    if (!Mode.Preview)
-                    {
-                        Mode.ImageWidthPixels = m_info.CropMode == 0 ? m_resolutions.ImageWidthPixels : m_resolutions.ImageWidthCroppedPixels;
-                        Mode.ImageHeightPixels = m_info.CropMode == 0 ? m_resolutions.ImageHeightPixels : m_resolutions.ImageHeightCroppedPixels;
-                    }
-                    else
-                    {
-                        Mode.ImageWidthPixels = m_resolutions.PreviewWidthPixels;
-                        Mode.ImageHeightPixels = m_resolutions.PreviewHeightPixels;
-                    }
-
-                    // This allows the driver to return assumed image size not the size of the last image
-                    // which will probably now be different
-                    if (m_lastImage != null)
-                    {
-                        m_lastImage.Cleanup();
-                        m_lastImage = null;
-                    }
-                }
             }
         }
 
