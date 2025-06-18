@@ -18,17 +18,14 @@ namespace ASCOM.PentaxKP
 
         public bool EnableLogging = false;
         public string DeviceId = "";
-        public short DefaultReadoutMode = PentaxKPCommon.OUTPUTFORMAT_RGB;
-        public bool UseLiveview = false;
-        public int Personality = PentaxKPCommon.PERSONALITY_APT;
+        public short DefaultReadoutMode = 1;// PentaxKPCommon.OUTPUTFORMAT_RGB;
+        public bool UseLiveview = true;
+        public int Personality = PentaxKPCommon.PERSONALITY_SHARPCAP;
         public bool AutoLiveview = false;
         public bool BulbModeEnable = false;
         public short BulbModeTime = 1;
         public bool AllowISOAdjust = false;
-        public bool ARWAutosave = false;
-        public string ARWAutosaveFolder = "";
-        public bool ARWAutosaveWithDate = false;
-        public bool ARWAutosaveAlwaysCreateEmptyFolder = false;
+        public bool RAWSave = true;
         public bool UsingCameraLens = false;
         public string LensId = "";
         public bool HandsOffFocus = false;
@@ -187,16 +184,22 @@ namespace ASCOM.PentaxKP
                 Settings.BulbModeTime = Convert.ToInt16(driverProfile.GetValue(CameraDriverId, bulbModeTimeProfileName, string.Empty, bulbModeTimeDefault));
                 Settings.AllowISOAdjust = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, allowISOAdjustProfileName, string.Empty, allowISOAdjustDefault));
 
+
                 if (Settings.DefaultReadoutMode == 0)
                 {
-                    Settings.DefaultReadoutMode = PentaxKPCommon.OUTPUTFORMAT_RGGB;
+                    //Settings.DefaultReadoutMode = PentaxKPCommon.OUTPUTFORMAT_RGGB;
+                    Settings.RAWSave = true;
+                }
+                else
+                {
+                    Settings.RAWSave = false;
                 }
 
                 // This needs to actually save to registry
-     //           Settings.ARWAutosave = Convert.ToBoolean(Registry.GetValue("HKEY_CURRENT_USER\\Software\\retro.kiwi\\SonyMTPCamera.dll", "File Auto Save", 0));
-     //           Settings.ARWAutosaveFolder = (string)Registry.GetValue("HKEY_CURRENT_USER\\Software\\retro.kiwi\\SonyMTPCamera.dll", "File Save Path", "");
-     //           Settings.ARWAutosaveWithDate = Convert.ToBoolean(Registry.GetValue("HKEY_CURRENT_USER\\Software\\retro.kiwi\\SonyMTPCamera.dll", "File Save Path Add Date", 0));
-     //           Settings.ARWAutosaveAlwaysCreateEmptyFolder = Convert.ToBoolean(Registry.GetValue("HKEY_CURRENT_USER\\Software\\retro.kiwi\\SonyMTPCamera.dll", "File Save Path Create Multiple Directories", 0));
+                //           Settings.ARWAutosave = Convert.ToBoolean(Registry.GetValue("HKEY_CURRENT_USER\\Software\\retro.kiwi\\SonyMTPCamera.dll", "File Auto Save", 0));
+                //           Settings.ARWAutosaveFolder = (string)Registry.GetValue("HKEY_CURRENT_USER\\Software\\retro.kiwi\\SonyMTPCamera.dll", "File Save Path", "");
+                //           Settings.ARWAutosaveWithDate = Convert.ToBoolean(Registry.GetValue("HKEY_CURRENT_USER\\Software\\retro.kiwi\\SonyMTPCamera.dll", "File Save Path Add Date", 0));
+                //           Settings.ARWAutosaveAlwaysCreateEmptyFolder = Convert.ToBoolean(Registry.GetValue("HKEY_CURRENT_USER\\Software\\retro.kiwi\\SonyMTPCamera.dll", "File Save Path Create Multiple Directories", 0));
             }
 
             using (Profile driverProfile = new Profile())
@@ -220,13 +223,9 @@ namespace ASCOM.PentaxKP
 
             Log($"DeviceID:                            {Settings.DeviceId}", "ReadProfile");
             Log($"Default Readout Mode:                {Settings.DefaultReadoutMode}", "ReadProfile");
-            Log($"Save Raw files:                      {Settings.ARWAutosave}", "ReadProfile");
-            Log($"Save Raw files Path:                 {Settings.ARWAutosaveFolder}", "ReadProfile");
-            Log($"Save Raw files Path Add Date:        {Settings.ARWAutosaveWithDate}", "ReadProfile");
-            Log($"Save Raw files Always Create Folder: {Settings.ARWAutosaveWithDate}", "ReadProfile");
+            Log($"Save Raw files:                      {Settings.RAWSave}", "ReadProfile");
             Log($"Use Liveview:                        {Settings.UseLiveview}", "ReadProfile");
             Log($"AutoLiveview @ 0.0s:                 {Settings.AutoLiveview}", "ReadProfile");
-            Log($"Personality:                         {Settings.Personality}", "ReadProfile");
             Log($"Bulb Mode Enable:                    {Settings.BulbModeEnable}", "ReadProfile");
             Log($"Bulb Mode Time:                      {Settings.BulbModeTime}", "ReadProfile");
             Log($"Using Camera Lens:                   {Settings.UsingCameraLens}", "ReadProfile");

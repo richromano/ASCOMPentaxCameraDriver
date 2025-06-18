@@ -198,63 +198,6 @@ namespace ASCOM.DSLR.Classes
                 pixels[col, row, 2] = r;
             };
 
-            /*
-                       var dataStructure = GetStructure<libraw_data_t>(data);
-
-                       var colorsStr = dataStructure.idata.cdesc;
-
-                       if (colorsStr != "RGBG")
-                           throw new NotImplementedException();
-
-                       int xoffs = 0;
-                       int yoffs = 0;
-
-                       string cameraPattern = "";
-                       cameraPattern += colorsStr[NativeMethods.libraw_COLOR(data, 0, 0)];
-                       cameraPattern += colorsStr[NativeMethods.libraw_COLOR(data, 0, 1)];
-                       cameraPattern += colorsStr[NativeMethods.libraw_COLOR(data, 1, 0)];
-                       cameraPattern += colorsStr[NativeMethods.libraw_COLOR(data, 1, 1)];
-
-                       switch (cameraPattern)
-                       {
-                           case "RGGB":
-                               break;
-                           case "GRBG":
-                               xoffs = 1;
-                               break;
-                           case "BGGR":
-                               xoffs = 1;
-                               yoffs = 1;
-                               break;
-                           case "GBRG":
-                               yoffs = 1;
-                               break;
-                           default:
-                               throw new System.NotImplementedException();
-                       }
-
-                       ushort width = dataStructure.sizes.iwidth;
-                       ushort height = dataStructure.sizes.iheight;
-
-                       var pixels = new int[width, height];
-
-                       for(int y=0;y<height-yoffs;y++)
-                       {
-
-                           int i0 = NativeMethods.libraw_COLOR(data, y, 0);
-                           int i1 = NativeMethods.libraw_COLOR(data, y, 1);
-                           ushort* ptr = (ushort*)((byte*)dataStructure.image.ToPointer() + width * 8 * y);
-
-                           for (int x = 0; x < width - xoffs; x += 2)
-                           {
-                               pixels[x + xoffs, y + yoffs] = *(ptr + i0);
-                               ptr += 4;
-                               pixels[x + xoffs + 1, y + yoffs] = *(ptr + i1);
-                               ptr += 4;
-                           }
-
-                       }
-                       */
 
             NativeMethods.libraw_close(data);
 

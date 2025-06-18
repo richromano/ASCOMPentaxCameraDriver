@@ -50,7 +50,10 @@ namespace ASCOM.PentaxKP
 
             ArrayList modes = device.ReadoutModes;
 
-            device.FastReadout = false;
+            //            device.FastReadout = false;
+//            device.ReadoutMode = 1;
+//            Thread.Sleep(1000);
+//            device.ReadoutMode = 0;
 
             Console.WriteLine(device.Gain);
             device.Gain = 0;

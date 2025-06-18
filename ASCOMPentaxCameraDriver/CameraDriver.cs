@@ -95,7 +95,7 @@ namespace ASCOM.PentaxKP
         internal static int m_readoutmode=0;
 
         // If saving in raw formate for standard output mode
-        internal static bool m_rawmode = true;
+//        internal static bool m_rawmode = true;
 //        internal static bool m_rawmode = false;
 
         internal Thread cameraThread;
@@ -114,7 +114,8 @@ namespace ASCOM.PentaxKP
                 bitmapImage.BeginInit();
                 bitmapImage.StreamSource = memoryStream;
                 bitmapImage.EndInit();
-                bitmapsToProcess.Enqueue(bitmapImage);
+                if(LastSetFastReadout)
+                    bitmapsToProcess.Enqueue(bitmapImage);
                 DriverCommon.LogCameraMessage("", "Received LiveView Image");
             }
 
@@ -127,7 +128,7 @@ namespace ASCOM.PentaxKP
                     image.Name, FileMode.Create, FileAccess.Write))
                 {
                     Response imageGetResponse = image.GetData(fs);
-                    DriverCommon.LogCameraMessage("","Get Image is " +
+                    DriverCommon.LogCameraMessage("","Get Image has " +
                         (imageGetResponse.Result == Result.OK ?
                             "SUCCEED." : "FAILED."));
                     DriverCommon.LogCameraMessage("", "c:/users/richr" + Path.DirectorySeparatorChar +
@@ -222,6 +223,22 @@ namespace ASCOM.PentaxKP
                 }
             }
 
+/*            if (DriverCommon.m_camera!=null&&IsConnected)
+            {
+                StorageWriting sw = new StorageWriting();
+                sw = Ricoh.CameraController.StorageWriting.False;
+                StillImageCaptureFormat sicf = new StillImageCaptureFormat();
+
+                sicf = Ricoh.CameraController.StillImageCaptureFormat.JPEG;
+                if (DriverCommon.Settings.RAWSave)
+                    sicf = Ricoh.CameraController.StillImageCaptureFormat.DNG;
+                StillImageQuality siq = new StillImageQuality();
+                siq = Ricoh.CameraController.StillImageQuality.LargeBest;
+                DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sw });
+                DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { siq });
+                DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sicf });
+            }*/
+
             DriverCommon.LogCameraMessage("SetupDialog", "[out]");
         }
 
@@ -314,7 +331,7 @@ namespace ASCOM.PentaxKP
                                     StillImageCaptureFormat sicf = new StillImageCaptureFormat();
 
                                     sicf = Ricoh.CameraController.StillImageCaptureFormat.JPEG;
-                                    if(m_rawmode)
+                                    if(DriverCommon.Settings.RAWSave)
                                         sicf = Ricoh.CameraController.StillImageCaptureFormat.DNG;
                                     StillImageQuality siq = new StillImageQuality();
                                     siq=Ricoh.CameraController.StillImageQuality.LargeBest;
@@ -323,6 +340,8 @@ namespace ASCOM.PentaxKP
                                     DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sicf });
                                     // Sleep to let the settings take effect
                                     Thread.Sleep(1000);
+                                    if (DriverCommon.Settings.UseLiveview)
+                                        DriverCommon.m_camera.StartLiveView();
 
                                     Gain = gainIndex;
                                 }
@@ -508,7 +527,7 @@ namespace ASCOM.PentaxKP
                 //using (new SerializedAccess(this, "get_CCDTemperature", true))
                 {
                     DriverCommon.LogCameraMessage("", "get_CCDTemperature");
-                   double temperature = 5;
+                   double temperature = 20; // Celcius
                    return temperature;
 				}
             }
@@ -745,12 +764,24 @@ namespace ASCOM.PentaxKP
                     if (LastSetFastReadout)
                     {
                         if (!value)
+                        {
+                            LastSetFastReadout = false;
                             DriverCommon.m_camera.StopLiveView();
-                        else
-                            StopExposure();
+                            Thread.Sleep(500);
+                            // Need to clear because the expected format has changed
+                            bitmapsToProcess.Clear();
+                            imagesToProcess.Clear();
+                        }
+                        //                        else
+                        //                            StopThreadCapture();
                     }
                     if (value)
+                    {
                         DriverCommon.m_camera.StartLiveView();
+                        // Need to clear because the expected format has changed
+                        imagesToProcess.Clear();
+                    }
+
                     LastSetFastReadout = value;
 /*                    if (value)
                         ReadoutMode = 1;
@@ -866,7 +897,8 @@ namespace ASCOM.PentaxKP
                 //using (new SerializedAccess(this, "get_HasShutter"))
                 {
                     DriverCommon.LogCameraMessage("", "get_HasShutter");
-                    return true;
+                    // We can't do dark frames
+                    return false;
 				}
             }
         }
@@ -879,60 +911,7 @@ namespace ASCOM.PentaxKP
                 throw new ASCOM.PropertyNotImplementedException("HeatSinkTemperature", false);
             }
         }
-/*
-        private object ImageData()
-        {
-            DriverCommon.LogCameraMessage("", "ImageData()");
 
-            object result = null;
-
-            // This is where the magic happens - the Image needs to be converted to RGB
-
-            if (DriverCommon.Camera.LastImage.Status != PentaxKPImage.ImageStatus.Ready)
-            {
-                DriverCommon.LogCameraMessage("ImageArray Get", "Throwing InvalidOperationException because of a call to ImageArray before the first image has been taken!");
-                throw new ASCOM.InvalidOperationException("Call to ImageArray before the first image has been taken!");
-            }
-
-            PentaxKPImage image = DriverCommon.Camera.LastImage;
-
-            int requestedWidth = NumX;
-            int requestedHeight = NumY;
-            DriverCommon.LogCameraMessage("ImageArray", "requestedWidth = {0}, cameraNumX = {1}, camera.Mode.ImageWidth = {2}", (int)Math.Min(DriverCommon.Settings.ImageWidth, DriverCommon.Camera.Mode.ImageWidthPixels), DriverCommon.Settings.ImageWidth, DriverCommon.Camera.Mode.ImageWidthPixels);
-            DriverCommon.LogCameraMessage("ImageArray Get", String.Format("(numX = {0}, numY = {1}, image.Width = {2}, image.Height = {3})", requestedWidth, requestedHeight, image.Width, image.Height));
-
-            switch (image.m_info.ImageMode)
-            {
-                case 1:
-                    DriverCommon.LogCameraMessage("BAYER info", String.Format("Dimensions = {0}, {1} x {2}", PentaxKPImage.BAYER.Rank, PentaxKPImage.BAYER.GetLength(0), PentaxKPImage.BAYER.GetLength(1)));
-
-                    result = Resize(PentaxKPImage.BAYER, PentaxKPImage.BAYER.Rank, StartX, StartY, requestedWidth, requestedHeight);
-                    break;
-
-                case 2:
-                    if (DriverCommon.Settings.Personality != PentaxKPCommon.PERSONALITY_NINA)
-                    {
-                        DriverCommon.LogCameraMessage("RGB info", String.Format("Dimensions = {0}, {1} x {2} x {3}", PentaxKPImage.RGB.Rank, PentaxKPImage.RGB.GetLength(0), PentaxKPImage.RGB.GetLength(1), PentaxKPImage.RGB.GetLength(2)));
-
-                        result = Resize(PentaxKPImage.RGB, PentaxKPImage.RGB.Rank, StartX, StartY, requestedWidth, requestedHeight);
-                    }
-                    else
-                    {
-                        DriverCommon.LogCameraMessage("RGB info as MONO", String.Format("Dimensions = {0}, {1} x {2}", PentaxKPImage.BAYER.Rank, PentaxKPImage.BAYER.GetLength(0), PentaxKPImage.BAYER.GetLength(1)));
-
-                        result = Resize(PentaxKPImage.BAYER, PentaxKPImage.BAYER.Rank, StartX, StartY, requestedWidth, requestedHeight);
-                    }
-                    break;
-
-                default:
-                    DriverCommon.LogCameraMessage("Unknown info", String.Format("{0} - Throwing", image.m_info.ImageMode));
-
-                    throw new ASCOM.InvalidOperationException("Call to ImageArray resulted in invalid image type!");
-            }
-
-            return result;
-        }
-*/
         private Bitmap BitmapImage2Bitmap(BitmapImage bitmapImage)
         {
             // BitmapImage bitmapImage = new BitmapImage(new Uri("../Images/test.png", UriKind.Relative));
@@ -962,104 +941,8 @@ namespace ASCOM.PentaxKP
             while (!IsFileClosed(MNewFile)) { }
             rgbImage = _imageDataProcessor.ReadRawPentax(MNewFile);
 
-/*            int height = 4000;
-            int width = 6016;
-
-            // RGGB
-
-            for (int y = 1; y < height - 1; y++)
-            {
-                for (int x = 1; x < width - 1; x++)
-                {
-                    if ((y % 2 == 0) && (x % 2 == 1)) // Green pixel (RGGB pattern)
-                    {
-                        rgbImage[x, y, 1] = bayerImage[x, y]; // Green
-                        rgbImage[x, y, 2] = ((bayerImage[x, y-1] + bayerImage[x, y+1]) / 2); // Red
-                        rgbImage[x, y, 0] = ((bayerImage[x-1, y] + bayerImage[x+1, y]) / 2); // Blue
-                    }
-                    else if ((y % 2 == 0) && (x % 2 == 0)) // Red pixel
-                    {
-                        rgbImage[x, y, 2] = bayerImage[x, y]; // Red
-                        rgbImage[x, y, 1] = ((bayerImage[x-1, y] + bayerImage[x+1, y] + bayerImage[x, y-1] + bayerImage[x, y+1]) / 4); // Green
-                        rgbImage[x, y, 0] = ((bayerImage[x - 1, y + 1] + bayerImage[x + 1, y + 1] + bayerImage[x - 1, y - 1] + bayerImage[x + 1, y - 1]) / 4); // Blue
-                    }
-                    else if ((y % 2 == 1) && (x % 2 == 1)) // Blue pixel
-                    {
-                        rgbImage[x, y, 0] = bayerImage[x, y]; // Blue
-                        rgbImage[x, y, 1] = ((bayerImage[x-1, y] + bayerImage[x+1, y] + bayerImage[x, y-1] + bayerImage[x, y+1]) / 4); // Green
-                        rgbImage[x, y, 2] = ((bayerImage[x - 1, y + 1] + bayerImage[x + 1, y + 1] + bayerImage[x - 1, y - 1] + bayerImage[x + 1, y - 1]) / 4); // Red
-                    }
-                    else // Green pixel (RGGB pattern)
-                    {
-                        rgbImage[x, y, 1] = bayerImage[x, y]; // Green
-                        rgbImage[x, y, 2] = ((bayerImage[x-1, y] + bayerImage[x+1, y]) / 2); // Red
-                        rgbImage[x, y, 0] = ((bayerImage[x, y-1] + bayerImage[x, y+1]) / 2); // Blue
-                    }
-                }
-            }
-
-/*            for (int y = 1; y < height-1; y++)
-            {
-                for (int x = 1; x < width-1; x++)
-                {
-                    int r = 0, g = 0, b = 0;
-
-                    if (y % 2 == 0) // Even row
-                    {
-                        if (x % 2 == 0) // Even column (Red pixel)
-                        {
-                            r = bayerData[x,y];
-                            g = (bayerData[x + 1, y] +
-                                 bayerData[x, y + 1]) / 2;
-                            b = bayerData[x + 1, y + 1];
-                        }
-                        else // Odd column (Green pixel)
-                        {
-                            g = bayerData[x,y];
-                            if(x==0)
-                                r = bayerData[x + 1, y];
-                            else
-                                r = (bayerData[x - 1, y] +
-                                     bayerData[x + 1, y]) / 2;
-                            b = bayerData[x, y + 1];
-                        }
-                    }
-                    else // Odd row
-                    {
-                        if (x % 2 == 0) // Even column (Green pixel)
-                        {
-                            g = bayerData[x,y];
-                            r = bayerData[x, y - 1];
-                            if(x==0)
-                                b = bayerData[x + 1, y] ;
-                            else
-                                b = (bayerData[x + 1, y] +
-                                     bayerData[x - 1, y]) / 2;
-                        }
-                        else // Odd column (Blue pixel)
-                        {
-                            b = bayerData[x,y];
-                            if(x==0)
-                                g = bayerData[x, y - 1];
-                            else
-                            g = (bayerData[x - 1, y] +
-                                 bayerData[x, y - 1]) / 2;
-                            if (x == 0)
-                                r = 0;
-                            else
-                                r = bayerData[x - 1, y - 1];
-                        }
-                    }
-
-                    _cameraImageArray[x, y, 0] = b;
-                    _cameraImageArray[x, y, 1] = g;
-                    _cameraImageArray[x, y, 2] = r;
-                }
-            }*/
-
-
-        //_cameraImageArray = _imageDataProcessor.ReadAndDebayerRaw(MNewFile);
-        result = Resize(rgbImage, 3, StartX, StartY, NumX, NumY);
+            //_cameraImageArray = _imageDataProcessor.ReadAndDebayerRaw(MNewFile);
+            result = Resize(rgbImage, 3, StartX, StartY, NumX, NumY);
             return result;
         }
 
@@ -1139,18 +1022,24 @@ namespace ASCOM.PentaxKP
             //Format24BppRgb Given X and Y coordinates, the address of the first element in the pixel is Scan0+(y*Stride)+(x*3). 
             //This points to the blue byte which is followed by the green and the red.
 
-            for (int y = 0; y < height; y++)
+            int scale = 1;
+
+            if (DriverCommon.Settings.RAWSave)
+                scale = 256;
+
+                for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
-                    _cameraImageArray[x, y, 0] = Marshal.ReadByte(ptr, (stride * y) + (4 * x));
-                    _cameraImageArray[x, y, 1] = Marshal.ReadByte(ptr + 1, (stride * y) + (4 * x));
-                    _cameraImageArray[x, y, 2] = Marshal.ReadByte(ptr + 2, (stride * y) + (4 * x));
+                    _cameraImageArray[x, y, 0] = scale*Marshal.ReadByte(ptr, (stride * y) + (4 * x));
+                    _cameraImageArray[x, y, 1] = scale * Marshal.ReadByte(ptr + 1, (stride * y) + (4 * x));
+                    _cameraImageArray[x, y, 2] = scale * Marshal.ReadByte(ptr + 2, (stride * y) + (4 * x));
                 }
             }
 
             // Unlock the bits.
             _bmp.UnlockBits(bmpData);
+            DriverCommon.LogCameraMessage("Image", "Resize");
             result = Resize(_cameraImageArray, 3, StartX, StartY, _bmp.Width, _bmp.Height);
             return result;
         }
@@ -1166,30 +1055,37 @@ namespace ASCOM.PentaxKP
                     DriverCommon.LogCameraMessage("", "get_ImageArray");
                     String imageName;
                     BitmapImage bitmap;
-                    if (bitmapsToProcess.Count != 0)
+                    while(bitmapsToProcess.Count != 0)
                     {
                         bitmap = bitmapsToProcess.Dequeue();
                         DriverCommon.LogCameraMessage("", "Calling ReadImageQuick");
 
                         result=ReadImageQuick(bitmap);
-                        return result;
+                        if (bitmapsToProcess.Count == 0)
+                            return result;
                     }
 
-                    if (imagesToProcess.Count != 0)
+                    while (imagesToProcess.Count != 0)
                     {
                         imageName = imagesToProcess.Dequeue();
                         if (imageName.Substring(imageName.Length - 3) == "JPG")
                         {
                             DriverCommon.LogCameraMessage("", "Calling ReadImageFileQuick");
                             result = ReadImageFileQuick(imageName);
-                            return result;
+                            while (!IsFileClosed(imageName)) { }
+                            File.Delete(imageName);
+                            if (imagesToProcess.Count == 0)
+                                return result;
                         }
 
                         if (imageName.Substring(imageName.Length - 3) == "DNG")
                         {
                             DriverCommon.LogCameraMessage("", "Calling ReadImageFileRAW");
                             result = ReadImageFileRaw(imageName);
-                            return result;
+                            while (!IsFileClosed(imageName)) { }
+                            File.Delete(imageName);
+                            if (imagesToProcess.Count == 0)
+                                return result;
                         }
 
                         throw new ASCOM.PropertyNotImplementedException("ImageArray", false);
@@ -1197,51 +1093,6 @@ namespace ASCOM.PentaxKP
 
                     throw new ASCOM.PropertyNotImplementedException("ImageArray", false);
 
-                    /*object result = null;
-
-                    if (DriverCommon.Camera.LastImage.Status != PentaxKPImage.ImageStatus.Ready)
-                    {
-                        DriverCommon.LogCameraMessage("ImageArray Get", "Throwing InvalidOperationException because of a call to ImageArray before the first image has been taken!");
-                        throw new ASCOM.InvalidOperationException("Call to ImageArray before the first image has been taken!");
-                    }
-
-                    PentaxKPImage image = DriverCommon.Camera.LastImage;
-
-                    int requestedWidth = NumX;
-                    int requestedHeight = NumY;
-                    DriverCommon.LogCameraMessage("ImageArray", "requestedWidth = {0}, cameraNumX = {1}, camera.Mode.ImageWidth = {2}", (int)Math.Min(DriverCommon.Settings.ImageWidth, DriverCommon.Camera.Mode.ImageWidthPixels), DriverCommon.Settings.ImageWidth, DriverCommon.Camera.Mode.ImageWidthPixels);
-                    DriverCommon.LogCameraMessage("ImageArray Get", String.Format("(numX = {0}, numY = {1}, image.Width = {2}, image.Height = {3})", requestedWidth, requestedHeight, image.Width, image.Height));
-
-                    switch (image.m_info.ImageMode)
-                    {
-                        case 1:
-                            DriverCommon.LogCameraMessage("BAYER info", String.Format("Dimensions = {0}, {1} x {2}", PentaxKPImage.BAYER.Rank, PentaxKPImage.BAYER.GetLength(0), PentaxKPImage.BAYER.GetLength(1)));
-
-                            result = Resize(PentaxKPImage.BAYER, PentaxKPImage.BAYER.Rank, StartX, StartY, requestedWidth, requestedHeight);
-                            break;
-
-                        case 2:
-                            if (DriverCommon.Settings.Personality != PentaxKPCommon.PERSONALITY_NINA)
-                            {
-                                DriverCommon.LogCameraMessage("RGB info", String.Format("Dimensions = {0}, {1} x {2} x {3}", PentaxKPImage.RGB.Rank, PentaxKPImage.RGB.GetLength(0), PentaxKPImage.RGB.GetLength(1), PentaxKPImage.RGB.GetLength(2)));
-
-                                result = Resize(PentaxKPImage.RGB, PentaxKPImage.RGB.Rank, StartX, StartY, requestedWidth, requestedHeight);
-                            }
-                            else
-                            {
-                                DriverCommon.LogCameraMessage("RGB info as MONO", String.Format("Dimensions = {0}, {1} x {2}", PentaxKPImage.BAYER.Rank, PentaxKPImage.BAYER.GetLength(0), PentaxKPImage.BAYER.GetLength(1)));
-
-                                result = Resize(PentaxKPImage.BAYER, PentaxKPImage.BAYER.Rank, StartX, StartY, requestedWidth, requestedHeight);
-                            }
-                            break;
-
-                        default:
-                             DriverCommon.LogCameraMessage("Unknown info", String.Format("{0} - Throwing", image.m_info.ImageMode));
-
-                            throw new ASCOM.InvalidOperationException("Call to ImageArray resulted in invalid image type!");
-                    }
-
-                    return result;*/
                 }
             }
         }
@@ -1393,7 +1244,7 @@ namespace ASCOM.PentaxKP
                 {
                     DriverCommon.LogCameraMessage("", "get_MaxADU");
                     int bpp = 8;
-                    if (m_rawmode)
+                    if (DriverCommon.Settings.RAWSave)
                         bpp = 16;
                     int maxADU = (1 << bpp) - 1;
 
@@ -1485,8 +1336,7 @@ namespace ASCOM.PentaxKP
                  //using (new SerializedAccess(this, "get_PixelSizeX"))
                 {
                     DriverCommon.LogCameraMessage("", "get_PixelSizeX");
-					//Fix
-                    return 0.004;// DriverCommon.Camera.Info.PixelWidth;
+                    return 3.88;// DriverCommon.Camera.Info.PixelWidth;
 				}
             }
         }
@@ -1498,8 +1348,7 @@ namespace ASCOM.PentaxKP
                 //using (new SerializedAccess(this, "get_PixelSizeY"))
                 {
                     DriverCommon.LogCameraMessage("", "get_PixelSizeY");
-					//Fix
-                    return 0.004;// DriverCommon.Camera.Info.PixelHeight;
+                    return 3.88;// DriverCommon.Camera.Info.PixelHeight;
 				}
             }
         }
@@ -1535,6 +1384,8 @@ namespace ASCOM.PentaxKP
                             case 0:
                                 FastReadout = false;
                                 m_readoutmode = 0;
+                                if(DriverCommon.Settings.UseLiveview)
+                                          DriverCommon.m_camera.StartLiveView();
                                 NumX = 6016;
                                 NumY = 4000;
                                 DefaultImageWidthPixels = 6016;
@@ -1573,14 +1424,7 @@ namespace ASCOM.PentaxKP
 
                                         if (true/*DriverCommon.Camera.HasLiveView*/)
                     {
-                        //                        if (DriverCommon.Settings.Personality == PentaxKPCommon.PERSONALITY_NINA)
-                        //                        {
-                        //                            modes.Add(String.Format("LiveView ({0} x {1}) [Mono]", DriverCommon.Camera.Resolutions.PreviewWidthPixels, DriverCommon.Camera.Resolutions.PreviewHeightPixels));
-                        //                        }
-                        //                        else
-                        //                        {
                                                     modes.Add(String.Format("LiveView ({0} x {1})", 720, 480));
-                        //                        }
                     }
 
                     return modes;
@@ -1595,6 +1439,7 @@ namespace ASCOM.PentaxKP
                 using (new DriverCommon.SerializedAccess("get_SensorName"))
                 {
                     DriverCommon.LogCameraMessage("", "get_SensorName");
+                    //Fix
                     return "IMX193";// "QHY247C";// "IMX271";
 				}
             }
@@ -1607,7 +1452,6 @@ namespace ASCOM.PentaxKP
                 //using (new SerializedAccess(this, "get_SensorType"))
                 {
                     DriverCommon.LogCameraMessage("", "get_SensorType");
-    //                type = camera.OutputMode == SonyCamera.ImageMode.RGB ? SensorType.Color : SensorType.RGGB;
                     return SensorType.Color;
 				}
             }
@@ -1649,7 +1493,7 @@ namespace ASCOM.PentaxKP
             m_captureState = Ricoh.CameraController.CaptureState.Unknown;
         }
 
-    private void StartThreadCapture()
+        private void StartThreadCapture()
         {
             _requestTermination.Reset();
 
@@ -1824,6 +1668,7 @@ namespace ASCOM.PentaxKP
                     shutterSpeed = ShutterSpeed.SS15_10;
                 if (Duration > 16.0 / 10.0 - 0.000001)
                     shutterSpeed = ShutterSpeed.SS16_10;
+                //Fix
                 //public static readonly ShutterSpeed SS10_13;
                 //public static readonly ShutterSpeed SS10_16;
                 //public static readonly ShutterSpeed SS10_25;
@@ -1943,6 +1788,16 @@ namespace ASCOM.PentaxKP
 
         
                 DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { shutterSpeed });
+
+                FNumber fNumber = new FNumber();
+                DriverCommon.m_camera.GetCaptureSettings(new List<CaptureSetting>() { fNumber });
+                List<CaptureSetting> availableFNumberSettings = fNumber.AvailableSettings;
+
+                //Number fNumber = FNumber.F5_6;
+                //cameraDevice.SetCaptureSettings(new List<CaptureSetting>() { fNumber });
+
+                // The list above might contain the following values.
+                // F4.0 (F4_0), F4.5 (F4_5), F5.0 (F5_0)
 
                 /*if (StartX + NumX > DriverCommon.Camera.Mode.ImageWidthPixels)
                 {
@@ -2126,6 +1981,9 @@ namespace ASCOM.PentaxKP
             {
                 using (new DriverCommon.SerializedAccess("IsConnected"))
                 {
+                    if (DriverCommon.m_camera == null)
+                        return false;
+
                     return DriverCommon.m_camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB);
                 }
             }

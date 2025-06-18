@@ -31,14 +31,19 @@ namespace ASCOM.PentaxKP
             // Update the state variables with results from the dialogue
             DriverCommon.Settings.DeviceId = (string)comboBoxCamera.SelectedItem;
             DriverCommon.Settings.EnableLogging = chkTrace.Checked;
-            DriverCommon.Settings.DefaultReadoutMode = (short)comboBoxOutputFormat.SelectedValue;
-            DriverCommon.Settings.ARWAutosave = checkBoxEnableSaveLocation.Checked;
-            DriverCommon.Settings.ARWAutosaveFolder = textBoxSaveLocation.Text;
-            DriverCommon.Settings.ARWAutosaveWithDate = checkBoxAppendDate.Checked;
-            DriverCommon.Settings.ARWAutosaveAlwaysCreateEmptyFolder = checkBoxCreateMultipleDirectories.Checked;
+            DriverCommon.Settings.DefaultReadoutMode = (short)(comboBoxOutputFormat.SelectedIndex);
+            if (DriverCommon.Settings.DefaultReadoutMode == 0)
+                DriverCommon.Settings.RAWSave = true;
+            else
+                DriverCommon.Settings.RAWSave = false;
+
+            //            DriverCommon.Settings.RAWSave = checkBoxEnableSaveLocation.Checked;
+            //            DriverCommon.Settings.ARWAutosaveFolder = textBoxSaveLocation.Text;
+            //            DriverCommon.Settings.ARWAutosaveWithDate = checkBoxAppendDate.Checked;
+            //            DriverCommon.Settings.ARWAutosaveAlwaysCreateEmptyFolder = checkBoxCreateMultipleDirectories.Checked;
             DriverCommon.Settings.UseLiveview = checkBoxUseLiveview.Checked;
             DriverCommon.Settings.AutoLiveview = checkBoxAutoLiveview.Checked;
-            DriverCommon.Settings.Personality = (int)comboBoxPersonality.SelectedValue;
+            DriverCommon.Settings.Personality = comboBoxPersonality.SelectedIndex+1;
             DriverCommon.Settings.BulbModeEnable = checkBoxBulbMode.Checked;
             DriverCommon.Settings.BulbModeTime = short.Parse(textBoxBulbMode.Text.Trim());
             DriverCommon.Settings.AllowISOAdjust = checkBoxAllowISOAdjust.Checked;
@@ -111,29 +116,30 @@ namespace ASCOM.PentaxKP
             checkBoxHandsOffFocus.Checked = DriverCommon.Settings.HandsOffFocus;
             checkBoxHandsOffFocus.Enabled = DriverCommon.Settings.UsingCameraLens;
 
-            checkBoxEnableSaveLocation.Checked = DriverCommon.Settings.ARWAutosave;
-            textBoxSaveLocation.Enabled = DriverCommon.Settings.ARWAutosave;
-            textBoxSaveLocation.Text = DriverCommon.Settings.ARWAutosaveFolder;
-            checkBoxAppendDate.Enabled = textBoxSaveLocation.Enabled;
-            checkBoxAppendDate.Checked = DriverCommon.Settings.ARWAutosaveWithDate;
-            checkBoxCreateMultipleDirectories.Enabled = textBoxSaveLocation.Enabled;
-            checkBoxCreateMultipleDirectories.Checked = DriverCommon.Settings.ARWAutosaveAlwaysCreateEmptyFolder;
+//            checkBoxEnableSaveLocation.Checked = DriverCommon.Settings.RAWSave;
+//            textBoxSaveLocation.Enabled = DriverCommon.Settings.RAWSave;
+//            textBoxSaveLocation.Text = DriverCommon.Settings.ARWAutosaveFolder;
+//            checkBoxAppendDate.Enabled = textBoxSaveLocation.Enabled;
+//            checkBoxAppendDate.Checked = DriverCommon.Settings.ARWAutosaveWithDate;
+//            checkBoxCreateMultipleDirectories.Enabled = textBoxSaveLocation.Enabled;
+//            checkBoxCreateMultipleDirectories.Checked = DriverCommon.Settings.ARWAutosaveAlwaysCreateEmptyFolder;
 
-            buttonSelectFolder.Enabled = DriverCommon.Settings.ARWAutosave;
+//            buttonSelectFolder.Enabled = DriverCommon.Settings.RAWSave;
             checkBoxUseLiveview.Checked = DriverCommon.Settings.UseLiveview;
             checkBoxAutoLiveview.Checked = DriverCommon.Settings.AutoLiveview;
 
             Dictionary<int, string> personalities = new Dictionary<int, string>();
 
-            personalities.Add(PentaxKPCommon.PERSONALITY_APT, "APT");
-            personalities.Add(PentaxKPCommon.PERSONALITY_NINA, "N.I.N.A");
+            //Commenting out makes it crash
+//            personalities.Add(PentaxKPCommon.PERSONALITY_APT, "APT");
+//            personalities.Add(PentaxKPCommon.PERSONALITY_NINA, "N.I.N.A");
             personalities.Add(PentaxKPCommon.PERSONALITY_SHARPCAP, "SharpCap");
 
             comboBoxPersonality.DataSource = new BindingSource(personalities, null);
             comboBoxPersonality.DisplayMember = "Value";
             comboBoxPersonality.ValueMember = "Key";
 
-            comboBoxPersonality.SelectedValue = DriverCommon.Settings.Personality;
+            comboBoxPersonality.SelectedIndex = 0;// DriverCommon.Settings.Personality;
 
             checkBoxBulbMode.Checked = DriverCommon.Settings.BulbModeEnable;
             textBoxBulbMode.Text = DriverCommon.Settings.BulbModeTime.ToString();
@@ -143,7 +149,7 @@ namespace ASCOM.PentaxKP
 
             PopulateOutputFormats();
 
-            comboBoxOutputFormat.SelectedValue = DriverCommon.Settings.DefaultReadoutMode;
+            comboBoxOutputFormat.SelectedIndex = 0;// DriverCommon.Settings.DefaultReadoutMode;
 
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
             FileVersionInfo fileVersion = FileVersionInfo.GetVersionInfo(assembly.Location);
@@ -196,50 +202,31 @@ namespace ASCOM.PentaxKP
 
         private void checkBoxEnableSaveLocation_CheckedChanged(object sender, EventArgs e)
         {
-            textBoxSaveLocation.Enabled = ((CheckBox)sender).Checked;
-            buttonSelectFolder.Enabled = ((CheckBox)sender).Checked;
-            checkBoxAppendDate.Enabled = ((CheckBox)sender).Checked;
-            checkBoxCreateMultipleDirectories.Enabled = ((CheckBox)sender).Checked;
+//            textBoxSaveLocation.Enabled = ((CheckBox)sender).Checked;
+//            buttonSelectFolder.Enabled = ((CheckBox)sender).Checked;
+//            checkBoxAppendDate.Enabled = ((CheckBox)sender).Checked;
+//            checkBoxCreateMultipleDirectories.Enabled = ((CheckBox)sender).Checked;
         }
 
         private void selectFolder_Click(object sender, EventArgs e)
         {
-            selectFolderDialog.SelectedPath = textBoxSaveLocation.Text;
+//            selectFolderDialog.SelectedPath = textBoxSaveLocation.Text;
 
             if (selectFolderDialog.ShowDialog() == DialogResult.OK)
             {
-                textBoxSaveLocation.Text = selectFolderDialog.SelectedPath;
+//                textBoxSaveLocation.Text = selectFolderDialog.SelectedPath;
             }
         }
 
         private void comboBoxPersonality_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int personality = (int)comboBoxPersonality.SelectedValue;
+            int personality=PentaxKPCommon.PERSONALITY_SHARPCAP;
+            personality = comboBoxPersonality.SelectedIndex+1;
 
-            short currentOutputFormat = comboBoxOutputFormat.SelectedValue != null ? (short)comboBoxOutputFormat.SelectedValue : PentaxKPCommon.OUTPUTFORMAT_RGGB;
+            short currentOutputFormat = (short)comboBoxOutputFormat.SelectedIndex;//.SelectedValue != null ? (short)comboBoxOutputFormat.SelectedValue : PentaxKPCommon.OUTPUTFORMAT_RGGB;
 
             switch (personality)
             {
-                case PentaxKPCommon.PERSONALITY_APT:
-                    // APT allows image output to be selected (though BGR will give interesting results)
-                    // APT also supports RGB output so liveview can be enabled
-                    comboBoxOutputFormat.Enabled = true;
-                    checkBoxUseLiveview.Enabled = true;
-
-                    PopulateOutputFormats();
-
-                    comboBoxOutputFormat.SelectedValue = currentOutputFormat > 0 ? currentOutputFormat : PentaxKPCommon.OUTPUTFORMAT_RGGB;
-                    break;
-
-                case PentaxKPCommon.PERSONALITY_NINA:
-                    // NINA only supports RGGB, so we need to preset format and disable liveview
-                    PopulateOutputFormats();
-                    comboBoxOutputFormat.SelectedValue = PentaxKPCommon.OUTPUTFORMAT_RGGB;
-                    comboBoxOutputFormat.Enabled = false;
-                    checkBoxUseLiveview.Enabled = false;
-                    checkBoxUseLiveview.Checked = false;
-                    break;
-
                 case PentaxKPCommon.PERSONALITY_SHARPCAP:
                     // Sharpcap supports format specification, but wants BGR, not RGB
                     // Doesn't support Liveview selection
@@ -253,8 +240,8 @@ namespace ASCOM.PentaxKP
                     }
 
                     comboBoxOutputFormat.SelectedValue = currentOutputFormat;
-                    checkBoxUseLiveview.Enabled = false;
-                    checkBoxUseLiveview.Checked = false;
+                    checkBoxUseLiveview.Enabled = true;
+                    checkBoxUseLiveview.Checked = true;
                     break;
             }
         }
@@ -265,17 +252,17 @@ namespace ASCOM.PentaxKP
 
             outputFormats.Add(PentaxKPCommon.OUTPUTFORMAT_RGGB, "RAW/RGGB (Unprocessed)");
 
-            switch ((int)comboBoxPersonality.SelectedValue)
+            switch (comboBoxPersonality.SelectedIndex)
             {
-                case PentaxKPCommon.PERSONALITY_APT:
+/*                case PentaxKPCommon.PERSONALITY_APT:
                     outputFormats.Add(PentaxKPCommon.OUTPUTFORMAT_RGB, "RGB (Processed)");
                     break;
 
                 case PentaxKPCommon.PERSONALITY_NINA:
                     break;
-
+*/
                 case PentaxKPCommon.PERSONALITY_SHARPCAP:
-                    outputFormats.Add(PentaxKPCommon.OUTPUTFORMAT_BGR, "BGR (Processed)");
+                    outputFormats.Add(PentaxKPCommon.OUTPUTFORMAT_BGR, "JPG (Processed)");
                     break;
             }
 
@@ -381,6 +368,11 @@ namespace ASCOM.PentaxKP
 //                {
 //                }
             }
+        }
+
+        private void checkBoxUseLiveview_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

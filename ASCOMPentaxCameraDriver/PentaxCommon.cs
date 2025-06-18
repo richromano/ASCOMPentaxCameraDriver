@@ -23,9 +23,7 @@ namespace ASCOM.PentaxKP
         protected const UInt32 IMAGEMODE_JPEG = 3;
         protected const UInt32 INFOFLAG_ACTIVE = 1;
 
-        public const int PERSONALITY_APT = 1;
-        public const int PERSONALITY_NINA = 2;
-        public const int PERSONALITY_SHARPCAP = 3;
+        public const int PERSONALITY_SHARPCAP = 0;
 
         public const short OUTPUTFORMAT_RGB = (short)IMAGEMODE_RGB;
         public const short OUTPUTFORMAT_BGR = OUTPUTFORMAT_RGB | 0x1000;
