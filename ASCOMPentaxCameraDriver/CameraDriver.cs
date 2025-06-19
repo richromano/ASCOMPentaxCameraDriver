@@ -21,27 +21,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Diagnostics;
-using System.Text;
 using System.Runtime.InteropServices;
-using ASCOM;
-using ASCOM.Astrometry;
 using ASCOM.Astrometry.AstroUtils;
 using ASCOM.Utilities;
 using ASCOM.DeviceInterface;
-using System.Globalization;
 using System.Collections;
 using System.Threading;
-using Microsoft.Win32;
 using System.IO;
 using Ricoh.CameraController;
 using System.Windows.Media.Imaging;
-using System.Diagnostics.Tracing;
-using System.Threading.Tasks;
 using System.Drawing;
 using System.Drawing.Imaging;
 using ASCOM.DSLR.Classes;
-using System.Collections.Concurrent;
 
 namespace ASCOM.PentaxKP
 {
@@ -308,7 +299,7 @@ namespace ASCOM.PentaxKP
                     DriverCommon.LogCameraMessage("", $"set_Connected Set {value.ToString()}");
                     if (value)
                     {
-	                    if (!DriverCommon.CameraConnected && DriverCommon.Settings.DeviceId == "")
+	                    //if (!DriverCommon.CameraConnected && DriverCommon.Settings.DeviceId == "")
 	                    {
 						//Fix!!!!
 	                        // Need to display setup dialog
@@ -1073,7 +1064,7 @@ namespace ASCOM.PentaxKP
                             DriverCommon.LogCameraMessage("", "Calling ReadImageFileQuick");
                             result = ReadImageFileQuick(imageName);
                             while (!IsFileClosed(imageName)) { }
-                            File.Delete(imageName);
+                            //File.Delete(imageName);
                             if (imagesToProcess.Count == 0)
                                 return result;
                         }
@@ -1083,7 +1074,7 @@ namespace ASCOM.PentaxKP
                             DriverCommon.LogCameraMessage("", "Calling ReadImageFileRAW");
                             result = ReadImageFileRaw(imageName);
                             while (!IsFileClosed(imageName)) { }
-                            File.Delete(imageName);
+                            //File.Delete(imageName);
                             if (imagesToProcess.Count == 0)
                                 return result;
                         }

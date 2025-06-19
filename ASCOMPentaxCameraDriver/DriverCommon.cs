@@ -60,8 +60,8 @@ namespace ASCOM.PentaxKP
         private static TraceLogger Logger = new TraceLogger("", "PentaxKP");
 
         private static PentaxKPCamera camera = null;
-        private static bool cameraConnected = false;
-        private static bool focuserConnected = false;
+        //private static bool cameraConnected = false;
+        //private static bool focuserConnected = false;
         internal static Ricoh.CameraController.CameraDevice m_camera = null;
 
         // Common to both
@@ -106,10 +106,18 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                return cameraConnected;
+                //Fix this is not Mutex safe
+                //using (new DriverCommon.SerializedAccess("get_Connected"))
+                {
+                    DriverCommon.LogCameraMessage("Connected", "get");
+                    if (DriverCommon.m_camera == null)
+                        return false;
+
+                    return DriverCommon.m_camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB);
+                }
             }
 
-            set
+/*            set
             {
                 bool oldValue = cameraConnected;
 
@@ -123,17 +131,25 @@ namespace ASCOM.PentaxKP
                 {
                     cameraConnected = oldValue;
                 }
-            }
+            }*/
         }
 
         static public bool FocuserConnected
         {
             get
             {
-                return focuserConnected;
+                //Fix this is not Mutex safe
+                //using (new DriverCommon.SerializedAccess("get_Connected"))
+                {
+                    DriverCommon.LogCameraMessage("Connected", "get");
+                    if (DriverCommon.m_camera == null)
+                        return false;
+
+                    return DriverCommon.m_camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB);
+                }
             }
 
-            set
+/*            set
             {
                 bool oldValue = focuserConnected;
 
@@ -147,7 +163,7 @@ namespace ASCOM.PentaxKP
                 {
                     focuserConnected = oldValue;
                 }
-            }
+            }*/
         }
 
         public static void LogCameraMessage(string identifier, string message, params object[] args)
@@ -321,78 +337,5 @@ namespace ASCOM.PentaxKP
         }
 
 
-        private static void EnsureCameraConnection()
-        {
-            if (cameraConnected || focuserConnected)
-            {
-                if (camera == null)
-                {
-                    Log("Camera does not currently exist, seeing if we can create", "EnsureCameraConnection");
-
-                    // See if we can create a camera using deviceId
-                    if (Settings.DeviceId != "")
-                    {
-                        Log($"Camera selected for connection {Settings.DeviceId}, searching", "EnsureCameraConnection");
-
-                        PentaxKPCameraEnumerator enumerator = new PentaxKPCameraEnumerator();
-
-                        foreach (PentaxKPCamera candidate in enumerator.Cameras)
-                        {
-                            if (camera == null && candidate.DisplayName == Settings.DeviceId)
-                            {
-                                Log("Found camera, hooray!", "EnsureCameraConnection");
-                                camera = candidate;
-                                Settings.ImageWidth = (int)(camera.Info.CropMode == 0 ? camera.Info.ImageWidthPixels : camera.Info.ImageWidthCroppedPixels);
-                                Settings.ImageHeight = (int)(camera.Info.CropMode == 0 ? camera.Info.ImageHeightPixels : camera.Info.ImageHeightCroppedPixels);
-
-                                switch (Settings.DefaultReadoutMode)
-                                {
-                                    case 0:
-                                        camera.OutputMode = PentaxKPCamera.ImageMode.RGB;
-                                        break;
-
-                                    case 1:
-                                        camera.OutputMode = PentaxKPCamera.ImageMode.RGGB;
-                                        break;
-                                }
-
-                                camera.BulbMode = Settings.BulbModeEnable;
-                                camera.BulbModeTime = Settings.BulbModeTime;
-                            }
-                        }
-                    }
-                }
-
-                if (camera != null)
-                {
-                    bool needsConnect = cameraConnected | focuserConnected;
-
-                    Log($"Ensure Camera {needsConnect}", "EnsureCameraConnection");
-
-                    if (needsConnect == camera.Connected)
-                    {
-                        Log("Camera already connected", "EnsureCameraConnection");
-                        return;
-                    }
-
-                    Log("Connecting", "EnsureCameraConnection");
-                    camera.Connected = needsConnect;
-                }
-
-                if (camera == null || !camera.Connected)
-                {
-                    throw new Exception("Cannot connect camera");
-                }
-            }
-            else
-            {
-                // Need to ensure disconnected
-                if (camera != null)
-                {
-                    camera.Connected = false;
-                    camera = null;
-                }
-            }
-        }
     }
 }
