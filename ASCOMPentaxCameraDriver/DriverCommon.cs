@@ -13,8 +13,8 @@ namespace ASCOM.PentaxKP
 {
     public class PentaxKPProfile
     {
-        private static int DefaultImageWidth = 6016; // Constants to define the ccd pixel dimenstions
-        private static int DefaultImageHeight = 4000;
+//        private static int DefaultImageWidth = 6016; // Constants to define the ccd pixel dimenstions
+//        private static int DefaultImageHeight = 4000;
 
         public bool EnableLogging = false;
         public string DeviceId = "";
@@ -31,10 +31,10 @@ namespace ASCOM.PentaxKP
         public bool HandsOffFocus = false;
 
         // Dynamic values
-        public int ImageWidth = DefaultImageWidth; // Initialise variables to hold values required for functionality tested by Conform
-        public int ImageHeight = DefaultImageHeight;
-        public int ImageXOffset = 0;
-        public int ImageYOffset = 0;
+//        public int ImageWidth = DefaultImageWidth; // Initialise variables to hold values required for functionality tested by Conform
+//        public int ImageHeight = DefaultImageHeight;
+//        public int ImageXOffset = 0;
+//        public int ImageYOffset = 0;
     }
 
     class DriverCommon
@@ -78,7 +78,7 @@ namespace ASCOM.PentaxKP
         internal static string autoLiveviewProfileName = "Auto Liveview";
         internal static string autoLiveviewDefault = "false";
         internal static string personalityProfileName = "Personality";
-        internal static string personalityDefault = "1";
+        internal static string personalityDefault = "1"; //Fix why is this one?
         internal static string bulbModeEnableProfileName = "Bulb Mode Enable";
         internal static string bulbModeEnableDefault = "true";
         internal static string bulbModeTimeProfileName = "Bulb Mode Time";
@@ -210,12 +210,6 @@ namespace ASCOM.PentaxKP
                 {
                     Settings.RAWSave = false;
                 }
-
-                // This needs to actually save to registry
-                //           Settings.ARWAutosave = Convert.ToBoolean(Registry.GetValue("HKEY_CURRENT_USER\\Software\\retro.kiwi\\SonyMTPCamera.dll", "File Auto Save", 0));
-                //           Settings.ARWAutosaveFolder = (string)Registry.GetValue("HKEY_CURRENT_USER\\Software\\retro.kiwi\\SonyMTPCamera.dll", "File Save Path", "");
-                //           Settings.ARWAutosaveWithDate = Convert.ToBoolean(Registry.GetValue("HKEY_CURRENT_USER\\Software\\retro.kiwi\\SonyMTPCamera.dll", "File Save Path Add Date", 0));
-                //           Settings.ARWAutosaveAlwaysCreateEmptyFolder = Convert.ToBoolean(Registry.GetValue("HKEY_CURRENT_USER\\Software\\retro.kiwi\\SonyMTPCamera.dll", "File Save Path Create Multiple Directories", 0));
             }
 
             using (Profile driverProfile = new Profile())
@@ -224,18 +218,11 @@ namespace ASCOM.PentaxKP
 
                 Settings.UsingCameraLens = Convert.ToBoolean(driverProfile.GetValue(FocuserDriverId, usingCameraLensProfileName, string.Empty, usingCameraLensProfileDefault));
                 Settings.LensId = driverProfile.GetValue(FocuserDriverId, lensIdProfileName, string.Empty, lensIdProfileDefault);
-
-                if (Settings.LensId != String.Empty)
-                {
-                    // We need to also set the value into the registry
-     //               String key = $"HKEY_CURRENT_USER\\Software\\retro.kiwi\\SonyMTPCamera.dll\\Lenses\\{Settings.LensId}";
-
-     //               Settings.HandsOffFocus = (int)Registry.GetValue(key, "Hands Off", 0) != 0 ? true : false;
-                }
             }
 
             Logger.Enabled = Settings.EnableLogging;
-//            Logger.Enabled = true;
+
+            // Fix: Add personality here
 
             Log($"DeviceID:                            {Settings.DeviceId}", "ReadProfile");
             Log($"Default Readout Mode:                {Settings.DefaultReadoutMode}", "ReadProfile");
@@ -264,11 +251,6 @@ namespace ASCOM.PentaxKP
                 driverProfile.WriteValue(CameraDriverId, bulbModeEnableProfileName, Settings.BulbModeEnable.ToString());
                 driverProfile.WriteValue(CameraDriverId, bulbModeTimeProfileName, Settings.BulbModeTime.ToString());
                 driverProfile.WriteValue(CameraDriverId, allowISOAdjustProfileName, Settings.AllowISOAdjust.ToString());
-
-     //           Registry.SetValue("HKEY_CURRENT_USER\\Software\\retro.kiwi\\SonyMTPCamera.dll", "File Auto Save", Settings.ARWAutosave ? 1 : 0);
-     //           Registry.SetValue("HKEY_CURRENT_USER\\Software\\retro.kiwi\\SonyMTPCamera.dll", "File Save Path", Settings.ARWAutosaveFolder);
-     //           Registry.SetValue("HKEY_CURRENT_USER\\Software\\retro.kiwi\\SonyMTPCamera.dll", "File Save Path Add Date", Settings.ARWAutosaveWithDate ? 1 : 0);
-     //           Registry.SetValue("HKEY_CURRENT_USER\\Software\\retro.kiwi\\SonyMTPCamera.dll", "File Save Path Create Multiple Directories", Settings.ARWAutosaveAlwaysCreateEmptyFolder ? 1 : 0);
 
                 if (Settings.DeviceId != null && Settings.DeviceId != "")
                 {

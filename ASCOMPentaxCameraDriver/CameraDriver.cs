@@ -69,16 +69,16 @@ namespace ASCOM.PentaxKP
         internal static bool LastSetFastReadout = false;
         internal static int RequestedStartX = 0;
         internal static int RequestedStartY = 0;
-        internal static int RequestedWidth = 6016;
+        internal static int RequestedWidth = 6016; // In NumX and NumY
         internal static int RequestedHeight = 4000;
-        internal static int DefaultImageWidthPixels = 6016;
-        internal static int DefaultImageHeightPixels = 4000;
-                                                           //        internal static ConcurrentQueue<String> imagesToProcess;
-        internal static Queue<String> imagesToProcess;
-        internal static Queue<BitmapImage> bitmapsToProcess;
+        internal static int MaxImageWidthPixels = 6016; // Constants to define the ccd pixel dimenstion
+        internal static int MaxImageHeightPixels = 4000;
+        internal static Queue<String> imagesToProcess = new Queue<string>();
+        internal static Queue<BitmapImage> bitmapsToProcess = new Queue<BitmapImage>();
+        internal static ManualResetEvent _requestTermination = new ManualResetEvent(false);
         private ImageDataProcessor _imageDataProcessor;
         // Index to the current ISO level
-        internal short gainIndex=0;
+        internal short gainIndex;
         // The different ISO levels
         internal ArrayList m_gains;
 
@@ -88,10 +88,10 @@ namespace ASCOM.PentaxKP
         // If saving in raw formate for standard output mode
 //        internal static bool m_rawmode = true;
 //        internal static bool m_rawmode = false;
-
+//Fix - all these statics means there can only be one camera
         internal Thread cameraThread;
 
-        internal Ricoh.CameraController.CaptureState m_captureState = Ricoh.CameraController.CaptureState.Unknown;
+        internal static Ricoh.CameraController.CaptureState m_captureState = Ricoh.CameraController.CaptureState.Unknown;
 
         class EventListener : CameraEventListener
         {
@@ -105,8 +105,11 @@ namespace ASCOM.PentaxKP
                 bitmapImage.BeginInit();
                 bitmapImage.StreamSource = memoryStream;
                 bitmapImage.EndInit();
-                if(LastSetFastReadout)
+                if (LastSetFastReadout) {
                     bitmapsToProcess.Enqueue(bitmapImage);
+                    m_captureState = Ricoh.CameraController.CaptureState.Complete;
+                }
+
                 DriverCommon.LogCameraMessage("", "Received LiveView Image");
             }
 
@@ -114,32 +117,35 @@ namespace ASCOM.PentaxKP
             public override void ImageAdded(CameraDevice sender, CameraImage image)
             {
                 // Get the image and save it in the current directory
-                using (FileStream fs = new FileStream(
-                    "c:/users/richr" + Path.DirectorySeparatorChar +
-                    image.Name, FileMode.Create, FileAccess.Write))
-                {
-                    Response imageGetResponse = image.GetData(fs);
-                    DriverCommon.LogCameraMessage("","Get Image has " +
-                        (imageGetResponse.Result == Result.OK ?
-                            "SUCCEED." : "FAILED."));
-                    DriverCommon.LogCameraMessage("", "c:/users/richr" + Path.DirectorySeparatorChar +
-                    image.Name);
-                    imagesToProcess.Enqueue("c:/users/richr" + Path.DirectorySeparatorChar + image.Name);
+                if (!LastSetFastReadout)
+                    using (FileStream fs = new FileStream(
+                        "c:/users/richr" + Path.DirectorySeparatorChar +
+                        image.Name, FileMode.Create, FileAccess.Write))
+                    {
+                        Response imageGetResponse = image.GetData(fs);
+                        DriverCommon.LogCameraMessage("","Get Image has " +
+                            (imageGetResponse.Result == Result.OK ?
+                                "SUCCEED." : "FAILED."));
+                        DriverCommon.LogCameraMessage("", "c:/users/richr" + Path.DirectorySeparatorChar +
+                        image.Name);
+                        imagesToProcess.Enqueue("c:/users/richr" + Path.DirectorySeparatorChar + image.Name);
                     
-                }
+                    }
             }
 
             // Capture Complete
             public override void CaptureComplete(CameraDevice sender, Capture capture)
             {
+                m_captureState = Ricoh.CameraController.CaptureState.Complete;
                 DriverCommon.LogCameraMessage("","Capture Complete. Capture ID: "+capture.ID.ToString());
             }
 
             public override void DeviceDisconnected(CameraDevice sender, Ricoh.CameraController.DeviceInterface deviceInterface)
             {
-                //Fix
-                //StopThreadCapture();
+                //Best we can do
                 DriverCommon.LogCameraMessage("","Device Disconnected.");
+                _requestTermination.Set();
+                m_captureState = Ricoh.CameraController.CaptureState.Unknown;
             }
         }
 
@@ -149,8 +155,7 @@ namespace ASCOM.PentaxKP
         /// </summary>
         public Camera()
         {
-            imagesToProcess = new Queue<string>();
-            bitmapsToProcess = new Queue<BitmapImage>();
+            gainIndex = 0 ;
             m_gains = new ArrayList();
             m_gains.Add("ISO 100");
             m_gains.Add("ISO 200");
@@ -206,11 +211,11 @@ namespace ASCOM.PentaxKP
                     DriverCommon.WriteProfile(); // Persist device configuration values to the ASCOM Profile store
 
                     // Update connected camera with bulb mode info
-                    if (DriverCommon.Camera != null)
+/*                    if (DriverCommon.Camera != null)
                     {
                         DriverCommon.Camera.BulbMode = DriverCommon.Settings.BulbModeEnable;
                         DriverCommon.Camera.BulbModeTime = DriverCommon.Settings.BulbModeTime;
-                    }
+                    }*/
                 }
             }
 
@@ -345,18 +350,6 @@ namespace ASCOM.PentaxKP
 
                                 if (DriverCommon.m_camera.EventListeners.Count == 0)
                                     DriverCommon.m_camera.EventListeners.Add(new EventListener());
-
-                                /*response = DriverCommon.m_camera.StartLiveView();
-                                if (response.Equals(Response.OK))
-                                {
-                                    LastSetFastReadout = true;
-                                    DriverCommon.LogCameraMessage("Connected", "Live View Enabled");
-                                }
-                                else
-                                {
-                                    LastSetFastReadout = false;
-                                    DriverCommon.LogCameraMessage("Connected", "Live View Failed.");
-                                }*/
                             }
                             else
                             {
@@ -554,7 +547,7 @@ namespace ASCOM.PentaxKP
                 //using (new SerializedAccess(this, "get_CameraXSize", true))
                 {
                     DriverCommon.LogCameraMessage("", "get_CameraXSize");
-                    return DefaultImageWidthPixels;
+                    return MaxImageWidthPixels;
 				}
             }
         }
@@ -566,7 +559,7 @@ namespace ASCOM.PentaxKP
                 //using (new SerializedAccess(this, "get_CameraYSize", true))
                 {
                     DriverCommon.LogCameraMessage("", "get_CameraYSize");
-                    return DefaultImageHeightPixels;
+                    return MaxImageHeightPixels;
 				}
             }
         }
@@ -719,6 +712,7 @@ namespace ASCOM.PentaxKP
             // Minimum exposure time
                 //using (new SerializedAccess(this, "get_ExposureMin", true))
                 {
+                    //Fix all exposures
                     DriverCommon.LogCameraMessage("", "get_ExposureMin");
                     return 0.001/5.0;
 				}
@@ -739,6 +733,7 @@ namespace ASCOM.PentaxKP
 
         public bool FastReadout
         {
+            // This is called by set_mode if the mode includes FastReadout
             get
             {
                 //using (new SerializedAccess(this, "get_FastReadout"))
@@ -749,7 +744,7 @@ namespace ASCOM.PentaxKP
             }
             set
             {
-                using (new DriverCommon.SerializedAccess("set_FastReadout",false))
+                using (new DriverCommon.SerializedAccess("set_FastReadout", false))
                 {
                     DriverCommon.LogCameraMessage("", "set_FastReadout");
                     if (LastSetFastReadout)
@@ -757,27 +752,28 @@ namespace ASCOM.PentaxKP
                         if (!value)
                         {
                             LastSetFastReadout = false;
+                            // Fix
                             DriverCommon.m_camera.StopLiveView();
                             Thread.Sleep(500);
                             // Need to clear because the expected format has changed
                             bitmapsToProcess.Clear();
+                            //imagesToProcess.Clear();
+                        }
+                        //else
+                            //In FastReadout we don't do any real captures so cancel the current one
+                            //StopThreadCapture();
+                    }
+                    else
+                    {
+                        if (value)
+                        {
+                            DriverCommon.m_camera.StartLiveView();
+                            // Need to clear because the expected format has changed
+                            StopThreadCapture();
                             imagesToProcess.Clear();
                         }
-                        //                        else
-                        //                            StopThreadCapture();
                     }
-                    if (value)
-                    {
-                        DriverCommon.m_camera.StartLiveView();
-                        // Need to clear because the expected format has changed
-                        imagesToProcess.Clear();
-                    }
-
                     LastSetFastReadout = value;
-/*                    if (value)
-                        ReadoutMode = 1;
-                    else
-                        ReadoutMode = 0;*/
 				}
             }
         }
@@ -850,7 +846,7 @@ namespace ASCOM.PentaxKP
 //                using (new DriverCommon.SerializedAccess("get_GainMax"))
                 {
                     DriverCommon.LogCameraMessage("", "get_GainMax");
-//                    return 5;
+                    return 5;
                     throw new ASCOM.PropertyNotImplementedException("GainMax", false);
 				}
             }
@@ -863,7 +859,7 @@ namespace ASCOM.PentaxKP
                 using (new DriverCommon.SerializedAccess("get_GainMin"))
                 {
                     DriverCommon.LogCameraMessage("", "get_GainMin");
-//                    return 0;
+                    return 0;
                     throw new ASCOM.PropertyNotImplementedException("GainMin", true);
 				}
             }
@@ -925,14 +921,12 @@ namespace ASCOM.PentaxKP
             int MSensorWidthPx = 6016;
             int MSensorHeightPx = 4000;
             int[,,] rgbImage= new int[MSensorWidthPx, MSensorHeightPx, 3]; // Assuming this is declared and initialized elsewhere.
-//            int[,] bayerImage;//=new int[MSensorHeightPx*2,MSensorHeightPx*2];
 
 
             // Wait for the file to be closed and available.
             while (!IsFileClosed(MNewFile)) { }
             rgbImage = _imageDataProcessor.ReadRawPentax(MNewFile);
 
-            //_cameraImageArray = _imageDataProcessor.ReadAndDebayerRaw(MNewFile);
             result = Resize(rgbImage, 3, StartX, StartY, NumX, NumY);
             return result;
         }
@@ -1031,7 +1025,7 @@ namespace ASCOM.PentaxKP
             // Unlock the bits.
             _bmp.UnlockBits(bmpData);
             DriverCommon.LogCameraMessage("Image", "Resize");
-            result = Resize(_cameraImageArray, 3, StartX, StartY, _bmp.Width, _bmp.Height);
+            result = Resize(_cameraImageArray, 3, StartX, StartY, NumX, NumY);
             return result;
         }
 
@@ -1064,7 +1058,7 @@ namespace ASCOM.PentaxKP
                             DriverCommon.LogCameraMessage("", "Calling ReadImageFileQuick");
                             result = ReadImageFileQuick(imageName);
                             while (!IsFileClosed(imageName)) { }
-                            //File.Delete(imageName);
+                            File.Delete(imageName);
                             if (imagesToProcess.Count == 0)
                                 return result;
                         }
@@ -1074,7 +1068,7 @@ namespace ASCOM.PentaxKP
                             DriverCommon.LogCameraMessage("", "Calling ReadImageFileRAW");
                             result = ReadImageFileRaw(imageName);
                             while (!IsFileClosed(imageName)) { }
-                            //File.Delete(imageName);
+                            File.Delete(imageName);
                             if (imagesToProcess.Count == 0)
                                 return result;
                         }
@@ -1184,6 +1178,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
+                //Firx
                 //using (new SerializedAccess(this, "get_LastExposureDuration"))
                 {
                     DriverCommon.LogCameraMessage("", "get_LastExposureDuration");
@@ -1209,6 +1204,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
+                // Fix
                 //using (new SerializedAccess(this, "get_LastExposureStartTime"))
                 {
                     DriverCommon.LogCameraMessage("", "get_LastExposureStartTime");
@@ -1282,8 +1278,9 @@ namespace ASCOM.PentaxKP
             {
                 //using (new SerializedAccess(this, "set_NumX"))
                 {
-                    DriverCommon.LogCameraMessage("", "set_NumX");
+                    DriverCommon.LogCameraMessage("", "set_NumX " + value.ToString() + " " + MaxImageWidthPixels);
                     RequestedWidth = value;
+                    //RequestedWidth = MaxImageWidthPixels;
 				}
             }
         }
@@ -1302,8 +1299,9 @@ namespace ASCOM.PentaxKP
             {
                 //using (new SerializedAccess(this, "set_NumY"))
                 {
-                    DriverCommon.LogCameraMessage("", "set_NumY");
+                    DriverCommon.LogCameraMessage("", "set_NumY " + value.ToString() + " " + MaxImageHeightPixels);
                     RequestedHeight = value;
+                    //RequestedHeight = MaxImageHeightPixels;
 				}
             }
         }
@@ -1360,7 +1358,7 @@ namespace ASCOM.PentaxKP
                 //using (new SerializedAccess(this, "get_ReadoutMode"))
                 {
                     DriverCommon.LogCameraMessage("", "get_ReadoutMode");
-                    return (short)m_readoutmode;//DriverCommon.Camera.OutputMode - 1);
+                    return (short)m_readoutmode;
 				}
             }
             set
@@ -1377,19 +1375,19 @@ namespace ASCOM.PentaxKP
                                 m_readoutmode = 0;
                                 if(DriverCommon.Settings.UseLiveview)
                                           DriverCommon.m_camera.StartLiveView();
+                                MaxImageWidthPixels = 6016; // Constants to define the ccd pixel dimenstion
+                                MaxImageHeightPixels = 4000;
                                 NumX = 6016;
                                 NumY = 4000;
-                                DefaultImageWidthPixels = 6016;
-                                DefaultImageHeightPixels = 4000;
                                 break;
 
                             case 1:
                                 m_readoutmode = 1;
+                                FastReadout = true;
+                                MaxImageWidthPixels = 720; // Constants to define the ccd pixel dimenstion
+                                MaxImageHeightPixels = 480;
                                 NumX = 720;
                                 NumY = 480;
-                                DefaultImageHeightPixels = 480;
-                                DefaultImageWidthPixels = 720;
-                                FastReadout = true;
                                 break;
                         }
                     }
@@ -1409,14 +1407,11 @@ namespace ASCOM.PentaxKP
                 {
                     DriverCommon.LogCameraMessage("","get_ReadoutModes");
 
+                    // Fix can I new it here?
                     ArrayList modes = new ArrayList();
 
                     modes.Add(String.Format("Full Resolution ({0} x {1})", 6016, 4000));
-
-                                        if (true/*DriverCommon.Camera.HasLiveView*/)
-                    {
-                                                    modes.Add(String.Format("LiveView ({0} x {1})", 720, 480));
-                    }
+                    modes.Add(String.Format("LiveView ({0} x {1})", 720, 480));
 
                     return modes;
 				}
@@ -1467,8 +1462,6 @@ namespace ASCOM.PentaxKP
 				}
             }
         }
-
-        ManualResetEvent _requestTermination = new ManualResetEvent(false);
 
         private void StopThreadCapture()
         {
@@ -1534,12 +1527,15 @@ namespace ASCOM.PentaxKP
                 //No need to start exposure
                 DriverCommon.LogCameraMessage("", "StartExposure() fast");
                 m_captureState = Ricoh.CameraController.CaptureState.Executing;
+                //Need to stop old exposure too
+                StopThreadCapture();
                 return;
             }
             using (new DriverCommon.SerializedAccess("StartExposure()"))
             {
                 DriverCommon.LogCameraMessage("", "StartExposure()");
 
+                //Check duration range and save 
                 if (Duration < 0.0)
                 {
                     throw new InvalidValueException("StartExposure", "Duration", ">= 0");
@@ -1903,6 +1899,7 @@ namespace ASCOM.PentaxKP
         {
             using (var P = new ASCOM.Utilities.Profile())
             {
+                //Fix
                 P.DeviceType = "Camera";
                 if (bRegister)
                 {

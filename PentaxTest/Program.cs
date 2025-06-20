@@ -6,7 +6,7 @@
 
 #define Camera
 // remove this to bypass the code that uses the chooser to select the driver
-#define UseChooser
+//#define UseChooser
 
 using System;
 using System.Collections.Generic;
@@ -51,20 +51,56 @@ namespace ASCOM.PentaxKP
             ArrayList modes = device.ReadoutModes;
 
             //            device.FastReadout = false;
-//            device.ReadoutMode = 1;
-//            Thread.Sleep(1000);
-//            device.ReadoutMode = 0;
+            device.ReadoutMode = 0;
 
             Console.WriteLine(device.Gain);
             device.Gain = 0;
             Console.WriteLine(device.Gains.ToString());
             Console.WriteLine(device.MaxADU.ToString());
 
-           for(int j=0;j<3;j++)
+           for(int j=0;j<1;j++)
               {
                 device.StartExposure(0.1, true);
                 for (int i = 0; i < 100 && !device.ImageReady; i++)
-                    Thread.Sleep(50);
+                    Thread.Sleep(250);
+
+                object o = device.ImageArray;
+                count++;
+                Console.WriteLine("Got an image #" + count.ToString());
+                GC.Collect();
+            }
+
+            device.ReadoutMode = 1;
+
+            Console.WriteLine(device.Gain);
+            device.Gain = 0;
+            Console.WriteLine(device.Gains.ToString());
+            Console.WriteLine(device.MaxADU.ToString());
+
+            for (int j = 0; j < 1; j++)
+            {
+                device.StartExposure(0.1, true);
+                for (int i = 0; i < 100 && !device.ImageReady; i++)
+                    Thread.Sleep(250);
+
+                object o = device.ImageArray;
+                count++;
+                Console.WriteLine("Got an image #" + count.ToString());
+                GC.Collect();
+            }
+
+            device.ReadoutMode = 0;
+
+            Console.WriteLine(device.Gain);
+            device.Gain = 0;
+            Console.WriteLine(device.Gains.ToString());
+            Console.WriteLine(device.MaxADU.ToString());
+
+            for (int j = 0; j < 1; j++)
+            {
+                device.StartExposure(0.1, true);
+                for (int i = 0; i < 100 && !device.ImageReady; i++)
+                    Thread.Sleep(250);
 
                 object o = device.ImageArray;
                 count++;
@@ -73,7 +109,6 @@ namespace ASCOM.PentaxKP
             }
 
             Console.WriteLine(device.CCDTemperature);
-//            */
             device.Connected = false;
             Console.WriteLine("Press Enter to finish");
             Console.ReadLine();
