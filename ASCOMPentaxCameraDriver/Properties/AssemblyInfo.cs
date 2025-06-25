@@ -10,9 +10,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("ASCOM.PentaxKP.Camera")]
 [assembly: AssemblyDescription("ASCOM Camera driver for Pentax KP")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Doug Henderson")]
+[assembly: AssemblyCompany("Richard Romano")]
 [assembly: AssemblyProduct("ASCOM Camera driver for Pentax KP")]
-[assembly: AssemblyCopyright("Driver Copyright © 2019-2024 D. Henderson")]
+[assembly: AssemblyCopyright("Driver Copyright © 2025 Richard Romano")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
