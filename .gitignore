@@ -188,3 +188,5 @@ PentaxTest/obj/x64/Release/ASCOM.PentaxKP.Test.exe
 PentaxTest/obj/x64/Release/ASCOM.PentaxKP.Test.pdb
 PentaxTest/obj/x64/Release/PentaxTest.csproj.FileListAbsolute.txt
 PentaxTest/obj/x64/Release/PentaxTest.csprojResolveAssemblyReference.cache
+PentaxTest/bin/x64/Release/ASCOM.PentaxKP.Test.exe.CodeAnalysisLog.xml
+PentaxTest/bin/x64/Release/ASCOM.PentaxKP.Test.exe.lastcodeanalysissucceeded
