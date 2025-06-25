@@ -7,14 +7,7 @@
 //				Communicates using USB connection.
 //
 // Implements:	ASCOM Camera interface version: 2
-// Author:		(2019) Doug Henderson <retrodotkiwi@gmail.com>
-//
-// Edit Log:
-//
-// Date			Who	Vers	Description
-// -----------	---	-----	-------------------------------------------------------
-// 10-Dec-2019	XXX	6.0.0	Initial edit, created from ASCOM driver template
-// --------------------------------------------------------------------------------
+// Author:		(2025) Richard Romano
 //
 #define Camera
 
@@ -32,7 +25,7 @@ using Ricoh.CameraController;
 using System.Windows.Media.Imaging;
 using System.Drawing;
 using System.Drawing.Imaging;
-using ASCOM.DSLR.Classes;
+using ASCOM.PentaxKP.Classes;
 
 namespace ASCOM.PentaxKP
 {
@@ -88,7 +81,7 @@ namespace ASCOM.PentaxKP
         // If saving in raw formate for standard output mode
 //        internal static bool m_rawmode = true;
 //        internal static bool m_rawmode = false;
-//Fix - all these statics means there can only be one camera
+// TODO:  - all these statics means there can only be one camera
         internal Thread cameraThread;
 
         internal static Ricoh.CameraController.CaptureState m_captureState = Ricoh.CameraController.CaptureState.Unknown;
@@ -119,17 +112,17 @@ namespace ASCOM.PentaxKP
                 // Get the image and save it in the current directory
                 if (!LastSetFastReadout)
                     using (FileStream fs = new FileStream(
-                        "c:/users/richr" + Path.DirectorySeparatorChar +
+                        System.IO.Path.GetTempPath() + Path.DirectorySeparatorChar +
                         image.Name, FileMode.Create, FileAccess.Write))
                     {
                         Response imageGetResponse = image.GetData(fs);
                         DriverCommon.LogCameraMessage("","Get Image has " +
                             (imageGetResponse.Result == Result.OK ?
                                 "SUCCEED." : "FAILED."));
-                        DriverCommon.LogCameraMessage("", "c:/users/richr" + Path.DirectorySeparatorChar +
+                        // TODO: save to memory instead MemoryStream
+                        DriverCommon.LogCameraMessage("", System.IO.Path.GetTempPath() + Path.DirectorySeparatorChar +
                         image.Name);
-                        imagesToProcess.Enqueue("c:/users/richr" + Path.DirectorySeparatorChar + image.Name);
-                    
+                        imagesToProcess.Enqueue(System.IO.Path.GetTempPath() + Path.DirectorySeparatorChar + image.Name);
                     }
             }
 
@@ -199,9 +192,15 @@ namespace ASCOM.PentaxKP
         {
             // consider only showing the setup dialog if not connected
             // or call a different dialog if connected
-            //            if (IsConnected)
-            //                System.Windows.Forms.MessageBox.Show("Camera is currently connected.  Some options are only available when not connected, these will be disabled.");
             DriverCommon.LogCameraMessage("SetupDialog", "[in]");
+            if (IsConnected) {
+                System.Windows.Forms.MessageBox.Show("Camera is currently connected.  Please disconnect and reconnect to change settings.");
+                DriverCommon.LogCameraMessage("SetupDialog", "[out]");
+                return;
+            }
+
+            // TODO: 
+            //Should we cancel capture and disconnect?
 
             using (SetupDialogForm F = new SetupDialogForm())
             {
@@ -219,7 +218,7 @@ namespace ASCOM.PentaxKP
                 }
             }
 
-/*            if (DriverCommon.m_camera!=null&&IsConnected)
+/*            if (IsConnected)
             {
                 StorageWriting sw = new StorageWriting();
                 sw = Ricoh.CameraController.StorageWriting.False;
@@ -233,8 +232,8 @@ namespace ASCOM.PentaxKP
                 DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sw });
                 DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { siq });
                 DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sicf });
-            }*/
-
+            }
+            */
             DriverCommon.LogCameraMessage("SetupDialog", "[out]");
         }
 
@@ -302,17 +301,13 @@ namespace ASCOM.PentaxKP
                 using (new DriverCommon.SerializedAccess("set_Connected", false))
                 {
                     DriverCommon.LogCameraMessage("", $"set_Connected Set {value.ToString()}");
-                    if (value)
+                    //if (value&& (DriverCommon.m_camera == null|| !DriverCommon.m_camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB)))
+                    if(value)
                     {
-	                    //if (!DriverCommon.CameraConnected && DriverCommon.Settings.DeviceId == "")
-	                    {
-						//Fix!!!!
-	                        // Need to display setup dialog
-	                        SetupDialog();
-	                    }
-						
                         if (DriverCommon.m_camera == null)
                         {
+	                        SetupDialog();
+                            // TODO: Make this use  DriverCommon.Settings.DeviceId rather than First
                             DriverCommon.LogCameraMessage("Connected", "Connecting...");
                             List<CameraDevice> detectedCameraDevices = CameraDeviceDetector.Detect(Ricoh.CameraController.DeviceInterface.USB);
                             DriverCommon.m_camera = detectedCameraDevices.First();
@@ -524,7 +519,7 @@ namespace ASCOM.PentaxKP
                 //using (new SerializedAccess(this, "get_CameraState", true))
                 {
                     DriverCommon.LogCameraMessage("", $"get_CameraState {m_captureState.ToString()}");
-                    //Fix!!!!
+                    // TODO: !!!!
                     switch (m_captureState)
                     {
                         case Ricoh.CameraController.CaptureState.Executing:
@@ -700,7 +695,7 @@ namespace ASCOM.PentaxKP
                 //using (new SerializedAccess(this, "get_ExposureMax", true))
                 {
                     DriverCommon.LogCameraMessage("", "get_ExposureMax");
-                    return 30;
+                    return 1200;
 				}
             }
         }
@@ -712,9 +707,9 @@ namespace ASCOM.PentaxKP
             // Minimum exposure time
                 //using (new SerializedAccess(this, "get_ExposureMin", true))
                 {
-                    //Fix all exposures
+                    // TODO:  all exposures
                     DriverCommon.LogCameraMessage("", "get_ExposureMin");
-                    return 0.001/5.0;
+                    return 1.0/24000.0;
 				}
             }
         }
@@ -726,7 +721,7 @@ namespace ASCOM.PentaxKP
                 //using (new SerializedAccess(this, "get_ExposureResolution", true))
                 {
                     DriverCommon.LogCameraMessage("", "get_ExposureResolution");
-                    return 0.001/5.0;
+                    return 1.0/24000.0;
 				}
             }
         }
@@ -752,7 +747,7 @@ namespace ASCOM.PentaxKP
                         if (!value)
                         {
                             LastSetFastReadout = false;
-                            // Fix
+                            // TODO: 
                             DriverCommon.m_camera.StopLiveView();
                             Thread.Sleep(500);
                             // Need to clear because the expected format has changed
@@ -814,7 +809,7 @@ namespace ASCOM.PentaxKP
                         gainIndex = 5;
                     using (new DriverCommon.SerializedAccess("get_Gain"))
                     {
-                        // Can I set this any time? Fix
+                        // TODO: Can I set this any time?
                         if (DriverCommon.m_camera != null)
                         {
                             ISO iso = new ISO();
@@ -846,7 +841,7 @@ namespace ASCOM.PentaxKP
 //                using (new DriverCommon.SerializedAccess("get_GainMax"))
                 {
                     DriverCommon.LogCameraMessage("", "get_GainMax");
-                    return 5;
+                    //return 5;
                     throw new ASCOM.PropertyNotImplementedException("GainMax", false);
 				}
             }
@@ -859,7 +854,7 @@ namespace ASCOM.PentaxKP
                 using (new DriverCommon.SerializedAccess("get_GainMin"))
                 {
                     DriverCommon.LogCameraMessage("", "get_GainMin");
-                    return 0;
+                    //return 0;
                     throw new ASCOM.PropertyNotImplementedException("GainMin", true);
 				}
             }
@@ -1086,7 +1081,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-			//Fix - need to be implemented
+			// TODO:  - need to be implemented
                 //using (new SerializedAccess(this, "get_ImageArrayVariant"))
                 {
                     DriverCommon.LogCameraMessage("", "get_ImageArrayVariant");
@@ -1149,7 +1144,7 @@ namespace ASCOM.PentaxKP
             get
             {
                 using (new DriverCommon.SerializedAccess("get_ImageReady", true))
-                //Fix not thread safe
+                // TODO:  not thread safe
                 {
                     DriverCommon.LogCameraMessage("", "get_ImageReady");
                     if(imagesToProcess.Count!=0)
@@ -1204,7 +1199,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                // Fix
+                // TODO: 
                 //using (new SerializedAccess(this, "get_LastExposureStartTime"))
                 {
                     DriverCommon.LogCameraMessage("", "get_LastExposureStartTime");
@@ -1407,7 +1402,7 @@ namespace ASCOM.PentaxKP
                 {
                     DriverCommon.LogCameraMessage("","get_ReadoutModes");
 
-                    // Fix can I new it here?
+                    // TODO:  can I new it here?
                     ArrayList modes = new ArrayList();
 
                     modes.Add(String.Format("Full Resolution ({0} x {1})", 6016, 4000));
@@ -1425,7 +1420,7 @@ namespace ASCOM.PentaxKP
                 using (new DriverCommon.SerializedAccess("get_SensorName"))
                 {
                     DriverCommon.LogCameraMessage("", "get_SensorName");
-                    //Fix
+                    // TODO: 
                     return "IMX193";// "QHY247C";// "IMX271";
 				}
             }
@@ -1491,7 +1486,7 @@ namespace ASCOM.PentaxKP
                     Response response =DriverCommon.m_camera.StartCapture(false);
 
                     //Console.WriteLine(" result: " + response.Result.ToString() + ((response.Result == Result.Error) ? ", Code: " + response.Errors.First().Code.ToString() + ", Message : " + response.Errors.First().Message : ""));
-                    m_captureState = Ricoh.CameraController.CaptureState.Unknown;
+                    //m_captureState = Ricoh.CameraController.CaptureState.Unknown;
 
                     while (DriverCommon.m_camera.Status.CurrentCapture == null)
                        sleepReturn = _requestTermination.WaitOne(250);
@@ -1508,9 +1503,11 @@ namespace ASCOM.PentaxKP
                         }
                         m_captureState = DriverCommon.m_camera.Status.CurrentCapture.State;
                     }
+                    else
+                        m_captureState = Ricoh.CameraController.CaptureState.Unknown;
                 }
 
-                DriverCommon.LogCameraMessage("long running task", "exiting"+m_captureState.ToString());
+                DriverCommon.LogCameraMessage("long running task", "exiting "+m_captureState.ToString());
             });
 
             cameraThread.SetApartmentState(ApartmentState.MTA);
@@ -1521,7 +1518,7 @@ namespace ASCOM.PentaxKP
         public void StartExposure(double Duration, bool Light)
         {
             // Light or dark frame
-            // Fix it!!!!!
+            // TODO:  it!!!!!
            if(LastSetFastReadout)
             {
                 //No need to start exposure
@@ -1655,7 +1652,7 @@ namespace ASCOM.PentaxKP
                     shutterSpeed = ShutterSpeed.SS15_10;
                 if (Duration > 16.0 / 10.0 - 0.000001)
                     shutterSpeed = ShutterSpeed.SS16_10;
-                //Fix
+                // TODO: 
                 //public static readonly ShutterSpeed SS10_13;
                 //public static readonly ShutterSpeed SS10_16;
                 //public static readonly ShutterSpeed SS10_25;
@@ -1899,7 +1896,7 @@ namespace ASCOM.PentaxKP
         {
             using (var P = new ASCOM.Utilities.Profile())
             {
-                //Fix
+                // TODO: register in installer 
                 P.DeviceType = "Camera";
                 if (bRegister)
                 {
