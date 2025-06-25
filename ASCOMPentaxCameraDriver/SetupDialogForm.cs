@@ -314,7 +314,7 @@ namespace ASCOM.PentaxKP
 
                 //Call the Process.Start method to open the default browser
                 //with a URL:
-                System.Diagnostics.Process.Start("https://github.com/dougforpres/ASCOMSonyCameraDriver/wiki/Controlling-the-Exposure-Time-and-ISO-(Gain)");
+                System.Diagnostics.Process.Start("https://github.com/richromano/ASCOMPentaxCameraDriver");
             }
             catch (Exception)
             {
@@ -332,7 +332,7 @@ namespace ASCOM.PentaxKP
 
                 //Call the Process.Start method to open the default browser
                 //with a URL:
-                System.Diagnostics.Process.Start("https://github.com/dougforpres/ASCOMSonyCameraDriver/wiki/");
+                System.Diagnostics.Process.Start("https://github.com/richromano/ASCOMPentaxCameraDriver/wiki/");
             }
             catch (Exception)
             {
@@ -348,9 +348,9 @@ namespace ASCOM.PentaxKP
 
         private void button1_Click(object sender, EventArgs e)
         {
-            using (FocusTools F = new FocusTools())
+//            using (FocusTools F = new FocusTools())
             {
-                var result = F.ShowDialog();
+//                var result = F.ShowDialog();
 //                if (result == System.Windows.Forms.DialogResult.OK)
 //                {
 //                }
