@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.IO;
-using ASCOM.Utilities;
-using System.Net;
-using System.Runtime.CompilerServices;
 
-namespace ASCOM.DSLR.Native
+namespace ASCOM.PentaxKP.Native
 {
 
     [Flags]
