@@ -78,7 +78,7 @@ namespace ASCOM.PentaxKP
         internal static string autoLiveviewProfileName = "Auto Liveview";
         internal static string autoLiveviewDefault = "false";
         internal static string personalityProfileName = "Personality";
-        internal static string personalityDefault = "1"; //Fix why is this one?
+        internal static string personalityDefault = "1"; // TODO:  why is this one?
         internal static string bulbModeEnableProfileName = "Bulb Mode Enable";
         internal static string bulbModeEnableDefault = "true";
         internal static string bulbModeTimeProfileName = "Bulb Mode Time";
@@ -106,7 +106,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                //Fix this is not Mutex safe
+                // TODO:  this is not Mutex safe
                 //using (new DriverCommon.SerializedAccess("get_Connected"))
                 {
                     DriverCommon.LogCameraMessage("Connected", "get");
@@ -138,7 +138,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                //Fix this is not Mutex safe
+                // TODO:  this is not Mutex safe
                 //using (new DriverCommon.SerializedAccess("get_Connected"))
                 {
                     DriverCommon.LogCameraMessage("Connected", "get");
@@ -222,7 +222,7 @@ namespace ASCOM.PentaxKP
 
             Logger.Enabled = Settings.EnableLogging;
 
-            // Fix: Add personality here
+            // TODO: : Add personality here
 
             Log($"DeviceID:                            {Settings.DeviceId}", "ReadProfile");
             Log($"Default Readout Mode:                {Settings.DefaultReadoutMode}", "ReadProfile");
