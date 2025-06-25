@@ -54,23 +54,10 @@ namespace ASCOM.PentaxKP
             this.label9 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.comboBoxPersonality = new System.Windows.Forms.ComboBox();
-            this.checkBoxAutoLiveview = new System.Windows.Forms.CheckBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.selectCameraTab = new System.Windows.Forms.TabPage();
-            this.checkBoxHandsOffFocus = new System.Windows.Forms.CheckBox();
-            this.buttonFocusTools = new System.Windows.Forms.Button();
-            this.label11 = new System.Windows.Forms.Label();
-            this.comboBoxLenses = new System.Windows.Forms.ComboBox();
-            this.checkBoxUsingCameraLens = new System.Windows.Forms.CheckBox();
-            this.textBoxVersion = new System.Windows.Forms.TextBox();
-            this.linkWiki = new System.Windows.Forms.LinkLabel();
             this.cameraPersonalityTab = new System.Windows.Forms.TabPage();
             this.driverSettingsTab = new System.Windows.Forms.TabPage();
-            this.linkExposureAndISO = new System.Windows.Forms.LinkLabel();
-            this.checkBoxAllowISOAdjust = new System.Windows.Forms.CheckBox();
-            this.textBoxBulbMode = new System.Windows.Forms.TextBox();
-            this.label10 = new System.Windows.Forms.Label();
-            this.checkBoxBulbMode = new System.Windows.Forms.CheckBox();
             this.extrasTab = new System.Windows.Forms.TabPage();
             this.label3 = new System.Windows.Forms.Label();
             this.modeWarning = new System.Windows.Forms.PictureBox();
@@ -78,7 +65,6 @@ namespace ASCOM.PentaxKP
             this.tabControl1.SuspendLayout();
             this.selectCameraTab.SuspendLayout();
             this.cameraPersonalityTab.SuspendLayout();
-            this.driverSettingsTab.SuspendLayout();
             this.extrasTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.modeWarning)).BeginInit();
             this.SuspendLayout();
@@ -321,18 +307,6 @@ namespace ASCOM.PentaxKP
             this.comboBoxPersonality.TabIndex = 0;
             this.comboBoxPersonality.SelectedIndexChanged += new System.EventHandler(this.comboBoxPersonality_SelectedIndexChanged);
             // 
-            // checkBoxAutoLiveview
-            // 
-            this.checkBoxAutoLiveview.AutoSize = true;
-            this.checkBoxAutoLiveview.Location = new System.Drawing.Point(8, 14);
-            this.checkBoxAutoLiveview.Margin = new System.Windows.Forms.Padding(1);
-            this.checkBoxAutoLiveview.Name = "checkBoxAutoLiveview";
-            this.checkBoxAutoLiveview.Size = new System.Drawing.Size(180, 17);
-            this.checkBoxAutoLiveview.TabIndex = 0;
-            this.checkBoxAutoLiveview.Text = "Use LiveView for 0.0s exposures";
-            this.checkBoxAutoLiveview.UseVisualStyleBackColor = true;
-            this.checkBoxAutoLiveview.CheckedChanged += new System.EventHandler(this.checkBoxAutoLiveview_CheckedChanged);
-            // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.selectCameraTab);
@@ -348,13 +322,6 @@ namespace ASCOM.PentaxKP
             // 
             // selectCameraTab
             // 
-            this.selectCameraTab.Controls.Add(this.checkBoxHandsOffFocus);
-            this.selectCameraTab.Controls.Add(this.buttonFocusTools);
-            this.selectCameraTab.Controls.Add(this.label11);
-            this.selectCameraTab.Controls.Add(this.comboBoxLenses);
-            this.selectCameraTab.Controls.Add(this.checkBoxUsingCameraLens);
-            this.selectCameraTab.Controls.Add(this.textBoxVersion);
-            this.selectCameraTab.Controls.Add(this.linkWiki);
             this.selectCameraTab.Controls.Add(this.comboBoxCamera);
             this.selectCameraTab.Controls.Add(this.label1);
             this.selectCameraTab.Controls.Add(this.label2);
@@ -366,83 +333,6 @@ namespace ASCOM.PentaxKP
             this.selectCameraTab.TabIndex = 0;
             this.selectCameraTab.Text = "Select Camera";
             this.selectCameraTab.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxHandsOffFocus
-            // 
-            this.checkBoxHandsOffFocus.AutoSize = true;
-            this.checkBoxHandsOffFocus.Location = new System.Drawing.Point(13, 151);
-            this.checkBoxHandsOffFocus.Margin = new System.Windows.Forms.Padding(1);
-            this.checkBoxHandsOffFocus.Name = "checkBoxHandsOffFocus";
-            this.checkBoxHandsOffFocus.Size = new System.Drawing.Size(342, 17);
-            this.checkBoxHandsOffFocus.TabIndex = 12;
-            this.checkBoxHandsOffFocus.Text = "I promise I\'ll keep my hands off the lens (this will speed up focusing)";
-            this.checkBoxHandsOffFocus.UseVisualStyleBackColor = true;
-            // 
-            // buttonFocusTools
-            // 
-            this.buttonFocusTools.Location = new System.Drawing.Point(304, 100);
-            this.buttonFocusTools.Margin = new System.Windows.Forms.Padding(1);
-            this.buttonFocusTools.Name = "buttonFocusTools";
-            this.buttonFocusTools.Size = new System.Drawing.Size(52, 25);
-            this.buttonFocusTools.TabIndex = 11;
-            this.buttonFocusTools.Text = "Tools";
-            this.buttonFocusTools.UseVisualStyleBackColor = true;
-            this.buttonFocusTools.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(11, 131);
-            this.label11.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(30, 13);
-            this.label11.TabIndex = 10;
-            this.label11.Text = "Lens";
-            // 
-            // comboBoxLenses
-            // 
-            this.comboBoxLenses.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxLenses.FormattingEnabled = true;
-            this.comboBoxLenses.Location = new System.Drawing.Point(73, 131);
-            this.comboBoxLenses.Margin = new System.Windows.Forms.Padding(1);
-            this.comboBoxLenses.Name = "comboBoxLenses";
-            this.comboBoxLenses.Size = new System.Drawing.Size(285, 21);
-            this.comboBoxLenses.TabIndex = 9;
-            // 
-            // checkBoxUsingCameraLens
-            // 
-            this.checkBoxUsingCameraLens.AutoSize = true;
-            this.checkBoxUsingCameraLens.Location = new System.Drawing.Point(13, 106);
-            this.checkBoxUsingCameraLens.Margin = new System.Windows.Forms.Padding(1);
-            this.checkBoxUsingCameraLens.Name = "checkBoxUsingCameraLens";
-            this.checkBoxUsingCameraLens.Size = new System.Drawing.Size(215, 17);
-            this.checkBoxUsingCameraLens.TabIndex = 8;
-            this.checkBoxUsingCameraLens.Text = "I\'m using a camera lens, not a telescope";
-            this.checkBoxUsingCameraLens.UseVisualStyleBackColor = true;
-            this.checkBoxUsingCameraLens.CheckedChanged += new System.EventHandler(this.checkBoxUsingCameraLens_CheckedChanged);
-            // 
-            // textBoxVersion
-            // 
-            this.textBoxVersion.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBoxVersion.Location = new System.Drawing.Point(389, 175);
-            this.textBoxVersion.Margin = new System.Windows.Forms.Padding(1);
-            this.textBoxVersion.Name = "textBoxVersion";
-            this.textBoxVersion.ReadOnly = true;
-            this.textBoxVersion.Size = new System.Drawing.Size(118, 13);
-            this.textBoxVersion.TabIndex = 7;
-            this.textBoxVersion.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
-            // linkWiki
-            // 
-            this.linkWiki.AutoSize = true;
-            this.linkWiki.Location = new System.Drawing.Point(11, 178);
-            this.linkWiki.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
-            this.linkWiki.Name = "linkWiki";
-            this.linkWiki.Size = new System.Drawing.Size(217, 13);
-            this.linkWiki.TabIndex = 6;
-            this.linkWiki.TabStop = true;
-            this.linkWiki.Text = "Wiki Link: Installation, Troubleshooting, Help";
-            this.linkWiki.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
             // cameraPersonalityTab
             // 
@@ -462,12 +352,6 @@ namespace ASCOM.PentaxKP
             // 
             // driverSettingsTab
             // 
-            this.driverSettingsTab.Controls.Add(this.linkExposureAndISO);
-            this.driverSettingsTab.Controls.Add(this.checkBoxAllowISOAdjust);
-            this.driverSettingsTab.Controls.Add(this.textBoxBulbMode);
-            this.driverSettingsTab.Controls.Add(this.label10);
-            this.driverSettingsTab.Controls.Add(this.checkBoxBulbMode);
-            this.driverSettingsTab.Controls.Add(this.checkBoxAutoLiveview);
             this.driverSettingsTab.Location = new System.Drawing.Point(4, 22);
             this.driverSettingsTab.Margin = new System.Windows.Forms.Padding(1);
             this.driverSettingsTab.Name = "driverSettingsTab";
@@ -475,62 +359,6 @@ namespace ASCOM.PentaxKP
             this.driverSettingsTab.TabIndex = 4;
             this.driverSettingsTab.Text = "Driver Settings";
             this.driverSettingsTab.UseVisualStyleBackColor = true;
-            // 
-            // linkExposureAndISO
-            // 
-            this.linkExposureAndISO.AutoSize = true;
-            this.linkExposureAndISO.Location = new System.Drawing.Point(8, 178);
-            this.linkExposureAndISO.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
-            this.linkExposureAndISO.Name = "linkExposureAndISO";
-            this.linkExposureAndISO.Size = new System.Drawing.Size(169, 13);
-            this.linkExposureAndISO.TabIndex = 5;
-            this.linkExposureAndISO.TabStop = true;
-            this.linkExposureAndISO.Text = "Wiki Link: ISO and Exposure Time";
-            this.linkExposureAndISO.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkWiki_LinkClicked);
-            // 
-            // checkBoxAllowISOAdjust
-            // 
-            this.checkBoxAllowISOAdjust.AutoSize = true;
-            this.checkBoxAllowISOAdjust.Location = new System.Drawing.Point(8, 62);
-            this.checkBoxAllowISOAdjust.Margin = new System.Windows.Forms.Padding(1);
-            this.checkBoxAllowISOAdjust.Name = "checkBoxAllowISOAdjust";
-            this.checkBoxAllowISOAdjust.Size = new System.Drawing.Size(285, 17);
-            this.checkBoxAllowISOAdjust.TabIndex = 4;
-            this.checkBoxAllowISOAdjust.Text = "Allow applications to adjust ISO setting via Gain control";
-            this.checkBoxAllowISOAdjust.UseVisualStyleBackColor = true;
-            this.checkBoxAllowISOAdjust.CheckedChanged += new System.EventHandler(this.checkBoxAllowISOAdjust_CheckedChanged);
-            // 
-            // textBoxBulbMode
-            // 
-            this.textBoxBulbMode.Location = new System.Drawing.Point(258, 37);
-            this.textBoxBulbMode.Margin = new System.Windows.Forms.Padding(1);
-            this.textBoxBulbMode.MaxLength = 2;
-            this.textBoxBulbMode.Name = "textBoxBulbMode";
-            this.textBoxBulbMode.Size = new System.Drawing.Size(24, 20);
-            this.textBoxBulbMode.TabIndex = 3;
-            this.textBoxBulbMode.Validating += new System.ComponentModel.CancelEventHandler(this.textBoxBulbMode_Validating);
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(283, 38);
-            this.label10.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(47, 13);
-            this.label10.TabIndex = 2;
-            this.label10.Text = "seconds";
-            // 
-            // checkBoxBulbMode
-            // 
-            this.checkBoxBulbMode.AutoSize = true;
-            this.checkBoxBulbMode.Location = new System.Drawing.Point(8, 38);
-            this.checkBoxBulbMode.Margin = new System.Windows.Forms.Padding(1);
-            this.checkBoxBulbMode.Name = "checkBoxBulbMode";
-            this.checkBoxBulbMode.Size = new System.Drawing.Size(247, 17);
-            this.checkBoxBulbMode.TabIndex = 1;
-            this.checkBoxBulbMode.Text = "Use BULB mode for any exposures longer than";
-            this.checkBoxBulbMode.UseVisualStyleBackColor = true;
-            this.checkBoxBulbMode.CheckedChanged += new System.EventHandler(this.checkBoxBulbMode_CheckedChanged);
             // 
             // extrasTab
             // 
@@ -586,8 +414,6 @@ namespace ASCOM.PentaxKP
             this.selectCameraTab.PerformLayout();
             this.cameraPersonalityTab.ResumeLayout(false);
             this.cameraPersonalityTab.PerformLayout();
-            this.driverSettingsTab.ResumeLayout(false);
-            this.driverSettingsTab.PerformLayout();
             this.extrasTab.ResumeLayout(false);
             this.extrasTab.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.modeWarning)).EndInit();
@@ -623,7 +449,6 @@ namespace ASCOM.PentaxKP
         private System.Windows.Forms.TextBox textBoxCameraISO;
         private System.Windows.Forms.TextBox textBoxCameraBatteryLevel;
         private System.Windows.Forms.Label labelCameraBatteryLevel;
-        private System.Windows.Forms.CheckBox checkBoxAutoLiveview;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage selectCameraTab;
         private System.Windows.Forms.TabPage cameraPersonalityTab;
@@ -632,17 +457,5 @@ namespace ASCOM.PentaxKP
         private System.Windows.Forms.PictureBox modeWarning;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TabPage driverSettingsTab;
-        private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.CheckBox checkBoxBulbMode;
-        private System.Windows.Forms.TextBox textBoxBulbMode;
-        private System.Windows.Forms.CheckBox checkBoxAllowISOAdjust;
-        private System.Windows.Forms.LinkLabel linkExposureAndISO;
-        private System.Windows.Forms.LinkLabel linkWiki;
-        private System.Windows.Forms.TextBox textBoxVersion;
-        private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.ComboBox comboBoxLenses;
-        private System.Windows.Forms.CheckBox checkBoxUsingCameraLens;
-        private System.Windows.Forms.Button buttonFocusTools;
-        private System.Windows.Forms.CheckBox checkBoxHandsOffFocus;
     }
 }

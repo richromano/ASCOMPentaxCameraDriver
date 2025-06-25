@@ -42,13 +42,13 @@ namespace ASCOM.PentaxKP
             //            DriverCommon.Settings.ARWAutosaveWithDate = checkBoxAppendDate.Checked;
             //            DriverCommon.Settings.ARWAutosaveAlwaysCreateEmptyFolder = checkBoxCreateMultipleDirectories.Checked;
             DriverCommon.Settings.UseLiveview = checkBoxUseLiveview.Checked;
-            DriverCommon.Settings.AutoLiveview = checkBoxAutoLiveview.Checked;
+            //DriverCommon.Settings.AutoLiveview = checkBoxAutoLiveview.Checked;
             DriverCommon.Settings.Personality = comboBoxPersonality.SelectedIndex+1;
-            DriverCommon.Settings.BulbModeEnable = checkBoxBulbMode.Checked;
-            DriverCommon.Settings.BulbModeTime = short.Parse(textBoxBulbMode.Text.Trim());
-            DriverCommon.Settings.AllowISOAdjust = checkBoxAllowISOAdjust.Checked;
-            DriverCommon.Settings.UsingCameraLens = checkBoxUsingCameraLens.Checked;
-            DriverCommon.Settings.HandsOffFocus = checkBoxHandsOffFocus.Checked;
+            //DriverCommon.Settings.BulbModeEnable = checkBoxBulbMode.Checked;
+            //DriverCommon.Settings.BulbModeTime = short.Parse(textBoxBulbMode.Text.Trim());
+            //DriverCommon.Settings.AllowISOAdjust = checkBoxAllowISOAdjust.Checked;
+            //DriverCommon.Settings.UsingCameraLens = checkBoxUsingCameraLens.Checked;
+            //DriverCommon.Settings.HandsOffFocus = checkBoxHandsOffFocus.Checked;
         }
 
         private void cmdCancel_Click(object sender, EventArgs e) // Cancel button event handler
@@ -97,11 +97,11 @@ namespace ASCOM.PentaxKP
                 comboBoxCamera.SelectedItem = selected;
             }
 
-            checkBoxUsingCameraLens.Checked = DriverCommon.Settings.UsingCameraLens;
-            comboBoxLenses.Enabled = DriverCommon.Settings.UsingCameraLens;
-            buttonFocusTools.Enabled = DriverCommon.Settings.UsingCameraLens;
-            checkBoxHandsOffFocus.Checked = DriverCommon.Settings.HandsOffFocus;
-            checkBoxHandsOffFocus.Enabled = DriverCommon.Settings.UsingCameraLens;
+            //checkBoxUsingCameraLens.Checked = DriverCommon.Settings.UsingCameraLens;
+            //comboBoxLenses.Enabled = DriverCommon.Settings.UsingCameraLens;
+            //buttonFocusTools.Enabled = DriverCommon.Settings.UsingCameraLens;
+            //checkBoxHandsOffFocus.Checked = DriverCommon.Settings.HandsOffFocus;
+            //checkBoxHandsOffFocus.Enabled = DriverCommon.Settings.UsingCameraLens;
 
 //            checkBoxEnableSaveLocation.Checked = DriverCommon.Settings.RAWSave;
 //            textBoxSaveLocation.Enabled = DriverCommon.Settings.RAWSave;
@@ -113,7 +113,7 @@ namespace ASCOM.PentaxKP
 
 //            buttonSelectFolder.Enabled = DriverCommon.Settings.RAWSave;
             checkBoxUseLiveview.Checked = DriverCommon.Settings.UseLiveview;
-            checkBoxAutoLiveview.Checked = DriverCommon.Settings.AutoLiveview;
+            //checkBoxAutoLiveview.Checked = DriverCommon.Settings.AutoLiveview;
 
             Dictionary<int, string> personalities = new Dictionary<int, string>();
 
@@ -128,11 +128,11 @@ namespace ASCOM.PentaxKP
 
             comboBoxPersonality.SelectedIndex = 0;// DriverCommon.Settings.Personality;
 
-            checkBoxBulbMode.Checked = DriverCommon.Settings.BulbModeEnable;
-            textBoxBulbMode.Text = DriverCommon.Settings.BulbModeTime.ToString();
-            textBoxBulbMode.Enabled = checkBoxBulbMode.Checked;
+            //checkBoxBulbMode.Checked = DriverCommon.Settings.BulbModeEnable;
+            //textBoxBulbMode.Text = DriverCommon.Settings.BulbModeTime.ToString();
+            //textBoxBulbMode.Enabled = checkBoxBulbMode.Checked;
 
-            checkBoxAllowISOAdjust.Checked = DriverCommon.Settings.AllowISOAdjust;
+            //checkBoxAllowISOAdjust.Checked = DriverCommon.Settings.AllowISOAdjust;
 
             PopulateOutputFormats();
 
@@ -141,7 +141,7 @@ namespace ASCOM.PentaxKP
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
             FileVersionInfo fileVersion = FileVersionInfo.GetVersionInfo(assembly.Location);
 
-            textBoxVersion.Text = fileVersion.FileVersion;
+            //textBoxVersion.Text = fileVersion.FileVersion;
 
             InInit = false;
 //            timer1.Tick += showCameraStatus;
@@ -258,15 +258,15 @@ namespace ASCOM.PentaxKP
             comboBoxOutputFormat.ValueMember = "Key";
         }
 
-        private void checkBoxAutoLiveview_CheckedChanged(object sender, EventArgs e)
+       /* private void checkBoxAutoLiveview_CheckedChanged(object sender, EventArgs e)
         {
             if (!InInit && checkBoxAutoLiveview.Checked)
             {
                 MessageBox.Show("Please note that this feature is experimental.\n\nThis will automatically take a LiveView image instead of a normal exposure if:\n  - The camera supports it\n  - The exposure time is set to less than\n    or equal to 0.00001s (in APT this is\n    represented as 0.000)");
             }
-        }
+        }*/
 
-        private void textBoxBulbMode_Validating(object sender, CancelEventArgs e)
+/*        private void textBoxBulbMode_Validating(object sender, CancelEventArgs e)
         {
             // Lowest possible value is 1, highest is 30
             int value = -1;
@@ -285,16 +285,16 @@ namespace ASCOM.PentaxKP
                 e.Cancel = true;
                 MessageBox.Show("Value for Bulb Mode must be a number from 1 to 30");
             }
-        }
+        }*/
 
-        private void checkBoxBulbMode_CheckedChanged(object sender, EventArgs e)
+/*        private void checkBoxBulbMode_CheckedChanged(object sender, EventArgs e)
         {
             if (!InInit)
             {
                 textBoxBulbMode.Enabled = checkBoxBulbMode.Checked;
                 MessageBox.Show("Note that this option will only take effect if your camera's list of supported Exposure times is known.  See the wiki page at the bottom of the settings page for more info.");
             }
-        }
+        }*/
 
         private void checkBoxAllowISOAdjust_CheckedChanged(object sender, EventArgs e)
         {
@@ -304,7 +304,7 @@ namespace ASCOM.PentaxKP
             }
         }
 
-        private void linkWiki_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        /*private void linkWiki_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             try
             {
@@ -320,9 +320,9 @@ namespace ASCOM.PentaxKP
             {
                 MessageBox.Show("Unable to open link that was clicked.");
             }
-        }
+        }*/
 
-        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+       /* private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             try
             {
@@ -338,13 +338,13 @@ namespace ASCOM.PentaxKP
             {
                 MessageBox.Show("Unable to open link that was clicked.");
             }
-        }
+        }*/
 
-        private void checkBoxUsingCameraLens_CheckedChanged(object sender, EventArgs e)
+        /*private void checkBoxUsingCameraLens_CheckedChanged(object sender, EventArgs e)
         {
             comboBoxLenses.Enabled = checkBoxUsingCameraLens.Checked;
             checkBoxHandsOffFocus.Enabled = checkBoxUsingCameraLens.Checked;
-        }
+        }*/
 
         private void button1_Click(object sender, EventArgs e)
         {
