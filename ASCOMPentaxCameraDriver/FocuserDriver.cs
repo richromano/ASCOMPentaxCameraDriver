@@ -6,14 +6,7 @@
 // Description:	Implements ASCOM driver for Pentax KP Camera.
 //
 // Implements:	ASCOM Focuser interface version: 3
-// Author:		(2023) Doug Henderson <retrodotkiwi@gmail.com>
-//
-// Edit Log:
-//
-// Date			Who	Vers	Description
-// -----------	---	-----	-------------------------------------------------------
-// dd-mmm-yyyy	XXX	6.0.0	Initial edit, created from ASCOM driver template
-// --------------------------------------------------------------------------------
+// Author:		(2025) Richard Romano
 //
 
 
@@ -22,13 +15,8 @@
 #define Focuser
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 using System.Runtime.InteropServices;
 
-using ASCOM;
-using ASCOM.Astrometry;
 using ASCOM.Astrometry.AstroUtils;
 using ASCOM.Utilities;
 using ASCOM.DeviceInterface;
@@ -101,9 +89,13 @@ namespace ASCOM.PentaxKP
         {
             // consider only showing the setup dialog if not connected
             // or call a different dialog if connected
-            if (IsConnected)
-                System.Windows.Forms.MessageBox.Show("Already connected, just press OK");
+            //            if (IsConnected)
+            rezero = 0;
+            Move(10000);
+            System.Windows.Forms.MessageBox.Show("Reset focus.  All settings are in the camera, just press OK");
 
+            //Fix which Dialog is this?
+/*
             using (SetupDialogForm F = new SetupDialogForm())
             {
                 var result = F.ShowDialog();
@@ -111,7 +103,7 @@ namespace ASCOM.PentaxKP
                 {
                     DriverCommon.WriteProfile(); // Persist device configuration values to the ASCOM Profile store
                 }
-            }
+            }*/
         }
 
         public ArrayList SupportedActions
@@ -182,6 +174,9 @@ namespace ASCOM.PentaxKP
             {
                 DriverCommon.LogFocuserMessage("Connected", "Set {0}", value.ToString());
                 requestedConnection = value;
+                if (value)
+                    rezero = 0;
+                //Fix
                 //What if it wants to disconnect?
 /*                if (value == IsConnected)
                     return;
@@ -249,6 +244,8 @@ namespace ASCOM.PentaxKP
 
         #region IFocuser Implementation
 
+        // This should be set inside the create
+        // Fix
         private int focuserPosition = 10000; // Class level variable to hold the current focuser position
         private int rezero = 0;
 //        private const int focuserSteps = 10000;
@@ -388,7 +385,7 @@ namespace ASCOM.PentaxKP
                 {
                     DriverCommon.LogFocuserMessage("Temperature Get", "Not implemented");
                     //                throw new ASCOM.PropertyNotImplementedException("Temperature", false);
-                    return 50;
+                    return 20;
                 }
             }
         }
