@@ -1,17 +1,18 @@
 ﻿ASCOM Driver Template
-This work is licensed under the Creative Commons Attribution-No Derivative Works 3.0 License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nd/3.0/ or send a letter to Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.
+This work is licensed under the https://creativecommons.org/licenses/by-sa/3.0/
 
-ASCOM Pentax KP Driver
+Original Sony Mirrorless Driver
 (c) 2019-2020 by Doug Henderson
 License TBD
 
-Pentax KP Driver DLL
-see https://github.com/dougforpres/SonyCamera/blob/master/LICENSE
+Pentax KP Driver
+(c) 2025 by Richard Romano
+https://creativecommons.org/licenses/by-sa/3.0/
 
 LibRaw
 This software is based in part on the work of LibRaw LLC
 see https://www.libraw.org/docs
 
-turbojpeg
-This software is based in part on the work of the Independent JPEG Group.
-see https://github.com/libjpeg-turbo/libjpeg-turbo/blob/master/LICENSE.md
+LibRaw.cs
+https://github.com/testezt/ASCOM.DSLR
+GPL V3
