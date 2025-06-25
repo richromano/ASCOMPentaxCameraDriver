@@ -22,6 +22,7 @@ using ASCOM.Utilities;
 using ASCOM.DeviceInterface;
 using System.Collections;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace ASCOM.PentaxKP
 {
@@ -90,20 +91,19 @@ namespace ASCOM.PentaxKP
             // consider only showing the setup dialog if not connected
             // or call a different dialog if connected
             //            if (IsConnected)
-            rezero = 0;
-            Move(10000);
-            System.Windows.Forms.MessageBox.Show("Reset focus.  All settings are in the camera, just press OK");
+            DialogResult result = MessageBox.Show("Do you want to reset the lens focus limit?", "Confirmation", MessageBoxButtons.OKCancel);
 
-            //Fix which Dialog is this?
-/*
-            using (SetupDialogForm F = new SetupDialogForm())
+            if (result == DialogResult.OK)
             {
-                var result = F.ShowDialog();
-                if (result == System.Windows.Forms.DialogResult.OK)
-                {
-                    DriverCommon.WriteProfile(); // Persist device configuration values to the ASCOM Profile store
-                }
-            }*/
+                rezero = 0;
+                Move(10000);
+                MessageBox.Show("Lens focus limit reset");
+                // User clicked OK, handle the action here
+            }
+            else if (result == DialogResult.Cancel)
+            {
+                // User clicked Cancel, handle the action here
+            }
         }
 
         public ArrayList SupportedActions
@@ -166,7 +166,7 @@ namespace ASCOM.PentaxKP
                 using (new DriverCommon.SerializedAccess("get_Connected"))
                 {
                     DriverCommon.LogFocuserMessage("Connected", "Get {0}", requestedConnection);
-                    //fix
+                    //TODO
                     return requestedConnection;
                 }
             }
@@ -176,7 +176,7 @@ namespace ASCOM.PentaxKP
                 requestedConnection = value;
                 if (value)
                     rezero = 0;
-                //Fix
+                // TODO: 
                 //What if it wants to disconnect?
 /*                if (value == IsConnected)
                     return;
@@ -245,7 +245,7 @@ namespace ASCOM.PentaxKP
         #region IFocuser Implementation
 
         // This should be set inside the create
-        // Fix
+        // TODO: 
         private int focuserPosition = 10000; // Class level variable to hold the current focuser position
         private int rezero = 0;
 //        private const int focuserSteps = 10000;
@@ -408,6 +408,7 @@ namespace ASCOM.PentaxKP
         /// <param name="bRegister">If <c>true</c>, registers the driver, otherwise unregisters it.</param>
         private static void RegUnregASCOM(bool bRegister)
         {
+            // TODO: Put in installer
             using (var P = new ASCOM.Utilities.Profile())
             {
                 P.DeviceType = "Focuser";
