@@ -49,12 +49,12 @@ namespace ASCOM.PentaxKP
         public static string CameraDriverName = "Pentax KP Camera";
         public static string CameraDriverId = "ASCOM.PentaxKP.Camera";
         public static string CameraDriverDescription = "Pentax KP Camera";
-        public static string CameraDriverInfo = $"Camera control for Pentax KP camera. Help/Support: <retrodotkiwi@gmail.com>. Version: {DriverVersion}";
+        public static string CameraDriverInfo = $"Camera control for Pentax KP camera. Version: {DriverVersion}";
 
         public static string FocuserDriverName = "Pentax KP Lens Focuser";
         public static string FocuserDriverId = "ASCOM.PentaxKP.Focuser";
         public static string FocuserDriverDescription = "Pentax KP Camera Focuser";
-        public static string FocuserDriverInfo = $"Focuser  that allows connection to a camera-controlled autofocus lens. Help/Support: <retrodotkiwi@gmail.com>. Version: {DriverVersion}";
+        public static string FocuserDriverInfo = $"Focuser  that allows connection to a camera-controlled autofocus lens. Version: {DriverVersion}";
 
         public static PentaxKPProfile Settings = new PentaxKPProfile();
         private static TraceLogger Logger = new TraceLogger("", "PentaxKP");
