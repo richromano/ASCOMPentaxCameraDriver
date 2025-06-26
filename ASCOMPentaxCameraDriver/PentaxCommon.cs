@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Collections.ObjectModel;
 
 namespace ASCOM.PentaxKP
 {
     abstract public class PentaxKPCommon
     {
-        protected static readonly UInt32 ERROR_SUCCESS = 0;
+/*        protected static readonly UInt32 ERROR_SUCCESS = 0;
         protected static readonly UInt32 INVALID_HANDLE_VALUE = 0xffffffff;
         protected const UInt32 STATUS_EXPOSING = 0x01;
         protected const UInt32 STATUS_FAILED = 0x02;
@@ -17,11 +18,11 @@ namespace ASCOM.PentaxKP
         protected const UInt32 STATUS_STARTING = 0x8001;
         protected const UInt32 STATUS_READING = 0x8002;
         protected const UInt32 FORMAT_ARW = 0xb101;
-        protected const UInt32 FORMAT_JPEG = 0x3801;
+        protected const UInt32 FORMAT_JPEG = 0x3801;*/
         protected const UInt32 IMAGEMODE_RAW = 1;
         protected const UInt32 IMAGEMODE_RGB = 2;
-        protected const UInt32 IMAGEMODE_JPEG = 3;
-        protected const UInt32 INFOFLAG_ACTIVE = 1;
+/*        protected const UInt32 IMAGEMODE_JPEG = 3;
+        protected const UInt32 INFOFLAG_ACTIVE = 1;*/
 
         public const int PERSONALITY_SHARPCAP = 0;
 
@@ -29,7 +30,7 @@ namespace ASCOM.PentaxKP
         public const short OUTPUTFORMAT_BGR = OUTPUTFORMAT_RGB | 0x1000;
         public const short OUTPUTFORMAT_RGGB = (short)IMAGEMODE_RAW;
 
-        public const UInt16 PROPERTY_ISO = 0xd21e;
+/*        public const UInt16 PROPERTY_ISO = 0xd21e;
         public const UInt16 PROPERTY_ISO_OPTIONS = 0xfffe;
         public const UInt16 PROPERTY_FOCUS_CONTROL = 0xd2d1;
         public const UInt16 PROPERTY_BATTERY_TEMPERATURE = 0xfffd;
@@ -44,7 +45,7 @@ namespace ASCOM.PentaxKP
             public string manufacturer;
             public string model;
             public string devicePath;
-        }
+        }*/
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct DeviceInfo
@@ -52,11 +53,10 @@ namespace ASCOM.PentaxKP
             public UInt32 Version;
             public UInt32 ImageWidthPixels;
             public UInt32 ImageHeightPixels;
-            public UInt32 ImageWidthCroppedPixels;
-            public UInt32 ImageHeightCroppedPixels;
+            public UInt32 ImageWidthLiveViewPixels;
+            public UInt32 ImageHeightLiveViewPixels;
             public UInt32 BayerXOffset;
             public UInt32 BayerYOffset;
-            public UInt32 CropMode;
             public Double ExposureTimeMin;
             public Double ExposureTimeMax;
             public Double ExposureTimeStep;
@@ -72,70 +72,104 @@ namespace ASCOM.PentaxKP
             public string DeviceVersion;
         }
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct ImageInfo
+        struct CameraInfo
         {
-            public UInt32 ImageSize;
-            public IntPtr ImageData;
-            public UInt32 Status;
-            public UInt32 ImageMode;
-            public UInt32 Width;
-            public UInt32 Height;
-            public UInt32 Flags;
-            public UInt32 MetaDataSize;
-            public IntPtr MetaData;
-            public Double ExposureTime;
+            private readonly string label;
+            private readonly int id;
+            private readonly int ImageWidthPixels;
+            private readonly int ImageHeightPixels;
+            private readonly int LiveViewWidthPixels;
+            private readonly int LiveViewHeightPixels;
+            private readonly double PixelWidth;
+            private readonly double PixelHeight;
+
+            public CameraInfo(string label, int id, int ImageWidthPixels, int ImageHeightPixels, int LiveViewWidthPixels, int LiveViewHeightPixels, double PixelWidth, double PixelHeight)
+            {
+                this.label = label;
+                this.id = id;
+                this.ImageWidthPixels = ImageWidthPixels;
+                this.ImageHeightPixels = ImageHeightPixels;
+                this.LiveViewWidthPixels = LiveViewWidthPixels;
+                this.LiveViewHeightPixels = LiveViewHeightPixels;
+                this.PixelWidth = PixelWidth;
+                this.PixelHeight = PixelHeight;
+            }
+
+            public string Label { get { return label; } }
+            public int Id { get { return id; } }
+
         }
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct CameraInfo
-        {
-            public UInt32 CameraFlags;
-            public UInt32 ImageWidthPixels;
-            public UInt32 ImageHeightPixels;
-            public UInt32 ImageWidthCroppedPixels;
-            public UInt32 ImageHeightCroppedPixels;
-            public UInt32 PreviewWidthPixels;
-            public UInt32 PreviewHeightPixels;
-            public UInt32 BayerXOffset;
-            public UInt32 BayerYOffset;
-            public Double PixelWidth;
-            public Double PixelHeight;
-        }
+        // KP 6016x4000 14bit
+        // K70 6000x4000 14bit
+        // KF 6000x4000 14bit
+        // K1ii 7360x4912 14bit
+        // K1  7360x4912 14bit
+        // K3iii 6192x4128 14bit 
+        // 645Z 8256x6192 14bit
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct PropertyValueOption
-        {
-            public UInt32 Value;
-            public string Name;
-        }
+        static readonly IList<CameraInfo> PentaxCameraInfo = new ReadOnlyCollection<CameraInfo>
+            (new[] {
+                // TODO: fix preview size and pixel size
+             new CameraInfo ("KP", 0, 6016, 4000, 720, 480, 3.88, 3.88),
+             new CameraInfo ("K70", 1, 6000, 4000, 720, 480, 3.88, 3.88),
+             new CameraInfo ("KF", 2, 6000, 4000, 720, 480, 3.88, 3.88),
+             new CameraInfo ("K1ii", 3, 7360, 4912, 720, 480, 3.88, 3.88),
+             new CameraInfo ("K1", 4, 7360, 4912, 720, 480, 3.88, 3.88),
+             new CameraInfo ("K3iii", 5, 6192, 4128, 720, 480, 3.88, 3.88),
+             new CameraInfo ("645Z", 6, 8256, 6192, 720, 480, 3.88, 3.88)
+            });
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct PropertyValue
-        {
-            public UInt32 Id;
-            public UInt32 Value;
-            public string Text;
-        }
+        /*        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+                public struct ImageInfo
+                {
+                    public UInt32 ImageSize;
+                    public IntPtr ImageData;
+                    public UInt32 Status;
+                    public UInt32 ImageMode;
+                    public UInt32 Width;
+                    public UInt32 Height;
+                    public UInt32 Flags;
+                    public UInt32 MetaDataSize;
+                    public IntPtr MetaData;
+                    public Double ExposureTime;
+                }
+        */
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct PropertyDescriptor
-        {
-            public UInt32 Id;
-            public UInt16 Type;
-            public UInt16 Flags;
-            public string Name;
-            public UInt32 ValueCount;
-        }
+        
+        /*        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+                public struct PropertyValueOption
+                {
+                    public UInt32 Value;
+                    public string Name;
+                }
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct LensInfo
-        {
-            public string Id;
-            public string Manufacturer;
-            public string Model;
-            public string LensPath;
-        }
+                [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+                public struct PropertyValue
+                {
+                    public UInt32 Id;
+                    public UInt32 Value;
+                    public string Text;
+                }
 
+                [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+                public struct PropertyDescriptor
+                {
+                    public UInt32 Id;
+                    public UInt16 Type;
+                    public UInt16 Flags;
+                    public string Name;
+                    public UInt32 ValueCount;
+                }
+
+                [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+                public struct LensInfo
+                {
+                    public string Id;
+                    public string Manufacturer;
+                    public string Model;
+                    public string LensPath;
+                }
+                */
     }
 }
