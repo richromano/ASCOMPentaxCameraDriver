@@ -1,6 +1,6 @@
 # ASCOMPentaxKPCameraDriver
 
-ASCOM Driver for Pentax KP Camera
+ASCOM Camera and Focuser Driver for Pentax KP Camera
 
 Developed by Richard Romano
 
