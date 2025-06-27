@@ -136,12 +136,12 @@ namespace ASCOM.PentaxKP
             (new[] {
                 // TODO: fix preview size and pixel size
              new CameraInfo ("PENTAX KP", 0, 6016, 4000, 720, 480, 3.88, 3.88),
-             new CameraInfo ("K70", 1, 6000, 4000, 720, 480, 3.88, 3.88),
-             new CameraInfo ("KF", 2, 6000, 4000, 720, 480, 3.88, 3.88),
-             new CameraInfo ("K1ii", 3, 7360, 4912, 720, 480, 3.88, 3.88),
-             new CameraInfo ("K1", 4, 7360, 4912, 720, 480, 3.88, 3.88),
-             new CameraInfo ("K3iii", 5, 6192, 4128, 720, 480, 3.88, 3.88),
-             new CameraInfo ("645Z", 6, 8256, 6192, 720, 480, 3.88, 3.88)
+             new CameraInfo ("PENTAX K-70", 1, 6000, 4000, 720, 480, 3.88, 3.88),
+             new CameraInfo ("PENTAX KF", 2, 6000, 4000, 720, 480, 3.88, 3.88),
+             new CameraInfo ("PENTAX K-1II", 3, 7360, 4912, 720, 480, 4.86, 4.86),
+             new CameraInfo ("PENTAX K-1", 4, 7360, 4912, 720, 480, 4.86, 4.86),
+             new CameraInfo ("PENTAX K-3III", 5, 6192, 4128, 720, 480, 3.75, 3.75),
+             new CameraInfo ("PENTAX 645Z", 6, 8256, 6192, 720, 480, 5.32, 5.32)
             });
 
         public DeviceInfo Info

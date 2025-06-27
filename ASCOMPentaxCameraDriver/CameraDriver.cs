@@ -819,7 +819,7 @@ namespace ASCOM.PentaxKP
                         gainIndex = 5;
                     using (new DriverCommon.SerializedAccess("get_Gain"))
                     {
-                        // TODO: Can I set this any time?
+                        // TODO: Can I set this any time?  Do we need more?
                         if (DriverCommon.m_camera != null)
                         {
                             ISO iso = new ISO();
@@ -1330,7 +1330,7 @@ namespace ASCOM.PentaxKP
                  //using (new SerializedAccess(this, "get_PixelSizeX"))
                 {
                     DriverCommon.LogCameraMessage("", "get_PixelSizeX");
-                    return 3.88;// DriverCommon.Camera.Info.PixelWidth;
+                    return DriverCommon.Settings.Info.PixelWidth;
 				}
             }
         }
@@ -1342,7 +1342,7 @@ namespace ASCOM.PentaxKP
                 //using (new SerializedAccess(this, "get_PixelSizeY"))
                 {
                     DriverCommon.LogCameraMessage("", "get_PixelSizeY");
-                    return 3.88;// DriverCommon.Camera.Info.PixelHeight;
+                    return DriverCommon.Settings.Info.PixelHeight;
 				}
             }
         }
@@ -1419,8 +1419,8 @@ namespace ASCOM.PentaxKP
                     // TODO:  can I new it here?
                     ArrayList modes = new ArrayList();
 
-                    modes.Add(String.Format("Full Resolution ({0} x {1})", 6016, 4000));
-                    modes.Add(String.Format("LiveView ({0} x {1})", 720, 480));
+                    modes.Add(String.Format("Full Resolution ({0} x {1})", DriverCommon.Settings.Info.ImageWidthPixels, DriverCommon.Settings.Info.ImageHeightPixels));
+                    modes.Add(String.Format("LiveView ({0} x {1})", DriverCommon.Settings.Info.LiveViewWidthPixels, DriverCommon.Settings.Info.LiveViewHeightPixels));
 
                     return modes;
 				}
@@ -1434,7 +1434,7 @@ namespace ASCOM.PentaxKP
                 using (new DriverCommon.SerializedAccess("get_SensorName"))
                 {
                     DriverCommon.LogCameraMessage("", "get_SensorName");
-                    // TODO: 
+                    // TODO: Add this info somewhere
                     return "IMX193";// "QHY247C";// "IMX271";
 				}
             }
