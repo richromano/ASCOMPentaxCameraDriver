@@ -130,9 +130,7 @@
     <Compile Include="SetupDialogForm.designer.cs">
       <DependentUpon>SetupDialogForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="PentaxCamera.cs" />
     <Compile Include="PentaxCameraEnumerator.cs" />
-    <Compile Include="PentaxCommon.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

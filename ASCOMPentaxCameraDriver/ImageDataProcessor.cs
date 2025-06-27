@@ -26,7 +26,7 @@ namespace ASCOM.PentaxKP.Classes
         }
         
 
-        public unsafe int[,,] ReadRawPentax(string fileName)
+        public int[,,] ReadRawPentax(string fileName)
         {
             IntPtr data = LoadRaw(fileName);
             NativeMethods.libraw_dcraw_process(data);

@@ -82,13 +82,13 @@ namespace ASCOM.PentaxKP
 
             comboBoxCamera.Items.Clear();
 
-            foreach (PentaxKPCamera candidate in enumerator.Cameras)
+            foreach (PentaxKPProfile.DeviceInfo candidate in enumerator.Cameras)
             {
-                int id = comboBoxCamera.Items.Add(candidate.DisplayName);
+                int id = comboBoxCamera.Items.Add(candidate.DeviceName);
 
-                if (candidate.DisplayName == DriverCommon.Settings.DeviceId)
+                if (candidate.DeviceName == DriverCommon.Settings.DeviceId)
                 {
-                    selected = candidate.DisplayName;
+                    selected = candidate.DeviceName;
                 }
             }
 
@@ -120,7 +120,7 @@ namespace ASCOM.PentaxKP
             //Commenting out makes it crash
 //            personalities.Add(PentaxKPCommon.PERSONALITY_APT, "APT");
 //            personalities.Add(PentaxKPCommon.PERSONALITY_NINA, "N.I.N.A");
-            personalities.Add(PentaxKPCommon.PERSONALITY_SHARPCAP, "SharpCap");
+            personalities.Add(PentaxKPProfile.PERSONALITY_SHARPCAP, "SharpCap");
 
             comboBoxPersonality.DataSource = new BindingSource(personalities, null);
             comboBoxPersonality.DisplayMember = "Value";
@@ -207,23 +207,23 @@ namespace ASCOM.PentaxKP
 
         private void comboBoxPersonality_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int personality=PentaxKPCommon.PERSONALITY_SHARPCAP;
+            int personality=PentaxKPProfile.PERSONALITY_SHARPCAP;
             personality = comboBoxPersonality.SelectedIndex+1;
 
             short currentOutputFormat = (short)comboBoxOutputFormat.SelectedIndex;//.SelectedValue != null ? (short)comboBoxOutputFormat.SelectedValue : PentaxKPCommon.OUTPUTFORMAT_RGGB;
 
             switch (personality)
             {
-                case PentaxKPCommon.PERSONALITY_SHARPCAP:
+                case PentaxKPProfile.PERSONALITY_SHARPCAP:
                     // Sharpcap supports format specification, but wants BGR, not RGB
                     // Doesn't support Liveview selection
                     comboBoxOutputFormat.Enabled = true;
 
                     PopulateOutputFormats();
 
-                    if (currentOutputFormat == PentaxKPCommon.OUTPUTFORMAT_RGB)
+                    if (currentOutputFormat == PentaxKPProfile.OUTPUTFORMAT_RGB)
                     {
-                        currentOutputFormat = PentaxKPCommon.OUTPUTFORMAT_BGR;
+                        currentOutputFormat = PentaxKPProfile.OUTPUTFORMAT_BGR;
                     }
 
                     comboBoxOutputFormat.SelectedValue = currentOutputFormat;
@@ -237,7 +237,7 @@ namespace ASCOM.PentaxKP
         {
             Dictionary<short, string> outputFormats = new Dictionary<short, string>();
 
-            outputFormats.Add(PentaxKPCommon.OUTPUTFORMAT_RGGB, "RAW/RGGB (Unprocessed)");
+            outputFormats.Add(PentaxKPProfile.OUTPUTFORMAT_RGGB, "RAW/RGGB (Unprocessed)");
 
             switch (comboBoxPersonality.SelectedIndex)
             {
@@ -248,8 +248,8 @@ namespace ASCOM.PentaxKP
                 case PentaxKPCommon.PERSONALITY_NINA:
                     break;
 */
-                case PentaxKPCommon.PERSONALITY_SHARPCAP:
-                    outputFormats.Add(PentaxKPCommon.OUTPUTFORMAT_BGR, "JPG (Processed)");
+                case PentaxKPProfile.PERSONALITY_SHARPCAP:
+                    outputFormats.Add(PentaxKPProfile.OUTPUTFORMAT_BGR, "JPG (Processed)");
                     break;
             }
 

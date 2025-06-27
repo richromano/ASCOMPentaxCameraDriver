@@ -8,19 +8,29 @@ using ASCOM.Utilities;
 using Microsoft.Win32;
 using Ricoh.CameraController;
 using System.Threading;
+using System.Collections.ObjectModel;
 
 namespace ASCOM.PentaxKP
 {
     public class PentaxKPProfile
     {
-//        private static int DefaultImageWidth = 6016; // Constants to define the ccd pixel dimenstions
-//        private static int DefaultImageHeight = 4000;
+        //        private static int DefaultImageWidth = 6016; // Constants to define the ccd pixel dimenstions
+        //        private static int DefaultImageHeight = 4000;
+        protected const UInt32 IMAGEMODE_RAW = 1;
+        protected const UInt32 IMAGEMODE_RGB = 2;
+
+        public const int PERSONALITY_SHARPCAP = 0;
+        public const short OUTPUTFORMAT_RGB = (short)IMAGEMODE_RGB;
+        public const short OUTPUTFORMAT_BGR = OUTPUTFORMAT_RGB | 0x1000;
+        public const short OUTPUTFORMAT_RGGB = (short)IMAGEMODE_RAW;
+
+        private DeviceInfo m_info;
 
         public bool EnableLogging = false;
         public string DeviceId = "";
         public short DefaultReadoutMode = 1;// PentaxKPCommon.OUTPUTFORMAT_RGB;
         public bool UseLiveview = true;
-        public int Personality = PentaxKPCommon.PERSONALITY_SHARPCAP;
+        public int Personality = PERSONALITY_SHARPCAP;
         public bool AutoLiveview = false;
         public bool BulbModeEnable = false;
         public short BulbModeTime = 1;
@@ -31,10 +41,144 @@ namespace ASCOM.PentaxKP
         public bool HandsOffFocus = false;
 
         // Dynamic values
-//        public int ImageWidth = DefaultImageWidth; // Initialise variables to hold values required for functionality tested by Conform
-//        public int ImageHeight = DefaultImageHeight;
-//        public int ImageXOffset = 0;
-//        public int ImageYOffset = 0;
+        //        public int ImageWidth = DefaultImageWidth; // Initialise variables to hold values required for functionality tested by Conform
+        //        public int ImageHeight = DefaultImageHeight;
+        //        public int ImageXOffset = 0;
+        //        public int ImageYOffset = 0;
+
+        public void assignCamera(int index)
+        {
+            m_info.ImageWidthPixels = PentaxCameraInfo.ElementAt(index).ImageWidthPixels;
+            m_info.ImageHeightPixels = PentaxCameraInfo.ElementAt(index).ImageHeightPixels;
+            m_info.LiveViewWidthPixels = PentaxCameraInfo.ElementAt(index).LiveViewWidthPixels;
+            m_info.LiveViewHeightPixels = PentaxCameraInfo.ElementAt(index).LiveViewHeightPixels;
+            m_info.PixelWidth = PentaxCameraInfo.ElementAt(index).PixelWidth;
+            m_info.PixelHeight = PentaxCameraInfo.ElementAt(index).PixelHeight;
+        }
+
+        public void assignCamera(string name)
+        {
+            for (int i = 0; i < PentaxCameraInfo.Count; i++)
+            {
+                DriverCommon.LogCameraMessage("assignCamera", PentaxCameraInfo.ElementAt(i).label+" "+name);
+                if (PentaxCameraInfo.ElementAt(i).label == name)
+                {
+                    assignCamera(i);
+                    return;
+                }
+            }
+
+            assignCamera(0);
+            return;
+        }
+
+        public struct DeviceInfo
+        {
+            public int Version;
+            public int ImageWidthPixels;
+            public int ImageHeightPixels;
+            public int LiveViewHeightPixels;
+            public int LiveViewWidthPixels;
+            //            public int BayerXOffset;
+            //            public int BayerYOffset;
+            //            public int ExposureTimeMin;
+            //            public int ExposureTimeMax;
+            //            public int ExposureTimeStep;
+            public double PixelWidth;
+            public double PixelHeight;
+            //            public int BitsPerPixel;
+
+            public string Manufacturer;
+            public string Model;
+            public string SerialNumber;
+            public string DeviceName;
+            public string SensorName;
+            public string DeviceVersion;
+        }
+
+        public struct CameraInfo
+        {
+            internal readonly string label;
+            internal readonly int id;
+            internal readonly int ImageWidthPixels;
+            internal readonly int ImageHeightPixels;
+            internal readonly int LiveViewWidthPixels;
+            internal readonly int LiveViewHeightPixels;
+            internal readonly double PixelWidth;
+            internal readonly double PixelHeight;
+
+            public CameraInfo(string label, int id, int ImageWidthPixels, int ImageHeightPixels, int LiveViewWidthPixels, int LiveViewHeightPixels, double PixelWidth, double PixelHeight)
+            {
+                this.label = label;
+                this.id = id;
+                this.ImageWidthPixels = ImageWidthPixels;
+                this.ImageHeightPixels = ImageHeightPixels;
+                this.LiveViewWidthPixels = LiveViewWidthPixels;
+                this.LiveViewHeightPixels = LiveViewHeightPixels;
+                this.PixelWidth = PixelWidth;
+                this.PixelHeight = PixelHeight;
+            }
+
+            public string Label { get { return label; } }
+            public int Id { get { return id; } }
+
+        }
+
+        // KP 6016x4000 14bit
+        // K70 6000x4000 14bit
+        // KF 6000x4000 14bit
+        // K1ii 7360x4912 14bit
+        // K1  7360x4912 14bit
+        // K3iii 6192x4128 14bit 
+        // 645Z 8256x6192 14bit
+
+        static readonly IList<CameraInfo> PentaxCameraInfo = new ReadOnlyCollection<CameraInfo>
+            (new[] {
+                // TODO: fix preview size and pixel size
+             new CameraInfo ("PENTAX KP", 0, 6016, 4000, 720, 480, 3.88, 3.88),
+             new CameraInfo ("K70", 1, 6000, 4000, 720, 480, 3.88, 3.88),
+             new CameraInfo ("KF", 2, 6000, 4000, 720, 480, 3.88, 3.88),
+             new CameraInfo ("K1ii", 3, 7360, 4912, 720, 480, 3.88, 3.88),
+             new CameraInfo ("K1", 4, 7360, 4912, 720, 480, 3.88, 3.88),
+             new CameraInfo ("K3iii", 5, 6192, 4128, 720, 480, 3.88, 3.88),
+             new CameraInfo ("645Z", 6, 8256, 6192, 720, 480, 3.88, 3.88)
+            });
+
+        public DeviceInfo Info
+        {
+            get
+            {
+                return m_info;
+            }
+        }
+
+        public String SerialNumber
+        {
+            get
+            {
+                return m_info.SerialNumber.TrimStart(new char[] { '0' });
+            }
+        }
+
+        public String DisplayName
+        {
+            get
+            {
+                return String.Format("{0} (s/n: {1})", "Pentax KP", SerialNumber);
+            }
+        }
+
+        public String Model
+        {
+            get
+            {
+                return m_info.Model;
+            }
+        }
+
+
+
+
     }
 
     class DriverCommon
@@ -59,7 +203,7 @@ namespace ASCOM.PentaxKP
         public static PentaxKPProfile Settings = new PentaxKPProfile();
         private static TraceLogger Logger = new TraceLogger("", "PentaxKP");
 
-        private static PentaxKPCamera camera = null;
+        //private static PentaxKPCamera camera = null;
         //private static bool cameraConnected = false;
         //private static bool focuserConnected = false;
         internal static Ricoh.CameraController.CameraDevice m_camera = null;
@@ -94,13 +238,13 @@ namespace ASCOM.PentaxKP
         internal static string handsOffProfileName = "Hands Off";
         internal static string handsOffProfileDefault = "false";
 
-        static public PentaxKPCamera Camera
+        /*static public PentaxKPCamera Camera
         {
             get
             {
                 return camera;
             }
-        }
+        }*/
 
         static public bool CameraConnected
         {
@@ -292,27 +436,27 @@ namespace ASCOM.PentaxKP
                 // Need to know what kind of message
                 m_method = method;
                 m_mustReleaseMutex = true;
-                DriverCommon.LogCameraMessage(m_method, "[enter] " + m_serialAccess.ToString() + " " + shortWait.ToString());
+//                DriverCommon.LogCameraMessage(m_method, "[enter] " + m_serialAccess.ToString() + " " + shortWait.ToString());
 
                 if (!m_serialAccess.WaitOne(100))
                 {
-                    DriverCommon.LogCameraMessage(m_method, "Waiting to enter " + m_serialAccess.ToString());
+//                    DriverCommon.LogCameraMessage(m_method, "Waiting to enter " + m_serialAccess.ToString());
 
                     if (shortWait)
                     {
                         m_mustReleaseMutex = false;
-                        DriverCommon.LogCameraMessage(m_method, "[in] short " + m_serialAccess.ToString());
+//                        DriverCommon.LogCameraMessage(m_method, "[in] short " + m_serialAccess.ToString());
                         return;
                     }
                     m_serialAccess.WaitOne(20000);
                 }
 
-                DriverCommon.LogCameraMessage(m_method, "[in] " + m_serialAccess.ToString());
+//                DriverCommon.LogCameraMessage(m_method, "[in] " + m_serialAccess.ToString());
             }
 
             public void Dispose()
             {
-                DriverCommon.LogCameraMessage(m_method, "[out] " + m_serialAccess.ToString());
+                //DriverCommon.LogCameraMessage(m_method, "[out] " + m_serialAccess.ToString());
                 if (m_mustReleaseMutex)
                     m_serialAccess.ReleaseMutex();
             }

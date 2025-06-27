@@ -62,10 +62,10 @@ namespace ASCOM.PentaxKP
         internal static bool LastSetFastReadout = false;
         internal static int RequestedStartX = 0;
         internal static int RequestedStartY = 0;
-        internal static int RequestedWidth = 6016; // In NumX and NumY
-        internal static int RequestedHeight = 4000;
-        internal static int MaxImageWidthPixels = 6016; // Constants to define the ccd pixel dimenstion
-        internal static int MaxImageHeightPixels = 4000;
+        internal static int RequestedWidth = 0;//6016; // In NumX and NumY
+        internal static int RequestedHeight = 0;//4000;
+        internal static int MaxImageWidthPixels = 0;//6016; // Constants to define the ccd pixel dimenstion
+        internal static int MaxImageHeightPixels = 0;//4000;
         internal static Queue<String> imagesToProcess = new Queue<string>();
         internal static Queue<BitmapImage> bitmapsToProcess = new Queue<BitmapImage>();
         internal static ManualResetEvent _requestTermination = new ManualResetEvent(false);
@@ -101,9 +101,9 @@ namespace ASCOM.PentaxKP
                 if (LastSetFastReadout) {
                     bitmapsToProcess.Enqueue(bitmapImage);
                     m_captureState = Ricoh.CameraController.CaptureState.Complete;
+                    DriverCommon.LogCameraMessage("", "Enqueued LiveView Image");
                 }
 
-                DriverCommon.LogCameraMessage("", "Received LiveView Image");
             }
 
             // Image Added
@@ -289,7 +289,7 @@ namespace ASCOM.PentaxKP
             {
                 using (new DriverCommon.SerializedAccess("get_Connected"))
                 {
-                    DriverCommon.LogCameraMessage("Connected", "get");
+                    //DriverCommon.LogCameraMessage("Connected", "get");
                     if (DriverCommon.m_camera == null)
                         return false;
 
@@ -333,6 +333,16 @@ namespace ASCOM.PentaxKP
                                     Thread.Sleep(1000);
                                     if (DriverCommon.Settings.UseLiveview)
                                         DriverCommon.m_camera.StartLiveView();
+
+                                    // TODO: should not always be zero
+                                    string deviceModel = DriverCommon.Settings.DeviceId;
+                                    DriverCommon.Settings.assignCamera(deviceModel);
+                                    MaxImageWidthPixels = DriverCommon.Settings.Info.ImageWidthPixels; // Constants to define the ccd pixel dimenstion
+                                    MaxImageHeightPixels = DriverCommon.Settings.Info.ImageHeightPixels;
+                                    StartX = 0;
+                                    StartY = 0;
+                                    NumX = MaxImageWidthPixels;
+                                    NumY = MaxImageHeightPixels;
 
                                     Gain = gainIndex;
                                 }
@@ -913,8 +923,8 @@ namespace ASCOM.PentaxKP
         {
             object result = null;
             //Bitmap _bmp;
-            int MSensorWidthPx = 6016;
-            int MSensorHeightPx = 4000;
+            int MSensorWidthPx = DriverCommon.Settings.Info.ImageWidthPixels;
+            int MSensorHeightPx = DriverCommon.Settings.Info.ImageHeightPixels;
             int[,,] rgbImage= new int[MSensorWidthPx, MSensorHeightPx, 3]; // Assuming this is declared and initialized elsewhere.
 
 
@@ -1370,19 +1380,23 @@ namespace ASCOM.PentaxKP
                                 m_readoutmode = 0;
                                 if(DriverCommon.Settings.UseLiveview)
                                           DriverCommon.m_camera.StartLiveView();
-                                MaxImageWidthPixels = 6016; // Constants to define the ccd pixel dimenstion
-                                MaxImageHeightPixels = 4000;
-                                NumX = 6016;
-                                NumY = 4000;
+                                MaxImageWidthPixels = DriverCommon.Settings.Info.ImageWidthPixels; // Constants to define the ccd pixel dimenstion
+                                MaxImageHeightPixels = DriverCommon.Settings.Info.ImageHeightPixels;
+                                StartX = 0;
+                                StartY = 0;
+                                NumX = MaxImageWidthPixels;
+                                NumY = MaxImageHeightPixels;
                                 break;
 
                             case 1:
                                 m_readoutmode = 1;
                                 FastReadout = true;
-                                MaxImageWidthPixels = 720; // Constants to define the ccd pixel dimenstion
-                                MaxImageHeightPixels = 480;
-                                NumX = 720;
-                                NumY = 480;
+                                MaxImageWidthPixels = DriverCommon.Settings.Info.LiveViewWidthPixels; // Constants to define the ccd pixel dimenstion
+                                MaxImageHeightPixels = DriverCommon.Settings.Info.LiveViewHeightPixels;
+                                StartX = 0;
+                                StartY = 0;
+                                NumX = MaxImageWidthPixels;
+                                NumY = MaxImageHeightPixels;
                                 break;
                         }
                     }
@@ -1835,7 +1849,7 @@ namespace ASCOM.PentaxKP
         {
                //using (new SerializedAccess(this, "set_StartX"))
                 {
-                    DriverCommon.LogCameraMessage("", "set_StartY");
+                    DriverCommon.LogCameraMessage("", "set_StartX "+value.ToString());
                     RequestedStartX = value;
 				}
         }
@@ -1855,7 +1869,7 @@ namespace ASCOM.PentaxKP
         {
                 //using (new SerializedAccess(this, "set_StartY"))
                 {
-                    DriverCommon.LogCameraMessage("", "set_StartY");
+                    DriverCommon.LogCameraMessage("", "set_StartY "+value.ToString());
                     RequestedStartY = value;
 				}
         }

@@ -8,7 +8,7 @@ using System.Collections;
 
 namespace ASCOM.PentaxKP
 {
-    public class PentaxKPCameraEnumerator : PentaxKPCommon
+    public class PentaxKPCameraEnumerator
     {
         public ArrayList Cameras
         {
@@ -26,7 +26,7 @@ namespace ASCOM.PentaxKP
                         // Sequence contains no elements
                         Response response = camera.Connect(Ricoh.CameraController.DeviceInterface.USB);
 
-                        DeviceInfo info = new DeviceInfo()
+                        PentaxKPProfile.DeviceInfo info = new PentaxKPProfile.DeviceInfo()
                         {
                             Version = 1
                         };
@@ -40,12 +40,12 @@ namespace ASCOM.PentaxKP
                             (LiveViewSpecificationValue)liveViewSpecification.Value;
 
                         LiveViewImage liveViewImage = liveViewSpecificationValue.Get();
-                        info.ImageWidthPixels = liveViewImage.Width;
-                        info.ImageHeightPixels = liveViewImage.Height;
+                        info.ImageWidthPixels = (int)liveViewImage.Width;
+                        info.ImageHeightPixels = (int)liveViewImage.Height;
 
                         if (camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB))
                         {
-                            result.Add(new PentaxKPCamera(info));
+                            result.Add(info);
                         }
 
                         camera.Disconnect(Ricoh.CameraController.DeviceInterface.USB);
