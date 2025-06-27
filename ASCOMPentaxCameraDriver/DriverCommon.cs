@@ -134,7 +134,7 @@ namespace ASCOM.PentaxKP
 
         static readonly IList<CameraInfo> PentaxCameraInfo = new ReadOnlyCollection<CameraInfo>
             (new[] {
-                // TODO: fix preview size and pixel size
+                // TODO: fix preview size
              new CameraInfo ("PENTAX KP", 0, 6016, 4000, 720, 480, 3.88, 3.88),
              new CameraInfo ("PENTAX K-70", 1, 6000, 4000, 720, 480, 3.88, 3.88),
              new CameraInfo ("PENTAX KF", 2, 6000, 4000, 720, 480, 3.88, 3.88),
@@ -203,9 +203,6 @@ namespace ASCOM.PentaxKP
         public static PentaxKPProfile Settings = new PentaxKPProfile();
         private static TraceLogger Logger = new TraceLogger("", "PentaxKP");
 
-        //private static PentaxKPCamera camera = null;
-        //private static bool cameraConnected = false;
-        //private static bool focuserConnected = false;
         internal static Ricoh.CameraController.CameraDevice m_camera = null;
 
         // Common to both
@@ -237,14 +234,6 @@ namespace ASCOM.PentaxKP
         internal static string usingCameraLensProfileDefault = "false";
         internal static string handsOffProfileName = "Hands Off";
         internal static string handsOffProfileDefault = "false";
-
-        /*static public PentaxKPCamera Camera
-        {
-            get
-            {
-                return camera;
-            }
-        }*/
 
         static public bool CameraConnected
         {
