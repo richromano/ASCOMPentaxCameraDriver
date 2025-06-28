@@ -30,6 +30,7 @@ namespace ASCOM.PentaxKP
             // Place any validation constraint checks here
             // Update the state variables with results from the dialogue
             DriverCommon.Settings.DeviceId = (string)comboBoxCamera.SelectedItem;
+            DriverCommon.Settings.DeviceIndex = comboBoxCamera.SelectedIndex;
             DriverCommon.Settings.EnableLogging = chkTrace.Checked;
             DriverCommon.Settings.DefaultReadoutMode = (short)(comboBoxOutputFormat.SelectedIndex);
             if (DriverCommon.Settings.DefaultReadoutMode == 0)
@@ -43,7 +44,7 @@ namespace ASCOM.PentaxKP
             //            DriverCommon.Settings.ARWAutosaveAlwaysCreateEmptyFolder = checkBoxCreateMultipleDirectories.Checked;
             DriverCommon.Settings.UseLiveview = checkBoxUseLiveview.Checked;
             //DriverCommon.Settings.AutoLiveview = checkBoxAutoLiveview.Checked;
-            DriverCommon.Settings.Personality = comboBoxPersonality.SelectedIndex+1;
+            DriverCommon.Settings.Personality = comboBoxPersonality.SelectedIndex;
             //DriverCommon.Settings.BulbModeEnable = checkBoxBulbMode.Checked;
             //DriverCommon.Settings.BulbModeTime = short.Parse(textBoxBulbMode.Text.Trim());
             //DriverCommon.Settings.AllowISOAdjust = checkBoxAllowISOAdjust.Checked;
@@ -126,7 +127,7 @@ namespace ASCOM.PentaxKP
             comboBoxPersonality.DisplayMember = "Value";
             comboBoxPersonality.ValueMember = "Key";
 
-            comboBoxPersonality.SelectedIndex = 0;// DriverCommon.Settings.Personality;
+            comboBoxPersonality.SelectedIndex = DriverCommon.Settings.Personality;
 
             //checkBoxBulbMode.Checked = DriverCommon.Settings.BulbModeEnable;
             //textBoxBulbMode.Text = DriverCommon.Settings.BulbModeTime.ToString();
@@ -207,8 +208,8 @@ namespace ASCOM.PentaxKP
 
         private void comboBoxPersonality_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int personality=PentaxKPProfile.PERSONALITY_SHARPCAP;
-            personality = comboBoxPersonality.SelectedIndex+1;
+            int personality;//=PentaxKPProfile.PERSONALITY_SHARPCAP;
+            personality = comboBoxPersonality.SelectedIndex;
 
             short currentOutputFormat = (short)comboBoxOutputFormat.SelectedIndex;//.SelectedValue != null ? (short)comboBoxOutputFormat.SelectedValue : PentaxKPCommon.OUTPUTFORMAT_RGGB;
 
