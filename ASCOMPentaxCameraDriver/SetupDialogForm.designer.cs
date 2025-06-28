@@ -155,9 +155,9 @@ namespace ASCOM.PentaxKP
             this.checkBoxUseLiveview.Location = new System.Drawing.Point(11, 64);
             this.checkBoxUseLiveview.Margin = new System.Windows.Forms.Padding(1);
             this.checkBoxUseLiveview.Name = "checkBoxUseLiveview";
-            this.checkBoxUseLiveview.Size = new System.Drawing.Size(126, 17);
+            this.checkBoxUseLiveview.Size = new System.Drawing.Size(225, 17);
             this.checkBoxUseLiveview.TabIndex = 15;
-            this.checkBoxUseLiveview.Text = "Always Use Liveview";
+            this.checkBoxUseLiveview.Text = "Always Use Liveview  (Allows Auto Focus)";
             this.checkBoxUseLiveview.UseVisualStyleBackColor = true;
             this.checkBoxUseLiveview.CheckedChanged += new System.EventHandler(this.checkBoxUseLiveview_CheckedChanged);
             // 
