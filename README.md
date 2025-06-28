@@ -1,12 +1,12 @@
 # ASCOMPentaxKPCameraDriver
 
-ASCOM Driver for Pentax KP Camera
+ASCOM Camera and Focuser Driver for Pentax KP Camera
 
 Developed by Richard Romano
 
 # Usage
 
-The driver has only been tested with a KP camera with Sharpcap.  It currently assumes a resolution of 6016x4000 for full sensor and 720x480 for LiveView.  You can select LiveView in both the Read Mode and the Sharpcap selector.  This will also fast image streaming for which you can perform initial focus adjustment.
+The driver has only been tested with a KP camera with Sharpcap.  It currently assumes a resolution of 6016x4000 for full sensor and 720x480 for LiveView.  You can select LiveView in the Read Mode and then using the LiveView button in Sharpcap.  This will allow fast image streaming with which you can perform initial focus adjustment.
 
 # Testing
 
