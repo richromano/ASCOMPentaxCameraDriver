@@ -318,6 +318,8 @@ namespace ASCOM.PentaxKP
                 focuserPosition = 10000;
                 DriverCommon.m_camera.Focus(-10000);
                 Thread.Sleep(200);
+                DriverCommon.m_camera.Focus(-10000);
+                Thread.Sleep(200);
             }
 
             if (Position > 10000)
