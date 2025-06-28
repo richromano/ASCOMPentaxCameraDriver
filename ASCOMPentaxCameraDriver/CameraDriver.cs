@@ -278,9 +278,6 @@ namespace ASCOM.PentaxKP
             utilities = null;
             astroUtilities.Dispose();
             astroUtilities = null;
-           // tl.Enabled = false;
-           // tl.Dispose();
-           // tl = null;
         }
 
         public bool Connected
@@ -310,7 +307,7 @@ namespace ASCOM.PentaxKP
                             // TODO: Make this use  DriverCommon.Settings.DeviceId rather than First
                             DriverCommon.LogCameraMessage("Connected", "Connecting...");
                             List<CameraDevice> detectedCameraDevices = CameraDeviceDetector.Detect(Ricoh.CameraController.DeviceInterface.USB);
-                            DriverCommon.m_camera = detectedCameraDevices.First();
+                            DriverCommon.m_camera = detectedCameraDevices.ElementAt(DriverCommon.Settings.DeviceIndex);
                             if (DriverCommon.m_camera != null)
                             {
                                 var response = DriverCommon.m_camera.Connect(Ricoh.CameraController.DeviceInterface.USB);
@@ -529,7 +526,7 @@ namespace ASCOM.PentaxKP
                 //using (new SerializedAccess(this, "get_CameraState", true))
                 {
                     DriverCommon.LogCameraMessage("", $"get_CameraState {m_captureState.ToString()}");
-                    // TODO: !!!!
+                    // TODO: !!!! Look at camera state diagram
                     switch (m_captureState)
                     {
                         case Ricoh.CameraController.CaptureState.Executing:
@@ -717,7 +714,6 @@ namespace ASCOM.PentaxKP
             // Minimum exposure time
                 //using (new SerializedAccess(this, "get_ExposureMin", true))
                 {
-                    // TODO:  all exposures
                     DriverCommon.LogCameraMessage("", "get_ExposureMin");
                     return 1.0/24000.0;
 				}
@@ -925,6 +921,7 @@ namespace ASCOM.PentaxKP
             //Bitmap _bmp;
             int MSensorWidthPx = DriverCommon.Settings.Info.ImageWidthPixels;
             int MSensorHeightPx = DriverCommon.Settings.Info.ImageHeightPixels;
+            // TODO: Should be returned based on image size
             int[,,] rgbImage= new int[MSensorWidthPx, MSensorHeightPx, 3]; // Assuming this is declared and initialized elsewhere.
 
 
@@ -940,8 +937,9 @@ namespace ASCOM.PentaxKP
         {
             object result = null;
             Bitmap _bmp;
-            int MSensorWidthPx = 6016;
-            int MSensorHeightPx = 4000;
+            int MSensorWidthPx = DriverCommon.Settings.Info.ImageWidthPixels;
+            int MSensorHeightPx = DriverCommon.Settings.Info.ImageHeightPixels;
+            // TODO: Should be returned based on image size
             int[,,] _cameraImageArray= new int[MSensorWidthPx, MSensorHeightPx, 3]; // Assuming this is declared and initialized elsewhere.
 
             // Wait for the file to be closed and available.
@@ -1183,7 +1181,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                //Firx
+                // TODO:
                 //using (new SerializedAccess(this, "get_LastExposureDuration"))
                 {
                     DriverCommon.LogCameraMessage("", "get_LastExposureDuration");
@@ -1209,7 +1207,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                // TODO: 
+                // TODO: Last exposure start time
                 //using (new SerializedAccess(this, "get_LastExposureStartTime"))
                 {
                     DriverCommon.LogCameraMessage("", "get_LastExposureStartTime");
