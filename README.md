@@ -5,6 +5,8 @@ ASCOM Camera and Focuser Driver for Pentax KP Camera.
 This is based on the Ricoh Camera SDK which supports the following cameras:
 https://ricohapi.github.io/docs/camera-usb-sdk-dotnet/
 
+Newer Pentax cameras should also be supported: KF, K70 and K3iii.
+
 Developed by Richard Romano
 
 # Usage
