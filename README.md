@@ -27,4 +27,4 @@ The driver uses the Ricoh Camera SDK USB for .NET and uses LibRaw.
 
 # Thanks
 
-Special thanks to Doug Henderson the developer of the Sony Mirrorless Driver on which this work is based
+Special thanks to Doug Henderson the developer of the Sony Mirrorless Driver on which this work is based. 
