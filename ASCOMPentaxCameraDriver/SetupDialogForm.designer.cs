@@ -268,7 +268,7 @@ namespace ASCOM.PentaxKP
             this.comboBoxOutputFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxOutputFormat.FormattingEnabled = true;
             this.comboBoxOutputFormat.Items.AddRange(new object[] {
-            "RGB (Processed)",
+            "RAW/Color (Processed)", "JPG/Color (Processed)",
             "RAW/RGGB (Unprocessed)"});
             this.comboBoxOutputFormat.Location = new System.Drawing.Point(131, 38);
             this.comboBoxOutputFormat.Margin = new System.Windows.Forms.Padding(1);
