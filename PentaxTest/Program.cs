@@ -48,7 +48,7 @@ namespace ASCOM.PentaxKP
             // TODO add more code to test the driver.
             int count = 0;
 
-            ArrayList modes = device.ReadoutModes;
+//            ArrayList modes = device.ReadoutModes;
 
             //            device.FastReadout = false;
             device.ReadoutMode = 0;

@@ -115,6 +115,7 @@ namespace ASCOM.PentaxKP
                         System.IO.Path.GetTempPath() + Path.DirectorySeparatorChar +
                         image.Name, FileMode.Create, FileAccess.Write))
                     {
+                        // TODO: Add frame progress
                         Response imageGetResponse = image.GetData(fs);
                         DriverCommon.LogCameraMessage("","Get Image has " +
                             (imageGetResponse.Result == Result.OK ?
@@ -316,10 +317,13 @@ namespace ASCOM.PentaxKP
                                     DriverCommon.LogCameraMessage("Connected", "Connected. Model: " + DriverCommon.m_camera.Model + ", SerialNumber:" + DriverCommon.m_camera.SerialNumber);
                                     StorageWriting sw = new StorageWriting();
                                     sw=Ricoh.CameraController.StorageWriting.False;
+                                    //ExposureProgram ep = new ExposureProgram();
+                                    //ep = Ricoh.CameraController.ExposureProgram.LensShutter;
                                     StillImageCaptureFormat sicf = new StillImageCaptureFormat();
 
                                     sicf = Ricoh.CameraController.StillImageCaptureFormat.JPEG;
-                                    if(DriverCommon.Settings.RAWSave)
+                                    if(DriverCommon.Settings.DefaultReadoutMode==PentaxKPProfile.OUTPUTFORMAT_RAWBGR
+                                        || DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RGGB)
                                         sicf = Ricoh.CameraController.StillImageCaptureFormat.DNG;
                                     StillImageQuality siq = new StillImageQuality();
                                     siq=Ricoh.CameraController.StillImageQuality.LargeBest;
@@ -929,7 +933,32 @@ namespace ASCOM.PentaxKP
             while (!IsFileClosed(MNewFile)) { }
             rgbImage = _imageDataProcessor.ReadRawPentax(MNewFile);
 
-            result = Resize(rgbImage, 3, StartX, StartY, NumX, NumY);
+//            if (StartX == 0 && StartY == 0 && NumX == 720 && NumY == 480)
+//                result = Resize(rgbImage, 3, 0, 0, MSensorWidthPx, MSensorHeightPx);
+//            else
+                result = Resize(rgbImage, 3, StartX, StartY, NumX, NumY);
+            return result;
+        }
+
+        private object ReadImageFileRGGB(string MNewFile)
+        {
+            object result = null;
+            //Bitmap _bmp;
+            int MSensorWidthPx = DriverCommon.Settings.Info.ImageWidthPixels;
+            int MSensorHeightPx = DriverCommon.Settings.Info.ImageHeightPixels;
+            // TODO: Should be returned based on image size
+            int[,] rgbImage = new int[MSensorWidthPx, MSensorHeightPx]; // Assuming this is declared and initialized elsewhere.
+
+
+            // Wait for the file to be closed and available.
+            while (!IsFileClosed(MNewFile)) { }
+            rgbImage = _imageDataProcessor.ReadRBBGPentax(MNewFile);
+
+            // TODO: Sharpcap problem
+//            if (StartX == 0 && StartY == 0 && NumX == 720 && NumY == 480)
+//                result = Resize(rgbImage, 2, 0, 0, MSensorWidthPx, MSensorHeightPx);
+//            else
+                result = Resize(rgbImage, 2, StartX, StartY, NumX, NumY);
             return result;
         }
 
@@ -969,6 +998,9 @@ namespace ASCOM.PentaxKP
  
             // Unlock the bits.
             _bmp.UnlockBits(bmpData);
+//            if (StartX == 0 && StartY == 0 && NumX == 720 && NumY == 480 && MaxImageHeightPixels==MSensorHeightPx && MaxImageWidthPixels==MSensorWidthPx)
+//                result = Resize(_cameraImageArray, 3, 0, 0, MSensorWidthPx, MSensorHeightPx);
+//            else
                 result = Resize(_cameraImageArray, 3, StartX, StartY, NumX, NumY);
             return result;
         }
@@ -1012,7 +1044,8 @@ namespace ASCOM.PentaxKP
 
             int scale = 1;
 
-            if (DriverCommon.Settings.RAWSave)
+            if (DriverCommon.Settings.DefaultReadoutMode==PentaxKPProfile.OUTPUTFORMAT_RAWBGR||
+                DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RGGB)
                 scale = 256;
 
                 for (int y = 0; y < height; y++)
@@ -1023,6 +1056,36 @@ namespace ASCOM.PentaxKP
                     _cameraImageArray[x, y, 1] = scale * Marshal.ReadByte(ptr + 1, (stride * y) + (4 * x));
                     _cameraImageArray[x, y, 2] = scale * Marshal.ReadByte(ptr + 2, (stride * y) + (4 * x));
                 }
+            }
+
+            if(DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RGGB)
+            {
+                int[,] _cameraImageArray2 = new int[_bmp.Width, _bmp.Height]; // Assuming this is declared and initialized elsewhere.
+
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        if (y % 2 == 0 && x % 2 == 0)
+                            // Red
+                            _cameraImageArray2[x, y] = _cameraImageArray[x, y, 2];
+                        if (y % 2 == 0 && x % 2 == 1)
+                            // Green
+                            _cameraImageArray2[x, y] = _cameraImageArray[x, y, 1];
+                        if (y % 2 == 1 && x % 2 == 0)
+                            // Green
+                            _cameraImageArray2[x, y] = _cameraImageArray[x, y, 1];
+                        if (y % 2 == 1 && x % 2 == 1)
+                            // Blue
+                            _cameraImageArray2[x, y] = _cameraImageArray[x, y, 0];
+                    }
+                }
+
+                // Unlock the bits.
+                _bmp.UnlockBits(bmpData);
+                DriverCommon.LogCameraMessage("Image", "Resize2");
+                result = Resize(_cameraImageArray2, 2, StartX, StartY, NumX, NumY);
+                return result;
             }
 
             // Unlock the bits.
@@ -1068,12 +1131,25 @@ namespace ASCOM.PentaxKP
 
                         if (imageName.Substring(imageName.Length - 3) == "DNG")
                         {
-                            DriverCommon.LogCameraMessage("", "Calling ReadImageFileRAW");
-                            result = ReadImageFileRaw(imageName);
-                            while (!IsFileClosed(imageName)) { }
-                            File.Delete(imageName);
-                            if (imagesToProcess.Count == 0)
-                                return result;
+                            if (DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RAWBGR)
+                            {
+                                DriverCommon.LogCameraMessage("", "Calling ReadImageFileRAW");
+                                result = ReadImageFileRaw(imageName);
+                                while (!IsFileClosed(imageName)) { }
+                                File.Delete(imageName);
+                                if (imagesToProcess.Count == 0)
+                                    return result;
+                            }
+                            else
+                            {
+                                DriverCommon.LogCameraMessage("", "Calling ReadImageFileRGGB");
+                                result = ReadImageFileRGGB(imageName);
+                                while (!IsFileClosed(imageName)) { }
+                                File.Delete(imageName);
+                                if (imagesToProcess.Count == 0)
+                                    return result;
+                            }
+
                         }
 
                         throw new ASCOM.PropertyNotImplementedException("ImageArray", false);
@@ -1234,7 +1310,7 @@ namespace ASCOM.PentaxKP
                 {
                     DriverCommon.LogCameraMessage("", "get_MaxADU");
                     int bpp = 8;
-                    if (DriverCommon.Settings.RAWSave)
+                    if (DriverCommon.Settings.DefaultReadoutMode==PentaxKPProfile.OUTPUTFORMAT_RGGB|| DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RAWBGR)
                         bpp = 16;
                     int maxADU = (1 << bpp) - 1;
 
@@ -1366,7 +1442,7 @@ namespace ASCOM.PentaxKP
             }
             set
             {
-                //using (new SerializedAccess(this, "set_ReadoutMode"))
+                //using (new DriverCommon.SerializedAccess("set_ReadoutMode"))
                 {
                     DriverCommon.LogCameraMessage("", "ReadoutMode Set "+value.ToString());
                     if (ReadoutModes.Count > value)
@@ -1445,8 +1521,11 @@ namespace ASCOM.PentaxKP
                 //using (new SerializedAccess(this, "get_SensorType"))
                 {
                     DriverCommon.LogCameraMessage("", "get_SensorType");
-                    return SensorType.Color;
-				}
+                    if (DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RGGB)
+                        return SensorType.RGGB;
+                    else
+                        return SensorType.Color;
+                }
             }
         }
 

@@ -16,27 +16,26 @@ namespace ASCOM.PentaxKP
     {
         //        private static int DefaultImageWidth = 6016; // Constants to define the ccd pixel dimenstions
         //        private static int DefaultImageHeight = 4000;
-        protected const UInt32 IMAGEMODE_RAW = 1;
-        protected const UInt32 IMAGEMODE_RGB = 2;
+//        protected const UInt32 IMAGEMODE_RAW = 1;
+//        protected const UInt32 IMAGEMODE_RGB = 2;
 
         public const int PERSONALITY_SHARPCAP = 0;
-        public const short OUTPUTFORMAT_RGB = (short)IMAGEMODE_RGB;
-        public const short OUTPUTFORMAT_BGR = OUTPUTFORMAT_RGB | 0x1000;
-        public const short OUTPUTFORMAT_RGGB = (short)IMAGEMODE_RAW;
+        public const short OUTPUTFORMAT_RAWBGR = 0;
+        public const short OUTPUTFORMAT_BGR = 1;
+        public const short OUTPUTFORMAT_RGGB = 2;
 
         private DeviceInfo m_info;
 
         public bool EnableLogging = false;
         public string DeviceId = "";
         public int DeviceIndex = 0;
-        public short DefaultReadoutMode = 1;// PentaxKPCommon.OUTPUTFORMAT_RGB;
+        public short DefaultReadoutMode = PentaxKPProfile.OUTPUTFORMAT_RAWBGR;
         public bool UseLiveview = true;
         public int Personality = PERSONALITY_SHARPCAP;
         public bool AutoLiveview = false;
         public bool BulbModeEnable = false;
         public short BulbModeTime = 1;
         public bool AllowISOAdjust = false;
-        public bool RAWSave = true;
         public bool UsingCameraLens = false;
         public string LensId = "";
         public bool HandsOffFocus = false;
@@ -214,7 +213,7 @@ namespace ASCOM.PentaxKP
 
         // Specific to Camera
         internal static string readoutModeDefaultProfileName = "Readout Mode";
-        internal static string readoutModeDefault = "0";
+        internal static string readoutModeDefault = "2";
         internal static string useLiveviewProfileName = "Use Camera Liveview";
         internal static string useLiveviewDefault = "true";
         internal static string autoLiveviewProfileName = "Auto Liveview";
@@ -334,17 +333,6 @@ namespace ASCOM.PentaxKP
                 Settings.BulbModeEnable = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, bulbModeEnableProfileName, string.Empty, bulbModeEnableDefault));
                 Settings.BulbModeTime = Convert.ToInt16(driverProfile.GetValue(CameraDriverId, bulbModeTimeProfileName, string.Empty, bulbModeTimeDefault));
                 Settings.AllowISOAdjust = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, allowISOAdjustProfileName, string.Empty, allowISOAdjustDefault));
-
-
-                if (Settings.DefaultReadoutMode == 0)
-                {
-                    //Settings.DefaultReadoutMode = PentaxKPCommon.OUTPUTFORMAT_RGGB;
-                    Settings.RAWSave = true;
-                }
-                else
-                {
-                    Settings.RAWSave = false;
-                }
             }
 
             using (Profile driverProfile = new Profile())
@@ -361,7 +349,6 @@ namespace ASCOM.PentaxKP
 
             Log($"DeviceID:                            {Settings.DeviceId}", "ReadProfile");
             Log($"Default Readout Mode:                {Settings.DefaultReadoutMode}", "ReadProfile");
-            Log($"Save Raw files:                      {Settings.RAWSave}", "ReadProfile");
             Log($"Use Liveview:                        {Settings.UseLiveview}", "ReadProfile");
             Log($"AutoLiveview @ 0.0s:                 {Settings.AutoLiveview}", "ReadProfile");
             Log($"Bulb Mode Enable:                    {Settings.BulbModeEnable}", "ReadProfile");
