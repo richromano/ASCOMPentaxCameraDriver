@@ -1,6 +1,11 @@
 # ASCOMPentaxKPCameraDriver
 
-ASCOM Camera and Focuser Driver for Pentax KP Camera
+ASCOM Camera and Focuser Driver for Pentax KP Camera.
+
+This is based on the Ricoh Camera SDK which supports the following cameras:
+https://ricohapi.github.io/docs/camera-usb-sdk-dotnet/
+
+Newer Pentax cameras should also be supported: KF, K70 and K3iii.
 
 Developed by Richard Romano
 
@@ -22,4 +27,4 @@ The driver uses the Ricoh Camera SDK USB for .NET and uses LibRaw.
 
 # Thanks
 
-Special thanks to Doug Henderson the developer of the Sony Mirrorless Driver on which this work is based
+Special thanks to Doug Henderson the developer of the Sony Mirrorless Driver on which this work is based. 
