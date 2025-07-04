@@ -20,6 +20,7 @@ namespace ASCOM.PentaxKP
 //        protected const UInt32 IMAGEMODE_RGB = 2;
 
         public const int PERSONALITY_SHARPCAP = 0;
+        public const int PERSONALITY_NINA = 1;
         public const short OUTPUTFORMAT_RAWBGR = 0;
         public const short OUTPUTFORMAT_BGR = 1;
         public const short OUTPUTFORMAT_RGGB = 2;
@@ -60,7 +61,7 @@ namespace ASCOM.PentaxKP
         {
             for (int i = 0; i < PentaxCameraInfo.Count; i++)
             {
-                DriverCommon.LogCameraMessage("assignCamera", PentaxCameraInfo.ElementAt(i).label+" "+name);
+                DriverCommon.LogCameraMessage(0,"assignCamera", PentaxCameraInfo.ElementAt(i).label+" "+name);
                 if (PentaxCameraInfo.ElementAt(i).label == name)
                 {
                     assignCamera(i);
@@ -242,7 +243,7 @@ namespace ASCOM.PentaxKP
                 // TODO:  this is not Mutex safe
                 //using (new DriverCommon.SerializedAccess("get_Connected"))
                 {
-                    DriverCommon.LogCameraMessage("Connected", "get");
+                    DriverCommon.LogCameraMessage(0,"Connected", "get");
                     if (DriverCommon.m_camera == null)
                         return false;
 
@@ -274,7 +275,7 @@ namespace ASCOM.PentaxKP
                 // TODO:  this is not Mutex safe
                 //using (new DriverCommon.SerializedAccess("get_Connected"))
                 {
-                    DriverCommon.LogCameraMessage("Connected", "get");
+                    DriverCommon.LogCameraMessage(0,"Connected", "get");
                     if (DriverCommon.m_camera == null)
                         return false;
 
@@ -299,16 +300,24 @@ namespace ASCOM.PentaxKP
             }*/
         }
 
-        public static void LogCameraMessage(string identifier, string message, params object[] args)
+        static int debuglevel = 0;
+
+        public static void LogCameraMessage(int level, string identifier, string message, params object[] args)
         {
-            var msg = string.Format(message, args);
-            Logger.LogMessage($"[camera] {identifier}", msg);
+            if (level <= debuglevel)
+            {
+                var msg = string.Format(message, args);
+                Logger.LogMessage($"[camera] {identifier}", msg);
+            }
         }
 
-        public static void LogFocuserMessage(string identifier, string message, params object[] args)
+        public static void LogFocuserMessage(int level, string identifier, string message, params object[] args)
         {
-            var msg = string.Format(message, args);
-            Logger.LogMessage($"[focuser] {identifier}", msg);
+            if (level <= debuglevel)
+            {
+                var msg = string.Format(message, args);
+                Logger.LogMessage($"[focuser] {identifier}", msg);
+            }
         }
 
         private static void Log(String message, String source = "DriverCommon")
@@ -414,27 +423,27 @@ namespace ASCOM.PentaxKP
                 // Need to know what kind of message
                 m_method = method;
                 m_mustReleaseMutex = true;
-//                DriverCommon.LogCameraMessage(m_method, "[enter] " + m_serialAccess.ToString() + " " + shortWait.ToString());
+//                DriverCommon.LogCameraMessage(0,m_method, "[enter] " + m_serialAccess.ToString() + " " + shortWait.ToString());
 
                 if (!m_serialAccess.WaitOne(100))
                 {
-//                    DriverCommon.LogCameraMessage(m_method, "Waiting to enter " + m_serialAccess.ToString());
+//                    DriverCommon.LogCameraMessage(0,m_method, "Waiting to enter " + m_serialAccess.ToString());
 
                     if (shortWait)
                     {
                         m_mustReleaseMutex = false;
-//                        DriverCommon.LogCameraMessage(m_method, "[in] short " + m_serialAccess.ToString());
+//                        DriverCommon.LogCameraMessage(0,m_method, "[in] short " + m_serialAccess.ToString());
                         return;
                     }
                     m_serialAccess.WaitOne(20000);
                 }
 
-//                DriverCommon.LogCameraMessage(m_method, "[in] " + m_serialAccess.ToString());
+//                DriverCommon.LogCameraMessage(0,m_method, "[in] " + m_serialAccess.ToString());
             }
 
             public void Dispose()
             {
-                //DriverCommon.LogCameraMessage(m_method, "[out] " + m_serialAccess.ToString());
+                //DriverCommon.LogCameraMessage(0,m_method, "[out] " + m_serialAccess.ToString());
                 if (m_mustReleaseMutex)
                     m_serialAccess.ReleaseMutex();
             }

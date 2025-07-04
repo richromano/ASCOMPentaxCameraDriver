@@ -32,6 +32,7 @@ namespace ASCOM.PentaxKP
             DriverCommon.Settings.DeviceId = (string)comboBoxCamera.SelectedItem;
             DriverCommon.Settings.DeviceIndex = comboBoxCamera.SelectedIndex;
             DriverCommon.Settings.EnableLogging = chkTrace.Checked;
+            // TODO: add NINA check for non-RGGB setting
             DriverCommon.Settings.DefaultReadoutMode = (short)(comboBoxOutputFormat.SelectedIndex);
 
             //            DriverCommon.Settings.RAWSave = checkBoxEnableSaveLocation.Checked;
@@ -116,8 +117,8 @@ namespace ASCOM.PentaxKP
 
             //Commenting out makes it crash
 //            personalities.Add(PentaxKPCommon.PERSONALITY_APT, "APT");
-//            personalities.Add(PentaxKPCommon.PERSONALITY_NINA, "N.I.N.A");
             personalities.Add(PentaxKPProfile.PERSONALITY_SHARPCAP, "SharpCap");
+            personalities.Add(PentaxKPProfile.PERSONALITY_NINA, "N.I.N.A");
 
             comboBoxPersonality.DataSource = new BindingSource(personalities, null);
             comboBoxPersonality.DisplayMember = "Value";
@@ -205,7 +206,7 @@ namespace ASCOM.PentaxKP
         private void comboBoxPersonality_SelectedIndexChanged(object sender, EventArgs e)
         {
             int personality=PentaxKPProfile.PERSONALITY_SHARPCAP;
-//            personality = comboBoxPersonality.SelectedIndex;
+            personality = comboBoxPersonality.SelectedIndex;
 
 //            DriverCommon.Settings.DefaultReadoutMode = (short)comboBoxOutputFormat.SelectedIndex;
             
@@ -227,6 +228,12 @@ namespace ASCOM.PentaxKP
                     //comboBoxOutputFormat.SelectedIndex = DriverCommon.Settings.CurrentOutputFormat;
                     //checkBoxUseLiveview.Enabled = true;
                     //checkBoxUseLiveview.Checked = true;
+                    comboBoxOutputFormat.Enabled = true;
+                    break;
+                case PentaxKPProfile.PERSONALITY_NINA:
+                    // NINA only supports RGGB, so we need to preset format and disable liveview
+                    comboBoxOutputFormat.SelectedValue = PentaxKPProfile.OUTPUTFORMAT_RGGB;
+                    comboBoxOutputFormat.Enabled = false;
                     break;
             }
         }

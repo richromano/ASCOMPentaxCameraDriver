@@ -64,13 +64,13 @@ namespace ASCOM.PentaxKP
         {
             DriverCommon.ReadProfile(); // Read device configuration from the ASCOM Profile store
 
-            DriverCommon.LogFocuserMessage("Focuser", "Starting initialisation");
+            DriverCommon.LogFocuserMessage(0,"Focuser", "Starting initialisation");
 
             utilities = new Util(); //Initialise util object
             astroUtilities = new AstroUtils(); // Initialise astro utilities object
             //TODO: Implement your additional construction here
 
-            DriverCommon.LogFocuserMessage("Focuser", "Completed initialisation");
+            DriverCommon.LogFocuserMessage(0,"Focuser", "Completed initialisation");
         }
 
 
@@ -110,14 +110,14 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                DriverCommon.LogFocuserMessage("SupportedActions Get", "Returning empty arraylist");
+                DriverCommon.LogFocuserMessage(0,"SupportedActions Get", "Returning empty arraylist");
                 return new ArrayList();
             }
         }
 
         public string Action(string actionName, string actionParameters)
         {
-            DriverCommon.LogFocuserMessage("", $"Action {actionName}, parameters {actionParameters} not implemented");
+            DriverCommon.LogFocuserMessage(0,"", $"Action {actionName}, parameters {actionParameters} not implemented");
             throw new ASCOM.ActionNotImplementedException("Action " + actionName + " is not implemented by this driver");
         }
 
@@ -165,14 +165,14 @@ namespace ASCOM.PentaxKP
             {
                 using (new DriverCommon.SerializedAccess("get_Connected"))
                 {
-                    DriverCommon.LogFocuserMessage("Connected", "Get {0}", requestedConnection);
+                    DriverCommon.LogFocuserMessage(5,"Connected", "Get {0}", requestedConnection);
                     //TODO
                     return requestedConnection;
                 }
             }
             set
             {
-                DriverCommon.LogFocuserMessage("Connected", "Set {0}", value.ToString());
+                DriverCommon.LogFocuserMessage(0,"Connected", "Set {0}", value.ToString());
                 requestedConnection = value;
                 if (value)
                     rezero = 0;
@@ -254,14 +254,14 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                DriverCommon.LogFocuserMessage("Absolute Get", true.ToString());
+                DriverCommon.LogFocuserMessage(0,"Absolute Get", true.ToString());
                 return true;
             }
         }
 
         public void Halt()
         {
-            DriverCommon.LogFocuserMessage("Halt", "Not implemented");
+            DriverCommon.LogFocuserMessage(0,"Halt", "Not implemented");
             throw new ASCOM.MethodNotImplementedException("Halt");
         }
 
@@ -271,7 +271,7 @@ namespace ASCOM.PentaxKP
             {
                 using (new DriverCommon.SerializedAccess("get_IsMoving"))
                 {
-                    DriverCommon.LogFocuserMessage("IsMoving Get", false.ToString());
+                    DriverCommon.LogFocuserMessage(4,"IsMoving Get", false.ToString());
                     return false; // This focuser always moves instantaneously so no need for IsMoving ever to be True
                 }
             }
@@ -281,13 +281,13 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                DriverCommon.LogFocuserMessage("Link Get", this.Connected.ToString());
+                DriverCommon.LogFocuserMessage(0,"Link Get", this.Connected.ToString());
                 return requestedConnection;
                 //this.Connected; // Direct function to the connected method, the Link method is just here for backwards compatibility
             }
             set
             {
-                DriverCommon.LogFocuserMessage("Link Set", value.ToString());
+                DriverCommon.LogFocuserMessage(0,"Link Set", value.ToString());
                 requestedConnection = value; // this.Connected = value; // Direct function to the connected method, the Link method is just here for backwards compatibility
             }
         }
@@ -296,7 +296,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                DriverCommon.LogFocuserMessage("MaxIncrement Get", "200");
+                DriverCommon.LogFocuserMessage(0,"MaxIncrement Get", "200");
                 return 200;// DriverCommon.Camera.GetFocusLimit(); // Maximum change in one move
             }
         }
@@ -305,14 +305,14 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                DriverCommon.LogFocuserMessage("MaxStep Get", "10000");
+                DriverCommon.LogFocuserMessage(0,"MaxStep Get", "10000");
                 return 10000;// DriverCommon.Camera.GetFocusLimit(); // Maximum extent of the focuser, so position range is 0 to 10,000
             }
         }
 
         public void Move(int Position)
         {
-            DriverCommon.LogFocuserMessage("Move", Position.ToString());
+            DriverCommon.LogFocuserMessage(0,"Move", Position.ToString());
             if (rezero<=0)
             {
                 focuserPosition = 10000;
@@ -351,7 +351,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                DriverCommon.LogFocuserMessage("StepSize Get", "Not implemented");
+                DriverCommon.LogFocuserMessage(0,"StepSize Get", "Not implemented");
                 throw new ASCOM.PropertyNotImplementedException("StepSize", false);
             }
         }
@@ -360,12 +360,12 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                DriverCommon.LogFocuserMessage("TempComp Get", false.ToString());
+                DriverCommon.LogFocuserMessage(4,"TempComp Get", false.ToString());
                 return false;
             }
             set
             {
-                DriverCommon.LogFocuserMessage("TempComp Set", "Not implemented");
+                DriverCommon.LogFocuserMessage(0,"TempComp Set", "Not implemented");
                 throw new ASCOM.PropertyNotImplementedException("TempComp", false);
             }
         }
@@ -374,7 +374,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                DriverCommon.LogFocuserMessage("TempCompAvailable Get", false.ToString());
+                DriverCommon.LogFocuserMessage(4,"TempCompAvailable Get", false.ToString());
                 return false; // Temperature compensation is not available in this driver
             }
         }
@@ -385,7 +385,7 @@ namespace ASCOM.PentaxKP
             {
                 using (new DriverCommon.SerializedAccess("get_Temperature"))
                 {
-                    DriverCommon.LogFocuserMessage("Temperature Get", "Not implemented");
+                    DriverCommon.LogFocuserMessage(4,"Temperature Get", "Not implemented");
                     //                throw new ASCOM.PropertyNotImplementedException("Temperature", false);
                     return 20;
                 }
