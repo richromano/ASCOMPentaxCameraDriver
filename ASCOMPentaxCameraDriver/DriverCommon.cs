@@ -425,7 +425,7 @@ namespace ASCOM.PentaxKP
                 m_mustReleaseMutex = true;
 //                DriverCommon.LogCameraMessage(0,m_method, "[enter] " + m_serialAccess.ToString() + " " + shortWait.ToString());
 
-                if (!m_serialAccess.WaitOne(100))
+                if (!m_serialAccess.WaitOne(10))
                 {
 //                    DriverCommon.LogCameraMessage(0,m_method, "Waiting to enter " + m_serialAccess.ToString());
 

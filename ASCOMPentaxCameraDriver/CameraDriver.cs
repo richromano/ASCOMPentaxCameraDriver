@@ -527,7 +527,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                //using (new SerializedAccess(this, "get_CameraState", true))
+                using (new DriverCommon.SerializedAccess("get_CameraState", true))
                 {
                     DriverCommon.LogCameraMessage(0,"", $"get_CameraState {m_captureState.ToString()}");
                     // TODO: !!!! Look at camera state diagram
@@ -1583,7 +1583,7 @@ namespace ASCOM.PentaxKP
                     //m_captureState = Ricoh.CameraController.CaptureState.Unknown;
 
                     while (DriverCommon.m_camera.Status.CurrentCapture == null)
-                       sleepReturn = _requestTermination.WaitOne(250);
+                       sleepReturn = _requestTermination.WaitOne(20);
 
                     if (!sleepReturn)
                     {
@@ -1592,7 +1592,7 @@ namespace ASCOM.PentaxKP
                         while (DriverCommon.m_camera.Status.CurrentCapture.State != Ricoh.CameraController.CaptureState.Complete)
                         {
                             DriverCommon.LogCameraMessage(1,"long running task", DriverCommon.m_camera.Status.CurrentCapture.State.ToString() + " " + Ricoh.CameraController.CaptureState.Complete.ToString());
-                            if (_requestTermination.WaitOne(250))
+                            if (_requestTermination.WaitOne(20))
                                 break;
                         }
                         m_captureState = DriverCommon.m_camera.Status.CurrentCapture.State;

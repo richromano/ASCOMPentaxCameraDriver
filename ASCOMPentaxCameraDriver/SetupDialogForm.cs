@@ -208,7 +208,8 @@ namespace ASCOM.PentaxKP
             int personality=PentaxKPProfile.PERSONALITY_SHARPCAP;
             personality = comboBoxPersonality.SelectedIndex;
 
-//            DriverCommon.Settings.DefaultReadoutMode = (short)comboBoxOutputFormat.SelectedIndex;
+            if(comboBoxOutputFormat.SelectedIndex!=-1)
+                DriverCommon.Settings.DefaultReadoutMode = (short)comboBoxOutputFormat.SelectedIndex;
             
             switch (personality)
             {

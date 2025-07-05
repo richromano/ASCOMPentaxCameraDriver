@@ -28,8 +28,11 @@ namespace ASCOM.PentaxKP.Classes
 
         public int[,,] ReadRawPentax(string fileName)
         {
+            DriverCommon.LogCameraMessage(0,"ReadRawPentax", "in");
             IntPtr data = LoadRaw(fileName);
+            DriverCommon.LogCameraMessage(0, "ReadRawPentax", "loadraw");
             NativeMethods.libraw_dcraw_process(data);
+            DriverCommon.LogCameraMessage(0, "ReadRawPentax", "dcraw_process");
 
             var dataStructure = GetStructure<libraw_data_t>(data);
             ushort width = dataStructure.sizes.iwidth;
@@ -51,6 +54,7 @@ namespace ASCOM.PentaxKP.Classes
                 pixels[col, row, 2] = r;
             };
 
+            DriverCommon.LogCameraMessage(0, "ReadRawPentax", "out");
 
             NativeMethods.libraw_close(data);
 
