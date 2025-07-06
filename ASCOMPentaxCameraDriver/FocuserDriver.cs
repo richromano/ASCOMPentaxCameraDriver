@@ -163,7 +163,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                using (new DriverCommon.SerializedAccess("get_Connected"))
+                //using (new DriverCommon.SerializedAccess("get_Connected"))
                 {
                     DriverCommon.LogFocuserMessage(5,"Connected", "Get {0}", requestedConnection);
                     //TODO
@@ -269,7 +269,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                using (new DriverCommon.SerializedAccess("get_IsMoving"))
+                //using (new DriverCommon.SerializedAccess("get_IsMoving"))
                 {
                     DriverCommon.LogFocuserMessage(4,"IsMoving Get", false.ToString());
                     return false; // This focuser always moves instantaneously so no need for IsMoving ever to be True
@@ -383,7 +383,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                using (new DriverCommon.SerializedAccess("get_Temperature"))
+                //using (new DriverCommon.SerializedAccess("get_Temperature"))
                 {
                     DriverCommon.LogFocuserMessage(4,"Temperature Get", "Not implemented");
                     //                throw new ASCOM.PropertyNotImplementedException("Temperature", false);

@@ -407,12 +407,13 @@ namespace ASCOM.PentaxKP
             return true;
         }
 
-        public class SerializedAccess : IDisposable
+/*        public class SerializedAccess : IDisposable
         {
             internal static Mutex m_serialAccess = new Mutex();
 
             internal String m_method;
             internal bool m_mustReleaseMutex;
+
 
             public SerializedAccess(String method, bool shortWait = true)
             {
@@ -444,7 +445,7 @@ namespace ASCOM.PentaxKP
                 if (m_mustReleaseMutex)
                     m_serialAccess.ReleaseMutex();
             }
-        }
+        }*/
 
 
     }
