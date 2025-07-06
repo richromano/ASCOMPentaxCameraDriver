@@ -139,7 +139,7 @@ namespace ASCOM.PentaxKP
             {
                 //Best we can do
                 DriverCommon.LogCameraMessage(0,"","Device Disconnected.");
-                _requestTermination.Set();
+                //_requestTermination.Set();
                 m_captureState = Ricoh.CameraController.CaptureState.Unknown;
             }
         }
