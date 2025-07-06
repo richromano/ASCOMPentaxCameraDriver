@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Globalization;
 
 using ASCOM.Utilities;
-using Microsoft.Win32;
-using Ricoh.CameraController;
 using System.Threading;
 using System.Collections.ObjectModel;
 
