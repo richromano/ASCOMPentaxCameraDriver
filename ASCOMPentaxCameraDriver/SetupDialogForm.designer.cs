@@ -137,7 +137,7 @@ namespace ASCOM.PentaxKP
             // 
             // comboBoxCamera
             // 
-            this.comboBoxCamera.AccessibleName = "Pentax KP Camera Selection";
+            this.comboBoxCamera.AccessibleName = "Pentax KP/K1 Camera Selection";
             this.comboBoxCamera.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxCamera.FormattingEnabled = true;
             this.comboBoxCamera.Location = new System.Drawing.Point(73, 70);
@@ -407,7 +407,7 @@ namespace ASCOM.PentaxKP
             this.Name = "SetupDialogForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Pentax KP Setup";
+            this.Text = "Pentax KP/K1 Setup";
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).EndInit();
             this.tabControl1.ResumeLayout(false);
             this.selectCameraTab.ResumeLayout(false);

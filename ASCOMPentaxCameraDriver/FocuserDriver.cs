@@ -1,9 +1,9 @@
 //tabs=4
 // --------------------------------------------------------------------------------
 //
-// ASCOM Focuser driver for Pentax KP Camera
+// ASCOM Focuser driver for Pentax KP/K1 Camera
 //
-// Description:	Implements ASCOM driver for Pentax KP Camera.
+// Description:	Implements ASCOM driver for Pentax KP/K1 Camera.
 //
 // Implements:	ASCOM Focuser interface version: 3
 // Author:		(2025) Richard Romano

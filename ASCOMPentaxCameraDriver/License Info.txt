@@ -5,7 +5,7 @@ Original Sony Mirrorless Driver
 (c) 2019-2020 by Doug Henderson
 License TBD
 
-Pentax KP Driver
+Pentax KP/K1 Driver
 (c) 2025 by Richard Romano
 https://creativecommons.org/licenses/by-sa/3.0/
 
