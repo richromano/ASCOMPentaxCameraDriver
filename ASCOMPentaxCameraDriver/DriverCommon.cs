@@ -371,6 +371,7 @@ namespace ASCOM.PentaxKP
             using (Profile driverProfile = new Profile())
             {
                 driverProfile.DeviceType = "Camera";
+                // TODO: read and save debugging level
 //                driverProfile.WriteValue(CameraDriverId, traceStateProfileName, Settings.DebugLevel.ToString());
                 driverProfile.WriteValue(CameraDriverId, traceStateProfileName, Settings.EnableLogging.ToString());
                 driverProfile.WriteValue(CameraDriverId, readoutModeDefaultProfileName, Settings.DefaultReadoutMode.ToString());

@@ -381,7 +381,7 @@ namespace ASCOM.PentaxKP
             }
             set
             {
-                // TODO: set_Connected called by Sharpcap
+                // TODO: set_Connected called by Sharpcap and NINA
                 DriverCommon.LogCameraMessage(0, "", $"set_Connected Set {value.ToString()}");
                 //throw new ASCOM.ActionNotImplementedException("set_Connected is not implemented by this driver");
                 //using (new DriverCommon.SerializedAccess("set_Connected", false))
@@ -393,7 +393,6 @@ namespace ASCOM.PentaxKP
                         if (DriverCommon.m_camera == null)
                         {
 	                        SetupDialog();
-                            // TODO: Make this use  DriverCommon.Settings.DeviceId rather than First
                             DriverCommon.LogCameraMessage(0,"Connected", "Connecting...");
                             List<CameraDevice> detectedCameraDevices = CameraDeviceDetector.Detect(Ricoh.CameraController.DeviceInterface.USB);
                             DriverCommon.m_camera = detectedCameraDevices.ElementAt(DriverCommon.Settings.DeviceIndex);
@@ -423,10 +422,9 @@ namespace ASCOM.PentaxKP
                                     if (DriverCommon.Settings.UseLiveview)
                                         DriverCommon.m_camera.StartLiveView();
 
-                                    // TODO: should not always be zero
                                     string deviceModel = DriverCommon.Settings.DeviceId;
                                     DriverCommon.Settings.assignCamera(deviceModel);
-                                    MaxImageWidthPixels = DriverCommon.Settings.Info.ImageWidthPixels; // Constants to define the ccd pixel dimenstion
+                                    MaxImageWidthPixels = DriverCommon.Settings.Info.ImageWidthPixels; // Constants to define the ccd pixel dimension
                                     MaxImageHeightPixels = DriverCommon.Settings.Info.ImageHeightPixels;
                                     StartX = 0;
                                     StartY = 0;
@@ -847,7 +845,7 @@ namespace ASCOM.PentaxKP
                         if (!value)
                         {
                             LastSetFastReadout = false;
-                            // TODO: 
+                            // TODO: Review?
                             DriverCommon.m_camera.StopLiveView();
                             Thread.Sleep(500);
                             // Need to clear because the expected format has changed
@@ -912,6 +910,7 @@ namespace ASCOM.PentaxKP
                     //using (new DriverCommon.SerializedAccess("get_Gain"))
                     {
                         // TODO: Can I set this any time?  Do we need more?
+                        // TODO: Save time and what else to return later
                         if (DriverCommon.m_camera != null)
                         {
                             ISO iso = new ISO();
@@ -1307,7 +1306,7 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                // TODO:
+                // TODO: save off duration
                 //using (new SerializedAccess(this, "get_LastExposureDuration"))
                 {
                     DriverCommon.LogCameraMessage(0,"", "get_LastExposureDuration");
@@ -1540,7 +1539,6 @@ namespace ASCOM.PentaxKP
                 {
                     DriverCommon.LogCameraMessage(0,"","get_ReadoutModes");
 
-                    // TODO:  can I new it here?
                     ArrayList modes = new ArrayList();
 
                     modes.Add(String.Format("Full Resolution ({0} x {1})", DriverCommon.Settings.Info.ImageWidthPixels, DriverCommon.Settings.Info.ImageHeightPixels));
@@ -1678,7 +1676,7 @@ namespace ASCOM.PentaxKP
         public async void StartExposure(double Duration, bool Light)
         {
             // Light or dark frame
-            // TODO:  it!!!!!
+            // TODO:  I think we need to update the state back and forth for LastSetFastReadout
             if (LastSetFastReadout)
             {
                 //No need to start exposure
@@ -1813,7 +1811,7 @@ namespace ASCOM.PentaxKP
                     shutterSpeed = ShutterSpeed.SS15_10;
                 if (Duration > 16.0 / 10.0 - 0.000001)
                     shutterSpeed = ShutterSpeed.SS16_10;
-                // TODO: 
+                // TODO: add additional times 
                 //public static readonly ShutterSpeed SS10_13;
                 //public static readonly ShutterSpeed SS10_16;
                 //public static readonly ShutterSpeed SS10_25;
