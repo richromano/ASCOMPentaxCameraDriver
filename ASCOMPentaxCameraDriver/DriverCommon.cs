@@ -25,6 +25,7 @@ namespace ASCOM.PentaxKP
         private DeviceInfo m_info;
 
         public bool EnableLogging = false;
+        public int DebugLevel = 0;
         public string DeviceId = "";
         public int DeviceIndex = 0;
         public short DefaultReadoutMode = PentaxKPProfile.OUTPUTFORMAT_RAWBGR;
@@ -297,11 +298,9 @@ namespace ASCOM.PentaxKP
             }*/
         }
 
-        static int debuglevel = 0;
-
         public static void LogCameraMessage(int level, string identifier, string message, params object[] args)
         {
-            if (level <= debuglevel)
+            if (level <= Settings.DebugLevel)
             {
                 var msg = string.Format(message, args);
                 Logger.LogMessage($"[camera] {identifier}", msg);
@@ -310,7 +309,7 @@ namespace ASCOM.PentaxKP
 
         public static void LogFocuserMessage(int level, string identifier, string message, params object[] args)
         {
-            if (level <= debuglevel)
+            if (level <= Settings.DebugLevel)
             {
                 var msg = string.Format(message, args);
                 Logger.LogMessage($"[focuser] {identifier}", msg);
@@ -330,6 +329,7 @@ namespace ASCOM.PentaxKP
                 driverProfile.DeviceType = "Camera";
 
                 Settings.DeviceIndex = 0;
+//                Settings.DebugLevel = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, traceStateProfileName, string.Empty, traceStateDefault));
                 Settings.EnableLogging = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, traceStateProfileName, string.Empty, traceStateDefault));
                 Settings.DeviceId = driverProfile.GetValue(CameraDriverId, cameraProfileName, string.Empty, cameraDefault);
                 Settings.DefaultReadoutMode = Convert.ToInt16(driverProfile.GetValue(CameraDriverId, readoutModeDefaultProfileName, string.Empty, readoutModeDefault));
@@ -371,6 +371,7 @@ namespace ASCOM.PentaxKP
             using (Profile driverProfile = new Profile())
             {
                 driverProfile.DeviceType = "Camera";
+//                driverProfile.WriteValue(CameraDriverId, traceStateProfileName, Settings.DebugLevel.ToString());
                 driverProfile.WriteValue(CameraDriverId, traceStateProfileName, Settings.EnableLogging.ToString());
                 driverProfile.WriteValue(CameraDriverId, readoutModeDefaultProfileName, Settings.DefaultReadoutMode.ToString());
                 driverProfile.WriteValue(CameraDriverId, useLiveviewProfileName, Settings.UseLiveview.ToString());

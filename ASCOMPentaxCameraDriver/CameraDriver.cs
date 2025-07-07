@@ -69,7 +69,6 @@ namespace ASCOM.PentaxKP
         internal static int MaxImageHeightPixels = 0;//4000;
         internal static Queue<String> imagesToProcess = new Queue<string>();
         internal static Queue<BitmapImage> bitmapsToProcess = new Queue<BitmapImage>();
-        //internal static ManualResetEvent _requestTermination = new ManualResetEvent(false);
         private ImageDataProcessor _imageDataProcessor;
         // Index to the current ISO level
         internal short gainIndex;
@@ -79,11 +78,7 @@ namespace ASCOM.PentaxKP
         // Two output modes 0=6016x4000 standard and 1=720x480 liveview
         internal static int m_readoutmode=0;
 
-        // If saving in raw formate for standard output mode
-//        internal static bool m_rawmode = true;
-//        internal static bool m_rawmode = false;
 // TODO:  - all these statics means there can only be one camera
-//        internal Thread cameraThread;
 
         internal static Ricoh.CameraController.CaptureState m_captureState = Ricoh.CameraController.CaptureState.Unknown;
 
@@ -210,32 +205,9 @@ namespace ASCOM.PentaxKP
                 if (result == System.Windows.Forms.DialogResult.OK)
                 {
                     DriverCommon.WriteProfile(); // Persist device configuration values to the ASCOM Profile store
-
-                    // Update connected camera with bulb mode info
-/*                    if (DriverCommon.Camera != null)
-                    {
-                        DriverCommon.Camera.BulbMode = DriverCommon.Settings.BulbModeEnable;
-                        DriverCommon.Camera.BulbModeTime = DriverCommon.Settings.BulbModeTime;
-                    }*/
                 }
             }
 
-/*            if (IsConnected)
-            {
-                StorageWriting sw = new StorageWriting();
-                sw = Ricoh.CameraController.StorageWriting.False;
-                StillImageCaptureFormat sicf = new StillImageCaptureFormat();
-
-                sicf = Ricoh.CameraController.StillImageCaptureFormat.JPEG;
-                if (DriverCommon.Settings.RAWSave)
-                    sicf = Ricoh.CameraController.StillImageCaptureFormat.DNG;
-                StillImageQuality siq = new StillImageQuality();
-                siq = Ricoh.CameraController.StillImageQuality.LargeBest;
-                DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sw });
-                DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { siq });
-                DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sicf });
-            }
-            */
             DriverCommon.LogCameraMessage(0,"SetupDialog", "[out]");
         }
 
@@ -359,12 +331,12 @@ namespace ASCOM.PentaxKP
                     }
                     else
                     {
-                        DriverCommon.LogCameraMessage(0, "Connect", "Connection is failed.");
+                        DriverCommon.LogCameraMessage(0, "Connect", "Connection has failed.");
                     }
                 }
                 else
                 {
-                    DriverCommon.LogCameraMessage(0, "Connect", "Device has not found.");
+                    DriverCommon.LogCameraMessage(0, "Connect", "Device not found.");
                 }
             });
         }
@@ -373,7 +345,12 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-                return false;
+                DriverCommon.LogCameraMessage(0, "", "Connecting");
+                // TODO: this should check on the connect task completing
+                if (DriverCommon.m_camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB))
+                    return false;
+
+                return true;
             }
         }
 
@@ -404,9 +381,12 @@ namespace ASCOM.PentaxKP
             }
             set
             {
+                // TODO: set_Connected called by Sharpcap
+                DriverCommon.LogCameraMessage(0, "", $"set_Connected Set {value.ToString()}");
+                //throw new ASCOM.ActionNotImplementedException("set_Connected is not implemented by this driver");
                 //using (new DriverCommon.SerializedAccess("set_Connected", false))
                 {
-                    DriverCommon.LogCameraMessage(0,"", $"set_Connected Set {value.ToString()}");
+//                    DriverCommon.LogCameraMessage(0,"", $"set_Connected Set {value.ToString()}");
                     //if (value&& (DriverCommon.m_camera == null|| !DriverCommon.m_camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB)))
                     if(value)
                     {
@@ -550,14 +530,6 @@ namespace ASCOM.PentaxKP
                 m_captureState = Ricoh.CameraController.CaptureState.Unknown;
             else
                 throw new ASCOM.InvalidOperationException("Unable to detect picture format");
-
-/*            if (LastSetFastReadout)
-            {
-                //No need to start exposure
-                DriverCommon.LogCameraMessage(0,"", "AbortExposure() fast");
-                m_captureState = Ricoh.CameraController.CaptureState.Executing;
-            }*/
-
         }
 
         public short BayerOffsetX
@@ -1068,10 +1040,7 @@ namespace ASCOM.PentaxKP
             while (!IsFileClosed(MNewFile)) { }
             rgbImage = _imageDataProcessor.ReadRawPentax(MNewFile);
 
-//            if (StartX == 0 && StartY == 0 && NumX == 720 && NumY == 480)
-//                result = Resize(rgbImage, 3, 0, 0, MSensorWidthPx, MSensorHeightPx);
-//            else
-                result = Resize(rgbImage, 3, StartX, StartY, NumX, NumY);
+            result = Resize(rgbImage, 3, StartX, StartY, NumX, NumY);
             return result;
         }
 
@@ -1090,10 +1059,7 @@ namespace ASCOM.PentaxKP
             rgbImage = _imageDataProcessor.ReadRBBGPentax(MNewFile);
 
             // TODO: Sharpcap problem
-//            if (StartX == 0 && StartY == 0 && NumX == 720 && NumY == 480)
-//                result = Resize(rgbImage, 2, 0, 0, MSensorWidthPx, MSensorHeightPx);
-//            else
-                result = Resize(rgbImage, 2, StartX, StartY, NumX, NumY);
+            result = Resize(rgbImage, 2, StartX, StartY, NumX, NumY);
             return result;
         }
 
@@ -1133,10 +1099,7 @@ namespace ASCOM.PentaxKP
  
             // Unlock the bits.
             _bmp.UnlockBits(bmpData);
-//            if (StartX == 0 && StartY == 0 && NumX == 720 && NumY == 480 && MaxImageHeightPixels==MSensorHeightPx && MaxImageWidthPixels==MSensorWidthPx)
-//                result = Resize(_cameraImageArray, 3, 0, 0, MSensorWidthPx, MSensorHeightPx);
-//            else
-                result = Resize(_cameraImageArray, 3, StartX, StartY, NumX, NumY);
+            result = Resize(_cameraImageArray, 3, StartX, StartY, NumX, NumY);
             return result;
         }
 
@@ -1300,60 +1263,11 @@ namespace ASCOM.PentaxKP
         {
             get
             {
-			// TODO:  - need to be implemented
                 //using (new SerializedAccess(this, "get_ImageArrayVariant"))
                 {
                     DriverCommon.LogCameraMessage(0,"", "get_ImageArrayVariant");
                     throw new ASCOM.PropertyNotImplementedException("ImageArrayVariant", false);
 
-/*                    PentaxKPImage image = DriverCommon.Camera.LastImage;
-                    int x = 0;
-                    int y = 0;
-                    int c;
-
-                    switch (image.m_info.ImageMode)
-                    {
-                        case 1:     // RGGB
-                            int[,] rggbInput = (int[,])ImageData();
-                            x = rggbInput.GetLength(0);
-                            y = rggbInput.GetLength(1);
-                            object[,] rggbOutput = new object[x, y];
-
-                            for (int xcopy = 0; xcopy < x; xcopy++)
-                            {
-                                for (int ycopy = 0; ycopy < y; ycopy++)
-                                {
-                                    rggbOutput[xcopy, ycopy] = rggbInput[xcopy, ycopy];
-                                }
-                            }
-
-                            return rggbOutput;
-
-
-                        case 2:     // RGB
-                            int[,,] rgbInput = (int[,,])ImageData();
-                            x = rgbInput.GetLength(0);
-                            y = rgbInput.GetLength(1);
-                            c = rgbInput.GetLength(2);
-                            object[,,] rgbOutput = new object[x, y, c];
-
-                            for (int xcopy = 0; xcopy < x; xcopy++)
-                            {
-                                for (int ycopy = 0; ycopy < y; ycopy++)
-                                {
-                                    for (int ccopy = 0; ccopy < c; ccopy++)
-                                    {
-                                        rgbOutput[xcopy, ycopy, ccopy] = rgbInput[xcopy, ycopy, ccopy];
-                                    }
-                                }
-                            }
-
-                            return rgbOutput;
-
-                        default:
-                            throw new ASCOM.InvalidOperationException("Unable to detect picture format");
-                    }
-*/
                 }
             }
         }

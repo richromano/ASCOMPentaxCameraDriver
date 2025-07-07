@@ -27,6 +27,7 @@ namespace ASCOM.PentaxKP
 
         private void cmdOK_Click(object sender, EventArgs e) // OK button event handler
         {
+            DriverCommon.Settings.DebugLevel=(int)numericUpDown1.Value;
             // Place any validation constraint checks here
             // Update the state variables with results from the dialogue
             DriverCommon.Settings.DeviceId = (string)comboBoxCamera.SelectedItem;
@@ -125,6 +126,8 @@ namespace ASCOM.PentaxKP
             comboBoxPersonality.ValueMember = "Key";
 
             comboBoxPersonality.SelectedIndex = DriverCommon.Settings.Personality;
+            numericUpDown1.Value=DriverCommon.Settings.DebugLevel;
+
 
             //checkBoxBulbMode.Checked = DriverCommon.Settings.BulbModeEnable;
             //textBoxBulbMode.Text = DriverCommon.Settings.BulbModeTime.ToString();

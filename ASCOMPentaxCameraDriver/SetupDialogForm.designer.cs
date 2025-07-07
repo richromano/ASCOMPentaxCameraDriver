@@ -61,12 +61,15 @@ namespace ASCOM.PentaxKP
             this.extrasTab = new System.Windows.Forms.TabPage();
             this.label3 = new System.Windows.Forms.Label();
             this.modeWarning = new System.Windows.Forms.PictureBox();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.label10 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.selectCameraTab.SuspendLayout();
             this.cameraPersonalityTab.SuspendLayout();
             this.extrasTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.modeWarning)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
             // cmdOK
@@ -128,7 +131,7 @@ namespace ASCOM.PentaxKP
             // chkTrace
             // 
             this.chkTrace.AutoSize = true;
-            this.chkTrace.Location = new System.Drawing.Point(8, 169);
+            this.chkTrace.Location = new System.Drawing.Point(8, 111);
             this.chkTrace.Name = "chkTrace";
             this.chkTrace.Size = new System.Drawing.Size(179, 17);
             this.chkTrace.TabIndex = 4;
@@ -268,7 +271,8 @@ namespace ASCOM.PentaxKP
             this.comboBoxOutputFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxOutputFormat.FormattingEnabled = true;
             this.comboBoxOutputFormat.Items.AddRange(new object[] {
-            "RAW/Color (Processed)", "JPG/Color (Processed)",
+            "RAW/Color (Processed)",
+            "JPG/Color (Processed)",
             "RAW/RGGB (Unprocessed)"});
             this.comboBoxOutputFormat.Location = new System.Drawing.Point(131, 38);
             this.comboBoxOutputFormat.Margin = new System.Windows.Forms.Padding(1);
@@ -362,6 +366,8 @@ namespace ASCOM.PentaxKP
             // 
             // extrasTab
             // 
+            this.extrasTab.Controls.Add(this.label10);
+            this.extrasTab.Controls.Add(this.numericUpDown1);
             this.extrasTab.Controls.Add(this.chkTrace);
             this.extrasTab.Location = new System.Drawing.Point(4, 22);
             this.extrasTab.Margin = new System.Windows.Forms.Padding(1);
@@ -392,6 +398,22 @@ namespace ASCOM.PentaxKP
             this.modeWarning.TabStop = false;
             this.modeWarning.Visible = false;
             // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Location = new System.Drawing.Point(8, 134);
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(32, 20);
+            this.numericUpDown1.TabIndex = 5;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(59, 136);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(139, 13);
+            this.label10.TabIndex = 6;
+            this.label10.Text = "Debug Level (0 min - 5 max)";
+            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -417,6 +439,7 @@ namespace ASCOM.PentaxKP
             this.extrasTab.ResumeLayout(false);
             this.extrasTab.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.modeWarning)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -457,5 +480,7 @@ namespace ASCOM.PentaxKP
         private System.Windows.Forms.PictureBox modeWarning;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TabPage driverSettingsTab;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.Label label10;
     }
 }
