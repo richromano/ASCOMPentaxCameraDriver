@@ -77,9 +77,9 @@ namespace ASCOM.PentaxKP
 
         // Two output modes 0=6016x4000 standard and 1=720x480 liveview
         internal static int m_readoutmode=0;
-        internal static double previousDuration;
-        internal static string lastCaptureResponse;
-        internal static string canceledCaptureResponse;
+        internal static double previousDuration=0;
+        internal static string lastCaptureResponse="None";
+        internal static string canceledCaptureResponse="None";
         internal static DateTime lastCaptureStartTime = DateTime.MinValue;
 
         // TODO:  - all these statics means there can only be one camera
@@ -113,6 +113,12 @@ namespace ASCOM.PentaxKP
                 DriverCommon.LogCameraMessage(5, "", "Received Image " + image.Name + " Capture state "+m_captureState.ToString());
                 DriverCommon.LogCameraMessage(5, "", sender.Status.CurrentCapture.ID.ToString() + " " + lastCaptureResponse.ToString()+" "+canceledCaptureResponse.ToString());
 
+                if (lastCaptureResponse == canceledCaptureResponse)
+                {
+                    image.Delete();
+                    return;
+                }
+
                 // Get the image and save it in the current directory
                 if ((!LastSetFastReadout)&&(m_captureState==CameraStates.cameraExposing))
                     using (FileStream fs = new FileStream(
@@ -136,7 +142,7 @@ namespace ASCOM.PentaxKP
             public override void CaptureComplete(CameraDevice sender, Capture capture)
             {
                 m_captureState = CameraStates.cameraIdle;
-                DriverCommon.LogCameraMessage(0,"","Capture Complete. Capture ID: "+capture.ID.ToString()+" tracking "+lastCaptureResponse.ToString());
+                DriverCommon.LogCameraMessage(0,"","Capture Complete. Capture ID: "+capture.ID.ToString()+" tracking "+lastCaptureResponse.ToString()+" "+canceledCaptureResponse.ToString());
             }
 
             public override void DeviceDisconnected(CameraDevice sender, Ricoh.CameraController.DeviceInterface deviceInterface)
@@ -536,7 +542,7 @@ namespace ASCOM.PentaxKP
 
         #region ICamera Implementation
 
-        public void AbortExposure()
+        public async void AbortExposure()
         {
             // TODO: fix abort exposure
             DriverCommon.LogCameraMessage(0, "", "AbortExposure");
@@ -551,7 +557,7 @@ namespace ASCOM.PentaxKP
                 return;
 
             //StopCapture doesn't get called
-            //await Task.Run(() =>
+            await Task.Run(() =>
             {
                 DriverCommon.LogCameraMessage(0, "AbortExposure", "Stopping Capture.");
                 while(m_captureState!=CameraStates.cameraExposing)
@@ -560,12 +566,14 @@ namespace ASCOM.PentaxKP
                     DriverCommon.LogCameraMessage(0, "AbortExposure", "Waiting for capture to start.");
                 }
 
-                canceledCaptureResponse = previousCaptureResponse;
-                if (previousDuration > 5)
+                canceledCaptureResponse = lastCaptureResponse;
+                /*if (previousDuration > 5)
                 {
-                    DriverCommon.m_camera.CloseConnection(Ricoh.CameraController.DeviceInterface.USB);
+                    //DriverCommon.m_camera.Disconnect(Ricoh.CameraController.DeviceInterface.USB);
+                    //m_captureState = CameraStates.cameraError;
+                    Disconnect();
                     return;
-                }
+                }*/
                 //Response response =DriverCommon.m_camera.StopCapture();
 
                 while(m_captureState==CameraStates.cameraExposing)
@@ -577,7 +585,7 @@ namespace ASCOM.PentaxKP
                 return;
                 //DriverCommon.LogCameraMessage(0, "AbortExposure", "Failed. "+response.Errors.First().Message);
                 //return;
-            }//);
+            });
         }
 
         public short BayerOffsetX
@@ -735,7 +743,7 @@ namespace ASCOM.PentaxKP
                     if (DriverCommon.Settings.Personality == PentaxKPProfile.PERSONALITY_NINA)
                         return true;
 
-                    return false;
+                    return true;
 				}
             }
         }
@@ -810,7 +818,7 @@ namespace ASCOM.PentaxKP
                     if (LastSetFastReadout)
                         return true;
 
-                    return true;
+                    return false;
 				}
             }
         }
@@ -1733,39 +1741,40 @@ namespace ASCOM.PentaxKP
         */
         public async void StartExposure(double Duration, bool Light)
         {
-            if (m_captureState != CameraStates.cameraIdle)
-                throw new ASCOM.DriverException("Call to StartExposure when camera busy");
-
             // Set it right away
             // TODO: Maybe use the starting state
+            DriverCommon.LogCameraMessage(0, "", "StartExposure()");
+
+            //Check duration range and save 
+            if (Duration <= 0.0)
+            {
+                throw new InvalidValueException("StartExposure", "Duration", " > 0");
+            }
+
 
             // Light or dark frame
             // TODO:  I think we need to update the state back and forth for LastSetFastReadout
-            if (LastSetFastReadout)
-            {
-                //No need to start exposure
-                DriverCommon.LogCameraMessage(0, "", "StartExposure() fast");
-                if (Duration <= 0.0)
-                {
-                    throw new InvalidValueException("StartExposure", "Duration", " > 0");
-                }
-
-                m_captureState = CameraStates.cameraExposing;
-                previousDuration = Duration;
-                return;
-            }
-
             //          using (new DriverCommon.SerializedAccess("StartExposure()"))
-            imagesToProcess.Clear();
-            m_captureState = CameraStates.cameraWaiting;
             await Task.Run(() =>
             {
-                DriverCommon.LogCameraMessage(0, "", "StartExposure()");
+                while (m_captureState != CameraStates.cameraIdle)
+                    Thread.Sleep(100);
 
-                //Check duration range and save 
-                if (Duration <= 0.0)
+                imagesToProcess.Clear();
+                m_captureState = CameraStates.cameraWaiting;
+
+                if (LastSetFastReadout)
                 {
-                    throw new InvalidValueException("StartExposure", "Duration", " > 0");
+                    //No need to start exposure
+                    DriverCommon.LogCameraMessage(0, "", "StartExposure() fast");
+                    if (Duration <= 0.0)
+                    {
+                        throw new InvalidValueException("StartExposure", "Duration", " > 0");
+                    }
+
+                    m_captureState = CameraStates.cameraExposing;
+                    previousDuration = Duration;
+                    return;
                 }
 
                 ShutterSpeed shutterSpeed;
@@ -2098,17 +2107,31 @@ namespace ASCOM.PentaxKP
                 }
 
                 canceledCaptureResponse = lastCaptureResponse;
-
-                DriverCommon.LogCameraMessage(0, "StopExposure", "Stopping Capture.");
-                Response response = DriverCommon.m_camera.StopCapture();
-                if (response.Result==Result.OK)
+                if (previousDuration > 5)
                 {
-                    DriverCommon.LogCameraMessage(0, "StopExposure", "Capture has been stopped.");
-                    m_captureState = CameraStates.cameraReading;
+                    DriverCommon.m_camera.Disconnect(Ricoh.CameraController.DeviceInterface.USB);
+                    m_captureState = CameraStates.cameraError;
                     return;
                 }
-                DriverCommon.LogCameraMessage(0, "StopExposure", "Failed. " + response.Errors.First().Message);
+
+                while (m_captureState == CameraStates.cameraExposing)
+                {
+                    Thread.Sleep(100);
+                    DriverCommon.LogCameraMessage(0, "StopExposure", "Waiting for capture to finish.");
+                }
+
                 return;
+
+                /*                DriverCommon.LogCameraMessage(0, "StopExposure", "Stopping Capture.");
+                                Response response = DriverCommon.m_camera.StopCapture();
+                                if (response.Result==Result.OK)
+                                {
+                                    DriverCommon.LogCameraMessage(0, "StopExposure", "Capture has been stopped.");
+                                    m_captureState = CameraStates.cameraReading;
+                                    return;
+                                }
+                                DriverCommon.LogCameraMessage(0, "StopExposure", "Failed. " + response.Errors.First().Message);
+                                return;*/
             });
         }
 
