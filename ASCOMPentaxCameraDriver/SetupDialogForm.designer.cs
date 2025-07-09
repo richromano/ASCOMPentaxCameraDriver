@@ -59,17 +59,18 @@ namespace ASCOM.PentaxKP
             this.cameraPersonalityTab = new System.Windows.Forms.TabPage();
             this.driverSettingsTab = new System.Windows.Forms.TabPage();
             this.extrasTab = new System.Windows.Forms.TabPage();
+            this.label10 = new System.Windows.Forms.Label();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
             this.modeWarning = new System.Windows.Forms.PictureBox();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
-            this.label10 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.selectCameraTab.SuspendLayout();
             this.cameraPersonalityTab.SuspendLayout();
             this.extrasTab.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.modeWarning)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.modeWarning)).BeginInit();
             this.SuspendLayout();
             // 
             // cmdOK
@@ -377,6 +378,27 @@ namespace ASCOM.PentaxKP
             this.extrasTab.Text = "Extras";
             this.extrasTab.UseVisualStyleBackColor = true;
             // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(59, 136);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(139, 13);
+            this.label10.TabIndex = 6;
+            this.label10.Text = "Debug Level (0 min - 5 max)";
+            // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Location = new System.Drawing.Point(8, 134);
+            this.numericUpDown1.Maximum = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(32, 20);
+            this.numericUpDown1.TabIndex = 5;
+            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -398,32 +420,22 @@ namespace ASCOM.PentaxKP
             this.modeWarning.TabStop = false;
             this.modeWarning.Visible = false;
             // 
-            // numericUpDown1
+            // label11
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(8, 134);
-            this.numericUpDown1.Maximum = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(32, 20);
-            this.numericUpDown1.TabIndex = 5;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(59, 136);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(139, 13);
-            this.label10.TabIndex = 6;
-            this.label10.Text = "Debug Level (0 min - 5 max)";
+            this.label11.AutoSize = true;
+            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label11.Location = new System.Drawing.Point(320, 238);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(217, 13);
+            this.label11.TabIndex = 22;
+            this.label11.Text = "NOTE: Stop Exposure Not Supported";
             // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(547, 291);
+            this.Controls.Add(this.label11);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.picASCOM);
             this.Controls.Add(this.cmdCancel);
@@ -443,9 +455,10 @@ namespace ASCOM.PentaxKP
             this.cameraPersonalityTab.PerformLayout();
             this.extrasTab.ResumeLayout(false);
             this.extrasTab.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.modeWarning)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.modeWarning)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -487,5 +500,6 @@ namespace ASCOM.PentaxKP
         private System.Windows.Forms.TabPage driverSettingsTab;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label11;
     }
 }
