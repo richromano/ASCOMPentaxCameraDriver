@@ -62,7 +62,7 @@ namespace ASCOM.PentaxKP
               {
                 device.StartExposure(3, true);
                 Thread.Sleep(1000);
-                device.StopExposure();
+//                device.AbortExposure();
                 for (int i = 0; i < 100 && !device.ImageReady; i++)
                     Thread.Sleep(250);
 

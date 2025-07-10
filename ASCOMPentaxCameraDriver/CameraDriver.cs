@@ -344,7 +344,7 @@ namespace ASCOM.PentaxKP
                         DriverCommon.m_camera.EventListeners.Add(new EventListener());
                     }
                     var response = DriverCommon.m_camera.Connect(Ricoh.CameraController.DeviceInterface.USB);
-                    if (response.Equals(Response.OK))
+                    if (response.Result.Equals(Response.OK))
                     {
                         DriverCommon.LogCameraMessage(0, "Connect","Connected. Model: " + DriverCommon.m_camera.Model + ", SerialNumber:" + DriverCommon.m_camera.SerialNumber);
                     }
@@ -420,7 +420,7 @@ namespace ASCOM.PentaxKP
                             if (DriverCommon.m_camera != null)
                             {
                                 var response = DriverCommon.m_camera.Connect(Ricoh.CameraController.DeviceInterface.USB);
-                                if (response.Equals(Response.OK))
+                                if (response.Equals(Response.OK)/*&& (DriverCommon.m_camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB))*/)
                                 {
                                     DriverCommon.LogCameraMessage(0,"Connected", "Connected. Model: " + DriverCommon.m_camera.Model + ", SerialNumber:" + DriverCommon.m_camera.SerialNumber);
                                     StorageWriting sw = new StorageWriting();

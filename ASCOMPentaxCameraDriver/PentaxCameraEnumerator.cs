@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Collections;
+using ASCOMPentaxCameraDriver;
 
 namespace ASCOM.PentaxKP
 {
@@ -18,6 +19,9 @@ namespace ASCOM.PentaxKP
                 Ricoh.CameraController.DeviceInterface deviceInterface = Ricoh.CameraController.DeviceInterface.USB;
                 List<CameraDevice> detectedCameraDevices =
                     CameraDeviceDetector.Detect(deviceInterface);
+
+//                var devices = PTPDeviceEnumerator.EnumeratePTPDevices();
+
                 UInt32 count = (UInt32)detectedCameraDevices.Count();
 
                 foreach (CameraDevice camera in detectedCameraDevices)
@@ -33,7 +37,7 @@ namespace ASCOM.PentaxKP
 
                         info.DeviceName = camera.Model;
                         info.SerialNumber = camera.SerialNumber;
-                        LiveViewSpecification liveViewSpecification = new LiveViewSpecification();
+                        /*LiveViewSpecification liveViewSpecification = new LiveViewSpecification();
                         camera.GetCameraDeviceSettings(
                             new List<CameraDeviceSetting>() { liveViewSpecification }); ;
                         LiveViewSpecificationValue liveViewSpecificationValue =
@@ -41,9 +45,9 @@ namespace ASCOM.PentaxKP
 
                         LiveViewImage liveViewImage = liveViewSpecificationValue.Get();
                         info.ImageWidthPixels = (int)liveViewImage.Width;
-                        info.ImageHeightPixels = (int)liveViewImage.Height;
+                        info.ImageHeightPixels = (int)liveViewImage.Height;*/
 
-                        if (camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB))
+//                        if (camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB))
                         {
                             result.Add(info);
                         }
