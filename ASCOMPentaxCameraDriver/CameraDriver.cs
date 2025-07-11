@@ -111,12 +111,16 @@ namespace ASCOM.PentaxKP
             public override void ImageAdded(CameraDevice sender, CameraImage image)
             {
                 DriverCommon.LogCameraMessage(5, "", "Received Image " + image.Name + " Capture state "+m_captureState.ToString());
-                DriverCommon.LogCameraMessage(5, "", sender.Status.CurrentCapture.ID.ToString() + " " + lastCaptureResponse.ToString()+" "+canceledCaptureResponse.ToString());
 
-                if (lastCaptureResponse == canceledCaptureResponse)
+                if (!DriverCommon.Settings.BulbModeEnable)
                 {
-                    image.Delete();
-                    return;
+                    DriverCommon.LogCameraMessage(5, "", sender.Status.CurrentCapture.ID.ToString() + " " + lastCaptureResponse.ToString() + " " + canceledCaptureResponse.ToString());
+
+                    if (lastCaptureResponse == canceledCaptureResponse)
+                    {
+                        image.Delete();
+                        return;
+                    }
                 }
 
                 // Get the image and save it in the current directory
@@ -135,6 +139,8 @@ namespace ASCOM.PentaxKP
                         DriverCommon.LogCameraMessage(0,"", System.IO.Path.GetTempPath() + Path.DirectorySeparatorChar +
                         image.Name);
                         imagesToProcess.Enqueue(System.IO.Path.GetTempPath() + Path.DirectorySeparatorChar + image.Name);
+                        if (DriverCommon.Settings.BulbModeEnable)
+                            m_captureState = CameraStates.cameraIdle;
                     }
             }
 
@@ -420,9 +426,13 @@ namespace ASCOM.PentaxKP
                             if (DriverCommon.m_camera != null)
                             {
                                 var response = DriverCommon.m_camera.Connect(Ricoh.CameraController.DeviceInterface.USB);
-                                if (response.Equals(Response.OK)/*&& (DriverCommon.m_camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB))*/)
+                                if (response.Equals(Response.OK))
                                 {
                                     DriverCommon.LogCameraMessage(0,"Connected", "Connected. Model: " + DriverCommon.m_camera.Model + ", SerialNumber:" + DriverCommon.m_camera.SerialNumber);
+                                    DriverCommon.m_camera.StartLiveView();
+                                    if (!DriverCommon.Settings.UseLiveview)
+                                        DriverCommon.m_camera.StopLiveView();
+                                    //bool connect = DriverCommon.m_camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB);
                                     StorageWriting sw = new StorageWriting();
                                     sw=Ricoh.CameraController.StorageWriting.False;
                                     ExposureProgram ep = new ExposureProgram();
@@ -441,8 +451,6 @@ namespace ASCOM.PentaxKP
                                     DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sicf });
                                     // Sleep to let the settings take effect
                                     Thread.Sleep(1000);
-                                    if (DriverCommon.Settings.UseLiveview)
-                                        DriverCommon.m_camera.StartLiveView();
 
                                     string deviceModel = DriverCommon.Settings.DeviceId;
                                     DriverCommon.Settings.assignCamera(deviceModel);
@@ -566,7 +574,9 @@ namespace ASCOM.PentaxKP
                     DriverCommon.LogCameraMessage(0, "AbortExposure", "Waiting for capture to start.");
                 }
 
-                canceledCaptureResponse = lastCaptureResponse;
+                if (!DriverCommon.Settings.BulbModeEnable)
+                    canceledCaptureResponse = lastCaptureResponse;
+
                 /*if (previousDuration > 5)
                 {
                     //DriverCommon.m_camera.Disconnect(Ricoh.CameraController.DeviceInterface.USB);
@@ -1749,6 +1759,16 @@ namespace ASCOM.PentaxKP
             if (Duration <= 0.0)
             {
                 throw new InvalidValueException("StartExposure", "Duration", " > 0");
+            }
+
+            if(DriverCommon.Settings.BulbModeEnable)
+            {
+                if(m_captureState != CameraStates.cameraIdle)
+                    throw new InvalidValueException("StartExposure", "CameraState", "Not idle");
+
+                imagesToProcess.Clear();
+                m_captureState = CameraStates.cameraExposing;
+                return;
             }
 
 

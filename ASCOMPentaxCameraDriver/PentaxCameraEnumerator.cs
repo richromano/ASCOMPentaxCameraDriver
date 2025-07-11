@@ -20,9 +20,17 @@ namespace ASCOM.PentaxKP
                 List<CameraDevice> detectedCameraDevices =
                     CameraDeviceDetector.Detect(deviceInterface);
 
-//                var devices = PTPDeviceEnumerator.EnumeratePTPDevices();
+                var devices = PTPDeviceEnumerator.EnumeratePTPDevices();
 
-                UInt32 count = (UInt32)detectedCameraDevices.Count();
+                foreach (PTPDeviceInfo device in devices)
+                {
+                    PentaxKPProfile.DeviceInfo info = new PentaxKPProfile.DeviceInfo();
+                    info.DeviceName = device.Description;
+                    info.SerialNumber = device.DeviceID;
+                    result.Add(info);
+                }
+
+/*                UInt32 count = (UInt32)detectedCameraDevices.Count();
 
                 foreach (CameraDevice camera in detectedCameraDevices)
                 {
@@ -37,23 +45,13 @@ namespace ASCOM.PentaxKP
 
                         info.DeviceName = camera.Model;
                         info.SerialNumber = camera.SerialNumber;
-                        /*LiveViewSpecification liveViewSpecification = new LiveViewSpecification();
-                        camera.GetCameraDeviceSettings(
-                            new List<CameraDeviceSetting>() { liveViewSpecification }); ;
-                        LiveViewSpecificationValue liveViewSpecificationValue =
-                            (LiveViewSpecificationValue)liveViewSpecification.Value;
 
-                        LiveViewImage liveViewImage = liveViewSpecificationValue.Get();
-                        info.ImageWidthPixels = (int)liveViewImage.Width;
-                        info.ImageHeightPixels = (int)liveViewImage.Height;*/
-
-//                        if (camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB))
                         {
                             result.Add(info);
                         }
 
                         camera.Disconnect(Ricoh.CameraController.DeviceInterface.USB);
-                }
+                }*/
 
                 return result;
             }

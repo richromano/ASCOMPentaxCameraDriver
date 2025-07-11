@@ -220,7 +220,7 @@ namespace ASCOM.PentaxKP
         internal static string personalityProfileName = "Personality";
         internal static string personalityDefault = "0"; // TODO:  why is this one?
         internal static string bulbModeEnableProfileName = "Bulb Mode Enable";
-        internal static string bulbModeEnableDefault = "true";
+        internal static string bulbModeEnableDefault = "false";
         internal static string bulbModeTimeProfileName = "Bulb Mode Time";
         internal static string bulbModeTimeDefault = "1";
         internal static string allowISOAdjustProfileName = "Allow ISO Adjust";
