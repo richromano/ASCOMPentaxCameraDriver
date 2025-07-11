@@ -1,21 +1,21 @@
 # ASCOMPentaxKPCameraDriver
 
-ASCOM Camera and Focuser Driver for Pentax KP Camera.
+ASCOM Camera and Focuser Driver for Pentax KP, K1, K1ii, 645z cameras.
 
 This is based on the Ricoh Camera SDK which supports the following cameras:
 https://ricohapi.github.io/docs/camera-usb-sdk-dotnet/
 
-Newer Pentax cameras should also be supported: KF, K70 and K3iii.
+Newer Pentax cameras might also be supported: KF and K70 but not K3iii.
 
 Developed by Richard Romano
 
 # Usage
 
-The driver has only been tested with a KP camera with Sharpcap.  It currently assumes a resolution of 6016x4000 for full sensor and 720x480 for LiveView.  You can select LiveView in the Read Mode and then using the LiveView button in Sharpcap.  This will allow fast image streaming with which you can perform initial focus adjustment.
+The driver has only been tested with a KP camera with Sharpcap and N.I.N.A.  You can select LiveView in the Read Mode and then use the LiveView button in Sharpcap.  This will allow fast image streaming with which you can perform initial focus adjustment.
 
 # Testing
 
-The software has only been tested with Sharpcap.  There is an issue changing Read Modes and Sharpcap is currently being updated.  After you change the Read Mode you must also update the Capture Area.
+There is an issue changing Read Modes in Sharpcap and Sharpcap is currently being updated.  After you change the Read Mode you must also update the Capture Area (ROI).  In N.I.N.A. you can use the Fast Capture mode. 
 
 # Building and Installing
 
