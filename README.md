@@ -17,7 +17,7 @@ The driver has only been tested with a KP camera with Sharpcap and N.I.N.A.  You
 
 # Focuser
 
-Be sure to also select Pentax KP/K1 in the Focuser and connect.  This will allow Sharpcap or N.I.N.A. to perform autofocus.
+Be sure to also select Pentax KP/K1 in the Focuser and connect.  This will allow Sharpcap or N.I.N.A. to perform autofocus using autofocus Pentax lens or the 1.7x autofocus teleconverter.
 
 # Testing
 
