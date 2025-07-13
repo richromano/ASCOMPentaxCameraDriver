@@ -429,9 +429,6 @@ namespace ASCOM.PentaxKP
                                 if (response.Equals(Response.OK))
                                 {
                                     DriverCommon.LogCameraMessage(0,"Connected", "Connected. Model: " + DriverCommon.m_camera.Model + ", SerialNumber:" + DriverCommon.m_camera.SerialNumber);
-                                    DriverCommon.m_camera.StartLiveView();
-                                    if (!DriverCommon.Settings.UseLiveview)
-                                        DriverCommon.m_camera.StopLiveView();
                                     //bool connect = DriverCommon.m_camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB);
                                     StorageWriting sw = new StorageWriting();
                                     sw=Ricoh.CameraController.StorageWriting.False;
@@ -451,6 +448,8 @@ namespace ASCOM.PentaxKP
                                     DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sicf });
                                     // Sleep to let the settings take effect
                                     Thread.Sleep(1000);
+                                    if (DriverCommon.Settings.UseLiveview)
+                                        DriverCommon.m_camera.StartLiveView();
 
                                     string deviceModel = DriverCommon.Settings.DeviceId;
                                     DriverCommon.Settings.assignCamera(deviceModel);
