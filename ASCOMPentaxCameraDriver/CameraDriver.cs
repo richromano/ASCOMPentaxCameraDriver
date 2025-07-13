@@ -432,8 +432,6 @@ namespace ASCOM.PentaxKP
                                     //bool connect = DriverCommon.m_camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB);
                                     StorageWriting sw = new StorageWriting();
                                     sw=Ricoh.CameraController.StorageWriting.False;
-                                    ExposureProgram ep = new ExposureProgram();
-                                    ep = Ricoh.CameraController.ExposureProgram.Bulb;
                                     StillImageCaptureFormat sicf = new StillImageCaptureFormat();
 
                                     sicf = Ricoh.CameraController.StillImageCaptureFormat.JPEG;
@@ -442,10 +440,23 @@ namespace ASCOM.PentaxKP
                                         sicf = Ricoh.CameraController.StillImageCaptureFormat.DNG;
                                     StillImageQuality siq = new StillImageQuality();
                                     siq=Ricoh.CameraController.StillImageQuality.LargeBest;
+
+                                    //ExposureProgram ep = new ExposureProgram();
+                                    //ep = Ricoh.CameraController.ExposureProgram.Bulb;
                                     //DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { ep });
                                     DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sw });
                                     DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { siq });
                                     DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sicf });
+
+                                    ExposureProgram exposureProgram = new ExposureProgram();
+                                    DriverCommon.m_camera.GetCaptureSettings(
+                                        new List<CaptureSetting>() { exposureProgram });
+                                    if (exposureProgram.Equals(Ricoh.CameraController.ExposureProgram.Bulb))
+                                        DriverCommon.Settings.BulbModeEnable = true;
+                                    else
+                                        DriverCommon.Settings.BulbModeEnable = false;
+                                    DriverCommon.LogCameraMessage(0, "Bulb mode", DriverCommon.Settings.BulbModeEnable.ToString()+" mode "+exposureProgram.ToString());
+
                                     // Sleep to let the settings take effect
                                     Thread.Sleep(1000);
                                     if (DriverCommon.Settings.UseLiveview)
