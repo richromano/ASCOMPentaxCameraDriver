@@ -350,7 +350,7 @@ namespace ASCOM.PentaxKP
                         DriverCommon.m_camera.EventListeners.Add(new EventListener());
                     }
                     var response = DriverCommon.m_camera.Connect(Ricoh.CameraController.DeviceInterface.USB);
-                    if (response.Result.Equals(Response.OK))
+                    if (response.Equals(Response.OK))
                     {
                         DriverCommon.LogCameraMessage(0, "Connect","Connected. Model: " + DriverCommon.m_camera.Model + ", SerialNumber:" + DriverCommon.m_camera.SerialNumber);
                     }
@@ -693,7 +693,9 @@ namespace ASCOM.PentaxKP
                 //using (new DriverCommon.SerializedAccess("get_CameraState", true))
                 {
                     DriverCommon.LogCameraMessage(0,"", $"get_CameraState {m_captureState.ToString()}");
-                    if(m_captureState==CameraStates.cameraReading)
+                    if(m_captureState==CameraStates.cameraExposing)
+                        DriverCommon.LogCameraMessage(0, "", $"get_CameraState {DriverCommon.m_camera.Status.CurrentCapture.State.ToString()}");
+                    if (m_captureState==CameraStates.cameraReading)
                     {
                         if (DriverCommon.m_camera.Status.CurrentCapture.Equals(Ricoh.CameraController.CaptureState.Complete))
                         {
@@ -2055,8 +2057,7 @@ namespace ASCOM.PentaxKP
 
                 StartCaptureResponse response = DriverCommon.m_camera.StartCapture(false);
                 lastCaptureResponse=response.Capture.ID;
-                // Clear existing images
-//                if (response.Equals(Response.OK))
+                if (response.Result == Result.OK)
                 {
                     previousDuration = Duration;
                     lastCaptureStartTime = DateTime.Now;
@@ -2064,10 +2065,11 @@ namespace ASCOM.PentaxKP
                     if (m_captureState == CameraStates.cameraWaiting)
                         m_captureState = CameraStates.cameraExposing;
                 }
-//                else
+                else
                 {
- //                   m_captureState = CameraStates.cameraError;
- //                   throw new ASCOM.InvalidOperationException("Call to StartExposure SDK not successful");
+                   m_captureState = CameraStates.cameraError;
+                   DriverCommon.LogCameraMessage(0, "StartExposure", "Call to StartExposure SDK not successful: Disconnect camera USB and make sure you can take a picture with shutter button");
+                   throw new ASCOM.InvalidOperationException("Call to StartExposure SDK not successful: Disconnect camera USB and make sure you can take a picture with shutter button");
                 }
             });
     }
