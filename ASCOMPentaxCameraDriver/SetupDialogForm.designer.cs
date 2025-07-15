@@ -58,6 +58,11 @@ namespace ASCOM.PentaxKP
             this.selectCameraTab = new System.Windows.Forms.TabPage();
             this.cameraPersonalityTab = new System.Windows.Forms.TabPage();
             this.driverSettingsTab = new System.Windows.Forms.TabPage();
+            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.checkBoxKeepInterimFiles = new System.Windows.Forms.CheckBox();
+            this.checkBoxBulbMode = new System.Windows.Forms.CheckBox();
             this.extrasTab = new System.Windows.Forms.TabPage();
             this.label10 = new System.Windows.Forms.Label();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
@@ -68,6 +73,7 @@ namespace ASCOM.PentaxKP
             this.tabControl1.SuspendLayout();
             this.selectCameraTab.SuspendLayout();
             this.cameraPersonalityTab.SuspendLayout();
+            this.driverSettingsTab.SuspendLayout();
             this.extrasTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.modeWarning)).BeginInit();
@@ -141,7 +147,7 @@ namespace ASCOM.PentaxKP
             // 
             // comboBoxCamera
             // 
-            this.comboBoxCamera.AccessibleName = "Pentax KP/K1 Camera Selection";
+            this.comboBoxCamera.AccessibleName = "Pentax KP/K1/645Z Camera Selection";
             this.comboBoxCamera.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxCamera.FormattingEnabled = true;
             this.comboBoxCamera.Location = new System.Drawing.Point(73, 70);
@@ -163,7 +169,6 @@ namespace ASCOM.PentaxKP
             this.checkBoxUseLiveview.TabIndex = 15;
             this.checkBoxUseLiveview.Text = "Always Use Liveview  (Allows Auto Focus)";
             this.checkBoxUseLiveview.UseVisualStyleBackColor = true;
-            this.checkBoxUseLiveview.CheckedChanged += new System.EventHandler(this.checkBoxUseLiveview_CheckedChanged);
             // 
             // textBoxCameraBatteryLevel
             // 
@@ -357,6 +362,11 @@ namespace ASCOM.PentaxKP
             // 
             // driverSettingsTab
             // 
+            this.driverSettingsTab.Controls.Add(this.linkLabel1);
+            this.driverSettingsTab.Controls.Add(this.label13);
+            this.driverSettingsTab.Controls.Add(this.label12);
+            this.driverSettingsTab.Controls.Add(this.checkBoxKeepInterimFiles);
+            this.driverSettingsTab.Controls.Add(this.checkBoxBulbMode);
             this.driverSettingsTab.Location = new System.Drawing.Point(4, 22);
             this.driverSettingsTab.Margin = new System.Windows.Forms.Padding(1);
             this.driverSettingsTab.Name = "driverSettingsTab";
@@ -364,6 +374,59 @@ namespace ASCOM.PentaxKP
             this.driverSettingsTab.TabIndex = 4;
             this.driverSettingsTab.Text = "Driver Settings";
             this.driverSettingsTab.UseVisualStyleBackColor = true;
+            // 
+            // linkLabel1
+            // 
+            this.linkLabel1.AutoSize = true;
+            this.linkLabel1.Location = new System.Drawing.Point(39, 77);
+            this.linkLabel1.Name = "linkLabel1";
+            this.linkLabel1.Size = new System.Drawing.Size(112, 13);
+            this.linkLabel1.TabIndex = 25;
+            this.linkLabel1.TabStop = true;
+            this.linkLabel1.Text = "N.I.N.A. Shutter Cable";
+            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label13.Location = new System.Drawing.Point(51, 24);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(358, 13);
+            this.label13.TabIndex = 24;
+            this.label13.Text = " or Bulb mode if you have a separate shutter cable connected";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label12.Location = new System.Drawing.Point(9, 9);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(444, 13);
+            this.label12.TabIndex = 23;
+            this.label12.Text = "NOTE: You must set Manual Mode on Camera before connecting to computer";
+            // 
+            // checkBoxKeepInterimFiles
+            // 
+            this.checkBoxKeepInterimFiles.AutoSize = true;
+            this.checkBoxKeepInterimFiles.Location = new System.Drawing.Point(12, 95);
+            this.checkBoxKeepInterimFiles.Margin = new System.Windows.Forms.Padding(2);
+            this.checkBoxKeepInterimFiles.Name = "checkBoxKeepInterimFiles";
+            this.checkBoxKeepInterimFiles.Size = new System.Drawing.Size(234, 17);
+            this.checkBoxKeepInterimFiles.TabIndex = 4;
+            this.checkBoxKeepInterimFiles.Text = "Keep DNG and JPG Files in the Temp folder";
+            this.checkBoxKeepInterimFiles.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxBulbMode
+            // 
+            this.checkBoxBulbMode.AutoSize = true;
+            this.checkBoxBulbMode.Location = new System.Drawing.Point(12, 58);
+            this.checkBoxBulbMode.Margin = new System.Windows.Forms.Padding(2);
+            this.checkBoxBulbMode.Name = "checkBoxBulbMode";
+            this.checkBoxBulbMode.Size = new System.Drawing.Size(362, 17);
+            this.checkBoxBulbMode.TabIndex = 1;
+            this.checkBoxBulbMode.Text = "Use BULB mode (must use N.I.N.A. and have a separate shutter cable)";
+            this.checkBoxBulbMode.UseVisualStyleBackColor = true;
             // 
             // extrasTab
             // 
@@ -446,13 +509,15 @@ namespace ASCOM.PentaxKP
             this.Name = "SetupDialogForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Pentax KP/K1 Setup";
+            this.Text = "Pentax KP/K1/K1ii/645Z Setup Version 7/15/2025";
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).EndInit();
             this.tabControl1.ResumeLayout(false);
             this.selectCameraTab.ResumeLayout(false);
             this.selectCameraTab.PerformLayout();
             this.cameraPersonalityTab.ResumeLayout(false);
             this.cameraPersonalityTab.PerformLayout();
+            this.driverSettingsTab.ResumeLayout(false);
+            this.driverSettingsTab.PerformLayout();
             this.extrasTab.ResumeLayout(false);
             this.extrasTab.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
@@ -500,6 +565,11 @@ namespace ASCOM.PentaxKP
         private System.Windows.Forms.TabPage driverSettingsTab;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.CheckBox checkBoxBulbMode;
+        private System.Windows.Forms.CheckBox checkBoxKeepInterimFiles;
         private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.LinkLabel linkLabel1;
     }
 }

@@ -43,9 +43,9 @@ namespace ASCOM.PentaxKP
             DriverCommon.Settings.UseLiveview = checkBoxUseLiveview.Checked;
             //DriverCommon.Settings.AutoLiveview = checkBoxAutoLiveview.Checked;
             DriverCommon.Settings.Personality = comboBoxPersonality.SelectedIndex;
-            //DriverCommon.Settings.BulbModeEnable = checkBoxBulbMode.Checked;
+            DriverCommon.Settings.BulbModeEnable = checkBoxBulbMode.Checked;
             //DriverCommon.Settings.BulbModeTime = short.Parse(textBoxBulbMode.Text.Trim());
-            //DriverCommon.Settings.AllowISOAdjust = checkBoxAllowISOAdjust.Checked;
+            DriverCommon.Settings.KeepInterimFiles = checkBoxKeepInterimFiles.Checked;
             //DriverCommon.Settings.UsingCameraLens = checkBoxUsingCameraLens.Checked;
             //DriverCommon.Settings.HandsOffFocus = checkBoxHandsOffFocus.Checked;
         }
@@ -148,11 +148,11 @@ namespace ASCOM.PentaxKP
             numericUpDown1.Value=DriverCommon.Settings.DebugLevel;
 
 
-            //checkBoxBulbMode.Checked = DriverCommon.Settings.BulbModeEnable;
+            checkBoxBulbMode.Checked = DriverCommon.Settings.BulbModeEnable;
             //textBoxBulbMode.Text = DriverCommon.Settings.BulbModeTime.ToString();
             //textBoxBulbMode.Enabled = checkBoxBulbMode.Checked;
 
-            //checkBoxAllowISOAdjust.Checked = DriverCommon.Settings.AllowISOAdjust;
+            checkBoxKeepInterimFiles.Checked = DriverCommon.Settings.KeepInterimFiles;
 
             PopulateOutputFormats();
 
@@ -252,11 +252,15 @@ namespace ASCOM.PentaxKP
                     //checkBoxUseLiveview.Enabled = true;
                     //checkBoxUseLiveview.Checked = true;
                     comboBoxOutputFormat.Enabled = true;
+                    checkBoxBulbMode.Checked = false;
+                    checkBoxBulbMode.Enabled = false;
                     break;
                 case PentaxKPProfile.PERSONALITY_NINA:
                     // NINA only supports RGGB, so we need to preset format and disable liveview
                     comboBoxOutputFormat.SelectedValue = PentaxKPProfile.OUTPUTFORMAT_RGGB;
                     comboBoxOutputFormat.Enabled = false;
+                    checkBoxBulbMode.Enabled = true;
+                    checkBoxBulbMode.Enabled = false;
                     break;
             }
         }
@@ -317,22 +321,14 @@ namespace ASCOM.PentaxKP
             }
         }*/
 
-/*        private void checkBoxBulbMode_CheckedChanged(object sender, EventArgs e)
+        /*private void checkBoxBulbMode_CheckedChanged(object sender, EventArgs e)
         {
             if (!InInit)
             {
-                textBoxBulbMode.Enabled = checkBoxBulbMode.Checked;
-                MessageBox.Show("Note that this option will only take effect if your camera's list of supported Exposure times is known.  See the wiki page at the bottom of the settings page for more info.");
+                //textBoxBulbMode.Enabled = checkBoxBulbMode.Checked;
+                MessageBox.Show("Note that this option only works if you have a trigger cable.");
             }
         }*/
-
-        private void checkBoxAllowISOAdjust_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!InInit)
-            {
-                MessageBox.Show("Note that this option will only take effect if your camera's list of supported ISO values is known.  See the wiki page at the bottom of the settings page for more info.");
-            }
-        }
 
         /*private void linkWiki_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
@@ -376,19 +372,22 @@ namespace ASCOM.PentaxKP
             checkBoxHandsOffFocus.Enabled = checkBoxUsingCameraLens.Checked;
         }*/
 
-        private void button1_Click(object sender, EventArgs e)
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-//            using (FocusTools F = new FocusTools())
+            try
             {
-//                var result = F.ShowDialog();
-//                if (result == System.Windows.Forms.DialogResult.OK)
-//                {
-//                }
-            }
-        }
+                // Change the color of the link text by setting LinkVisited
+                // to true.
+                linkLabel1.LinkVisited = true;
 
-        private void checkBoxUseLiveview_CheckedChanged(object sender, EventArgs e)
-        {
+                //Call the Process.Start method to open the default browser
+                //with a URL:
+                System.Diagnostics.Process.Start("https://nighttime-imaging.eu/docs/master/site/advanced/bulbshutter/");
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Unable to open link that was clicked.");
+            }
 
         }
     }

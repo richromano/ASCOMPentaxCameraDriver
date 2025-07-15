@@ -85,7 +85,7 @@ namespace ASCOM.PentaxKP.Classes
             {
                 case "RGGB":
                     break;
-                case "GRBG":
+/*                case "GRBG":
                     xoffs = 1;
                     break;
                 case "BGGR":
@@ -94,7 +94,7 @@ namespace ASCOM.PentaxKP.Classes
                     break;
                 case "GBRG":
                     yoffs = 1;
-                    break;
+                    break;*/
                 default:
                     throw new System.NotImplementedException();
             }

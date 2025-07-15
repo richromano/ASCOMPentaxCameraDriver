@@ -34,7 +34,7 @@ namespace ASCOM.PentaxKP
         public bool AutoLiveview = false;
         public bool BulbModeEnable = false;
         public short BulbModeTime = 1;
-        public bool AllowISOAdjust = false;
+        public bool KeepInterimFiles = false;
         public bool UsingCameraLens = false;
         public string LensId = "";
         public bool HandsOffFocus = false;
@@ -137,9 +137,9 @@ namespace ASCOM.PentaxKP
              new CameraInfo ("PENTAX KP", 0, 6016, 4000, 720, 480, 3.88, 3.88),
              new CameraInfo ("PENTAX K-70", 1, 6000, 4000, 720, 480, 3.88, 3.88),
              new CameraInfo ("PENTAX KF", 2, 6000, 4000, 720, 480, 3.88, 3.88),
-             new CameraInfo ("PENTAX K-1II", 3, 7360, 4912, 720, 480, 4.86, 4.86),
+             new CameraInfo ("PENTAX K-1 Mark II", 3, 7360, 4912, 720, 480, 4.86, 4.86),
              new CameraInfo ("PENTAX K-1", 4, 7360, 4912, 720, 480, 4.86, 4.86),
-             new CameraInfo ("PENTAX K-3III", 5, 6192, 4128, 720, 480, 3.75, 3.75),
+//             new CameraInfo ("PENTAX K-3III", 5, 6192, 4128, 720, 480, 3.75, 3.75),
              new CameraInfo ("PENTAX 645Z", 6, 8256, 6192, 720, 480, 5.32, 5.32)
             });
 
@@ -189,14 +189,14 @@ namespace ASCOM.PentaxKP
         // CameraDriverName **cannot** change, the APT software recognizes this name specifically and enables fast-readout
         // for preview mode.
         // "Pentax KP Camera"
-        public static string CameraDriverName = "Pentax KP/K1 Camera";
+        public static string CameraDriverName = "Pentax KP/K1/645Z Camera";
         public static string CameraDriverId = "ASCOM.PentaxKP.Camera";
-        public static string CameraDriverDescription = "Pentax KP/K1 Camera";
-        public static string CameraDriverInfo = $"Camera control for Pentax KP/K1 cameras. Version: {DriverVersion}";
+        public static string CameraDriverDescription = "Pentax KP/K1/645Z Camera";
+        public static string CameraDriverInfo = $"Camera control for Pentax KP/K1/645Z cameras. Version: {DriverVersion}";
 
-        public static string FocuserDriverName = "Pentax KP/K1 Lens Focuser";
+        public static string FocuserDriverName = "Pentax KP/K1/645Z Lens Focuser";
         public static string FocuserDriverId = "ASCOM.PentaxKP.Focuser";
-        public static string FocuserDriverDescription = "Pentax KP/K1 Camera Focuser";
+        public static string FocuserDriverDescription = "Pentax KP/K1/645Z Camera Focuser";
         public static string FocuserDriverInfo = $"Focuser  that allows connection to a camera-controlled autofocus lens. Version: {DriverVersion}";
 
         public static PentaxKPProfile Settings = new PentaxKPProfile();
@@ -223,8 +223,8 @@ namespace ASCOM.PentaxKP
         internal static string bulbModeEnableDefault = "false";
         internal static string bulbModeTimeProfileName = "Bulb Mode Time";
         internal static string bulbModeTimeDefault = "1";
-        internal static string allowISOAdjustProfileName = "Allow ISO Adjust";
-        internal static string allowISOAdjustDefault = "false";
+        internal static string keepInterimFilesProfileName = "Keep Interim Files";
+        internal static string keepInterimFilesDefault = "false";
 
         // Specific to Focuser
         internal static string lensIdProfileName = "Lens ID";
@@ -338,7 +338,7 @@ namespace ASCOM.PentaxKP
                 Settings.AutoLiveview = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, autoLiveviewProfileName, string.Empty, autoLiveviewDefault));
                 Settings.BulbModeEnable = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, bulbModeEnableProfileName, string.Empty, bulbModeEnableDefault));
                 Settings.BulbModeTime = Convert.ToInt16(driverProfile.GetValue(CameraDriverId, bulbModeTimeProfileName, string.Empty, bulbModeTimeDefault));
-                Settings.AllowISOAdjust = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, allowISOAdjustProfileName, string.Empty, allowISOAdjustDefault));
+                Settings.KeepInterimFiles = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, keepInterimFilesProfileName, string.Empty, keepInterimFilesDefault));
             }
 
             using (Profile driverProfile = new Profile())
@@ -380,7 +380,7 @@ namespace ASCOM.PentaxKP
                 driverProfile.WriteValue(CameraDriverId, personalityProfileName, Settings.Personality.ToString());
                 driverProfile.WriteValue(CameraDriverId, bulbModeEnableProfileName, Settings.BulbModeEnable.ToString());
                 driverProfile.WriteValue(CameraDriverId, bulbModeTimeProfileName, Settings.BulbModeTime.ToString());
-                driverProfile.WriteValue(CameraDriverId, allowISOAdjustProfileName, Settings.AllowISOAdjust.ToString());
+                driverProfile.WriteValue(CameraDriverId, keepInterimFilesProfileName, Settings.KeepInterimFiles.ToString());
 
                 if (Settings.DeviceId != null && Settings.DeviceId != "")
                 {

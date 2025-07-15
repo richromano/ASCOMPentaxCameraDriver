@@ -1,9 +1,9 @@
 //tabs=4
 // --------------------------------------------------------------------------------
 //
-// ASCOM Focuser driver for Pentax KP/K1 Camera
+// ASCOM Focuser driver for Pentax KP/K1/645Z Camera
 //
-// Description:	Implements ASCOM driver for Pentax KP/K1 Camera.
+// Description:	Implements ASCOM driver for Pentax KP/K1/645Z Camera.
 //
 // Implements:	ASCOM Focuser interface version: 3
 // Author:		(2025) Richard Romano
@@ -136,6 +136,7 @@ namespace ASCOM.PentaxKP
             //CheckConnected("CommandBool");
 //            string ret = CommandString(command, raw);
             // TODO decode the return string and return true or false
+            // TODO These commands are used by NINA and could be implemented
             // or
             throw new ASCOM.MethodNotImplementedException("CommandBool");
             // DO NOT have both these sections!  One or the other
@@ -166,7 +167,6 @@ namespace ASCOM.PentaxKP
                 //using (new DriverCommon.SerializedAccess("get_Connected"))
                 {
                     DriverCommon.LogFocuserMessage(5,"Connected", "Get {0}", requestedConnection);
-                    //TODO
                     return requestedConnection;
                 }
             }
@@ -175,28 +175,10 @@ namespace ASCOM.PentaxKP
                 DriverCommon.LogFocuserMessage(0,"Connected", "Set {0}", value.ToString());
                 requestedConnection = value;
                 if (value)
+                {
                     rezero = 0;
-                // TODO: 
-                //What if it wants to disconnect?
-/*                if (value == IsConnected)
-                    return;
-
-                if (value)
-                {
-                    if (DriverCommon.Settings.UsingCameraLens && DriverCommon.Settings.LensId != "")
-                    {
-                        DriverCommon.FocuserConnected = true;
-                        DriverCommon.Camera.SetLens(DriverCommon.Settings.LensId);
-                    }
-                    else
-                    {
-                        throw new DriverException("Settings page must be configured to use Camera Lens and specify which lens to use");
-                    }
+                    Move(10000);
                 }
-                else
-                {
-                    DriverCommon.FocuserConnected = false;
-                }*/
             }
         }
 
