@@ -1174,6 +1174,22 @@ namespace ASCOM.PentaxKP
             // Wait for the file to be closed and available.
             while (!IsFileClosed(MNewFile)) { }
             rgbImage = _imageDataProcessor.ReadRawPentax(MNewFile);
+            int scale = 1;
+
+            if (DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RAWBGR ||
+                DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RGGB)
+                scale = 4;
+
+            for (int y = 0; y < MSensorHeightPx; y++)
+            {
+                for (int x = 0; x < MSensorWidthPx; x++)
+                {
+                    rgbImage[x, y, 0] = scale * rgbImage[x, y, 0];
+                    rgbImage[x, y, 1] = scale * rgbImage[x, y, 1];
+                    rgbImage[x, y, 2] = scale * rgbImage[x, y, 2];
+                }
+            }
+
 
             result = Resize(rgbImage, 3, StartX, StartY, NumX, NumY);
             return result;
@@ -1192,6 +1208,20 @@ namespace ASCOM.PentaxKP
             // Wait for the file to be closed and available.
             while (!IsFileClosed(MNewFile)) { }
             rgbImage = _imageDataProcessor.ReadRBBGPentax(MNewFile);
+
+            int scale = 1;
+
+            if (DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RAWBGR ||
+                DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RGGB)
+                scale = 4;
+
+            for (int y = 0; y < MSensorHeightPx; y++)
+            {
+                for (int x = 0; x < MSensorWidthPx; x++)
+                {
+                    rgbImage[x, y] = scale * rgbImage[x, y];
+                }
+            }
 
             // TODO: Sharpcap problem
             result = Resize(rgbImage, 2, StartX, StartY, NumX, NumY);
