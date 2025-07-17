@@ -234,9 +234,9 @@ namespace ASCOM.PentaxKP
                 {
                     DriverCommon.WriteProfile(); // Persist device configuration values to the ASCOM Profile store
                 }
-                else
+//                else
                     // TODO: need to fix connect
-                    throw new ASCOM.DriverException("User canceled");
+//                    throw new ASCOM.DriverException("User canceled");
             }
 
             DriverCommon.LogCameraMessage(0,"SetupDialog", "[out]");
@@ -441,7 +441,18 @@ namespace ASCOM.PentaxKP
 
                             DriverCommon.LogCameraMessage(0,"Connected", "Connecting...");
                             List<CameraDevice> detectedCameraDevices = CameraDeviceDetector.Detect(Ricoh.CameraController.DeviceInterface.USB);
-                            DriverCommon.m_camera = detectedCameraDevices.ElementAt(DriverCommon.Settings.DeviceIndex);
+ //                           System.Windows.Forms.MessageBox.Show("Number of detected cameras "+detectedCameraDevices.Count.ToString()+" "+DriverCommon.Settings.DeviceIndex.ToString());
+
+                            foreach (CameraDevice camera in detectedCameraDevices)
+                            {
+                                if (camera.Model == DriverCommon.Settings.DeviceId)
+                                {
+                                    DriverCommon.m_camera = camera;
+                                    break;
+                                }
+                            }
+
+                            //DriverCommon.m_camera = detectedCameraDevices.ElementAt(DriverCommon.Settings.DeviceIndex);
                             if (DriverCommon.m_camera != null)
                             {
                                 var response = DriverCommon.m_camera.Connect(Ricoh.CameraController.DeviceInterface.USB);

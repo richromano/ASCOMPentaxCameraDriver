@@ -22,7 +22,7 @@ namespace ASCOM.PentaxKP
         public bool EnableLogging = false;
         public int DebugLevel = 0;
         public string DeviceId = "";
-        public int DeviceIndex = 0;
+//        public int DeviceIndex = 0;
         public short DefaultReadoutMode = PentaxKPProfile.OUTPUTFORMAT_RAWBGR;
         public bool UseLiveview = true;
         public int Personality = PERSONALITY_SHARPCAP;
@@ -304,7 +304,6 @@ namespace ASCOM.PentaxKP
             {
                 driverProfile.DeviceType = "Camera";
 
-                Settings.DeviceIndex = -1;
                 Settings.DebugLevel = Convert.ToInt16(driverProfile.GetValue(CameraDriverId, debugLevelProfileName, string.Empty, debugLevelDefault));
                 Settings.EnableLogging = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, traceStateProfileName, string.Empty, traceStateDefault));
                 Settings.DeviceId = driverProfile.GetValue(CameraDriverId, cameraProfileName, string.Empty, cameraDefault);

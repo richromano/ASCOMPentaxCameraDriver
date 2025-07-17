@@ -35,8 +35,9 @@ namespace ASCOM.PentaxKP
             ASCOM.DriverAccess.Camera device = new ASCOM.DriverAccess.Camera("ASCOM.PentaxKP.Camera");
 #endif
 
+            device.SetupDialog();
+            device.SetupDialog();
             device.Connected = true;
-//            device.SetupDialog();
             // now run some tests, adding code to your driver so that the tests will pass.
             // these first tests are common to all drivers.
             Console.WriteLine("name " + device.Name);

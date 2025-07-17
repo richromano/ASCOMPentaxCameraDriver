@@ -31,7 +31,7 @@ namespace ASCOM.PentaxKP
             // Place any validation constraint checks here
             // Update the state variables with results from the dialogue
             DriverCommon.Settings.DeviceId = (string)comboBoxCamera.SelectedItem;
-            DriverCommon.Settings.DeviceIndex = comboBoxCamera.SelectedIndex;
+            //DriverCommon.Settings.DeviceIndex = comboBoxCamera.SelectedIndex;
             DriverCommon.Settings.EnableLogging = chkTrace.Checked;
             // TODO: add NINA check for non-RGGB setting
             DriverCommon.Settings.DefaultReadoutMode = (short)(comboBoxOutputFormat.SelectedIndex);
