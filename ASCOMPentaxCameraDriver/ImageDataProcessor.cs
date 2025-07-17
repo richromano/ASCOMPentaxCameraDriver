@@ -111,6 +111,7 @@ namespace ASCOM.PentaxKP.Classes
                 var r = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8);
                 var g = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8 + 2);
                 var b = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8 + 4);
+                var g2 = (ushort)Marshal.ReadInt16(dataStructure.image, rc * 8 + 6);
 
                 int row = rc / width;
                 int col = rc - width * row;
@@ -123,7 +124,7 @@ namespace ASCOM.PentaxKP.Classes
                     pixels[col, row] = g;
                 if (row % 2 == 1 && col % 2 == 0)
                     // Green
-                    pixels[col, row] = g;
+                    pixels[col, row] = g2;
                 if (row % 2 == 1 && col % 2 == 1)
                     // Blue
                     pixels[col, row] = b;

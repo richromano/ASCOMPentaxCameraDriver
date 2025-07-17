@@ -434,7 +434,7 @@ namespace ASCOM.PentaxKP
 
                         if (DriverCommon.m_camera == null)
                         {
-                            if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "SharpCap")
+                            //if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "SharpCap")
                             {
                                 SetupDialog();
                             }
@@ -1207,9 +1207,9 @@ namespace ASCOM.PentaxKP
             rgbImage = _imageDataProcessor.ReadRawPentax(MNewFile);
             int scale = 1;
 
-            if (DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RAWBGR ||
-                DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RGGB)
-                scale = 4;
+            //if (DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RAWBGR ||
+            //    DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RGGB)
+            scale = 1;
 
             for (int y = 0; y < rgbImage.GetLength(1); y++)
             {
