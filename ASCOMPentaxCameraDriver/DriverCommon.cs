@@ -11,11 +11,6 @@ namespace ASCOM.PentaxKP
 {
     public class PentaxKPProfile
     {
-        //        private static int DefaultImageWidth = 6016; // Constants to define the ccd pixel dimenstions
-        //        private static int DefaultImageHeight = 4000;
-//        protected const UInt32 IMAGEMODE_RAW = 1;
-//        protected const UInt32 IMAGEMODE_RGB = 2;
-
         public const int PERSONALITY_SHARPCAP = 0;
         public const int PERSONALITY_NINA = 1;
         public const short OUTPUTFORMAT_RAWBGR = 0;
@@ -27,23 +22,12 @@ namespace ASCOM.PentaxKP
         public bool EnableLogging = false;
         public int DebugLevel = 0;
         public string DeviceId = "";
-        public int DeviceIndex = 0;
+        public int DeviceIndex = -1;
         public short DefaultReadoutMode = PentaxKPProfile.OUTPUTFORMAT_RAWBGR;
         public bool UseLiveview = true;
         public int Personality = PERSONALITY_SHARPCAP;
-        public bool AutoLiveview = false;
         public bool BulbModeEnable = false;
-        public short BulbModeTime = 1;
         public bool KeepInterimFiles = false;
-        public bool UsingCameraLens = false;
-        public string LensId = "";
-        public bool HandsOffFocus = false;
-
-        // Dynamic values
-        //        public int ImageWidth = DefaultImageWidth; // Initialise variables to hold values required for functionality tested by Conform
-        //        public int ImageHeight = DefaultImageHeight;
-        //        public int ImageXOffset = 0;
-        //        public int ImageYOffset = 0;
 
         public void assignCamera(int index)
         {
@@ -205,6 +189,8 @@ namespace ASCOM.PentaxKP
         internal static Ricoh.CameraController.CameraDevice m_camera = null;
 
         // Common to both
+        internal static string debugLevelProfileName = "Debug Level";
+        internal static string debugLevelDefault = "5";
         internal static string traceStateProfileName = "Trace Level";
         internal static string traceStateDefault = "false";
         internal static string cameraProfileName = "Camera ID";
@@ -215,24 +201,14 @@ namespace ASCOM.PentaxKP
         internal static string readoutModeDefault = "2";
         internal static string useLiveviewProfileName = "Use Camera Liveview";
         internal static string useLiveviewDefault = "true";
-        internal static string autoLiveviewProfileName = "Auto Liveview";
-        internal static string autoLiveviewDefault = "false";
         internal static string personalityProfileName = "Personality";
-        internal static string personalityDefault = "0"; // TODO:  why is this one?
+        internal static string personalityDefault = "0";
         internal static string bulbModeEnableProfileName = "Bulb Mode Enable";
         internal static string bulbModeEnableDefault = "false";
-        internal static string bulbModeTimeProfileName = "Bulb Mode Time";
-        internal static string bulbModeTimeDefault = "1";
         internal static string keepInterimFilesProfileName = "Keep Interim Files";
         internal static string keepInterimFilesDefault = "false";
 
         // Specific to Focuser
-        internal static string lensIdProfileName = "Lens ID";
-        internal static string lensIdProfileDefault = "";
-        internal static string usingCameraLensProfileName = "Using Camera Lens";
-        internal static string usingCameraLensProfileDefault = "false";
-        internal static string handsOffProfileName = "Hands Off";
-        internal static string handsOffProfileDefault = "false";
 
         static public bool CameraConnected
         {
@@ -328,16 +304,14 @@ namespace ASCOM.PentaxKP
             {
                 driverProfile.DeviceType = "Camera";
 
-                Settings.DeviceIndex = 0;
-//                Settings.DebugLevel = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, traceStateProfileName, string.Empty, traceStateDefault));
+                Settings.DeviceIndex = -1;
+                Settings.DebugLevel = Convert.ToInt16(driverProfile.GetValue(CameraDriverId, debugLevelProfileName, string.Empty, debugLevelDefault));
                 Settings.EnableLogging = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, traceStateProfileName, string.Empty, traceStateDefault));
                 Settings.DeviceId = driverProfile.GetValue(CameraDriverId, cameraProfileName, string.Empty, cameraDefault);
                 Settings.DefaultReadoutMode = Convert.ToInt16(driverProfile.GetValue(CameraDriverId, readoutModeDefaultProfileName, string.Empty, readoutModeDefault));
                 Settings.UseLiveview = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, useLiveviewProfileName, string.Empty, useLiveviewDefault));
                 Settings.Personality = Convert.ToInt16(driverProfile.GetValue(CameraDriverId, personalityProfileName, string.Empty, personalityDefault));
-                Settings.AutoLiveview = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, autoLiveviewProfileName, string.Empty, autoLiveviewDefault));
                 Settings.BulbModeEnable = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, bulbModeEnableProfileName, string.Empty, bulbModeEnableDefault));
-                Settings.BulbModeTime = Convert.ToInt16(driverProfile.GetValue(CameraDriverId, bulbModeTimeProfileName, string.Empty, bulbModeTimeDefault));
                 Settings.KeepInterimFiles = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, keepInterimFilesProfileName, string.Empty, keepInterimFilesDefault));
             }
 
@@ -345,23 +319,24 @@ namespace ASCOM.PentaxKP
             {
                 driverProfile.DeviceType = "Focuser";
 
-                Settings.UsingCameraLens = Convert.ToBoolean(driverProfile.GetValue(FocuserDriverId, usingCameraLensProfileName, string.Empty, usingCameraLensProfileDefault));
-                Settings.LensId = driverProfile.GetValue(FocuserDriverId, lensIdProfileName, string.Empty, lensIdProfileDefault);
+                //Settings.UsingCameraLens = Convert.ToBoolean(driverProfile.GetValue(FocuserDriverId, usingCameraLensProfileName, string.Empty, usingCameraLensProfileDefault));
+                //Settings.LensId = driverProfile.GetValue(FocuserDriverId, lensIdProfileName, string.Empty, lensIdProfileDefault);
             }
 
             Logger.Enabled = Settings.EnableLogging;
 
-            // TODO: : Add personality here
+            // TODO: : Set Default Readout Mode and Set Debug Level
 
             Log($"DeviceID:                            {Settings.DeviceId}", "ReadProfile");
+            Log($"Personality:                         {Settings.Personality}", "ReadProfile");
             Log($"Default Readout Mode:                {Settings.DefaultReadoutMode}", "ReadProfile");
             Log($"Use Liveview:                        {Settings.UseLiveview}", "ReadProfile");
-            Log($"AutoLiveview @ 0.0s:                 {Settings.AutoLiveview}", "ReadProfile");
+            //Log($"AutoLiveview @ 0.0s:                 {Settings.AutoLiveview}", "ReadProfile");
             Log($"Bulb Mode Enable:                    {Settings.BulbModeEnable}", "ReadProfile");
-            Log($"Bulb Mode Time:                      {Settings.BulbModeTime}", "ReadProfile");
-            Log($"Using Camera Lens:                   {Settings.UsingCameraLens}", "ReadProfile");
-            Log($"FocuserDeviceID:                     {Settings.LensId}", "ReadProfile");
-            Log($"User promises to not touch lens:     {Settings.HandsOffFocus}", "ReadProfile");
+            //Log($"Bulb Mode Time:                      {Settings.BulbModeTime}", "ReadProfile");
+            //Log($"Using Camera Lens:                   {Settings.UsingCameraLens}", "ReadProfile");
+            //Log($"FocuserDeviceID:                     {Settings.LensId}", "ReadProfile");
+            //Log($"User promises to not touch lens:     {Settings.HandsOffFocus}", "ReadProfile");
 
             return true;
         }
@@ -372,14 +347,12 @@ namespace ASCOM.PentaxKP
             {
                 driverProfile.DeviceType = "Camera";
                 // TODO: read and save debugging level
-//                driverProfile.WriteValue(CameraDriverId, traceStateProfileName, Settings.DebugLevel.ToString());
+                driverProfile.WriteValue(CameraDriverId, debugLevelProfileName, Settings.DebugLevel.ToString());
                 driverProfile.WriteValue(CameraDriverId, traceStateProfileName, Settings.EnableLogging.ToString());
                 driverProfile.WriteValue(CameraDriverId, readoutModeDefaultProfileName, Settings.DefaultReadoutMode.ToString());
                 driverProfile.WriteValue(CameraDriverId, useLiveviewProfileName, Settings.UseLiveview.ToString());
-                driverProfile.WriteValue(CameraDriverId, autoLiveviewProfileName, Settings.AutoLiveview.ToString());
                 driverProfile.WriteValue(CameraDriverId, personalityProfileName, Settings.Personality.ToString());
                 driverProfile.WriteValue(CameraDriverId, bulbModeEnableProfileName, Settings.BulbModeEnable.ToString());
-                driverProfile.WriteValue(CameraDriverId, bulbModeTimeProfileName, Settings.BulbModeTime.ToString());
                 driverProfile.WriteValue(CameraDriverId, keepInterimFilesProfileName, Settings.KeepInterimFiles.ToString());
 
                 if (Settings.DeviceId != null && Settings.DeviceId != "")
@@ -393,10 +366,10 @@ namespace ASCOM.PentaxKP
             using (Profile driverProfile = new Profile())
             {
                 driverProfile.DeviceType = "Focuser";
-                driverProfile.WriteValue(FocuserDriverId, lensIdProfileName, Settings.LensId);
-                driverProfile.WriteValue(FocuserDriverId, usingCameraLensProfileName, Settings.UsingCameraLens.ToString());
+                //driverProfile.WriteValue(FocuserDriverId, lensIdProfileName, Settings.LensId);
+                //driverProfile.WriteValue(FocuserDriverId, usingCameraLensProfileName, Settings.UsingCameraLens.ToString());
 
-                if (Settings.LensId != String.Empty)
+                //if (Settings.LensId != String.Empty)
                 {
                     // We need to also set the value into the registry
      //               String key = $"HKEY_CURRENT_USER\\Software\\retro.kiwi\\SonyMTPCamera.dll\\Lenses\\{Settings.LensId}";

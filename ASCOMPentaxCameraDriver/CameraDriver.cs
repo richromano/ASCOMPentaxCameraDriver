@@ -213,7 +213,7 @@ namespace ASCOM.PentaxKP
             // or call a different dialog if connected
             DriverCommon.LogCameraMessage(0,"SetupDialog", "[in]");
             if (IsConnected) {
-                System.Windows.Forms.MessageBox.Show("Camera is currently connected.  Please disconnect and reconnect to change settings.");
+                System.Windows.Forms.MessageBox.Show("Camera is currently connected.  Please disconnect to change settings then reconnect.");
                 DriverCommon.LogCameraMessage(0,"SetupDialog", "[out]");
                 return;
             }
@@ -425,7 +425,9 @@ namespace ASCOM.PentaxKP
 
                         if (DriverCommon.m_camera == null)
                         {
-	                        SetupDialog();
+                            if(DriverCommon.Settings.DeviceIndex==-1)
+    	                        SetupDialog();
+
                             DriverCommon.LogCameraMessage(0,"Connected", "Connecting...");
                             List<CameraDevice> detectedCameraDevices = CameraDeviceDetector.Detect(Ricoh.CameraController.DeviceInterface.USB);
                             DriverCommon.m_camera = detectedCameraDevices.ElementAt(DriverCommon.Settings.DeviceIndex);
@@ -435,6 +437,7 @@ namespace ASCOM.PentaxKP
                                 if (response.Equals(Response.OK))
                                 {
                                     DriverCommon.LogCameraMessage(0,"Connected", "Connected. Model: " + DriverCommon.m_camera.Model + ", SerialNumber:" + DriverCommon.m_camera.SerialNumber);
+                                    DriverCommon.Settings.DeviceId = DriverCommon.m_camera.Model;
                                     bool connect = DriverCommon.m_camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB);
                                     if (!connect)
                                     {
@@ -1165,10 +1168,10 @@ namespace ASCOM.PentaxKP
         {
             object result = null;
             //Bitmap _bmp;
-            int MSensorWidthPx = DriverCommon.Settings.Info.ImageWidthPixels;
-            int MSensorHeightPx = DriverCommon.Settings.Info.ImageHeightPixels;
+            //int MSensorWidthPx = DriverCommon.Settings.Info.ImageWidthPixels;
+            //int MSensorHeightPx = DriverCommon.Settings.Info.ImageHeightPixels;
             // TODO: Should be returned based on image size
-            int[,,] rgbImage= new int[MSensorWidthPx, MSensorHeightPx, 3]; // Assuming this is declared and initialized elsewhere.
+            int[,,] rgbImage;//= new int[MSensorWidthPx, MSensorHeightPx, 3]; // Assuming this is declared and initialized elsewhere.
 
 
             // Wait for the file to be closed and available.
@@ -1180,9 +1183,9 @@ namespace ASCOM.PentaxKP
                 DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RGGB)
                 scale = 4;
 
-            for (int y = 0; y < MSensorHeightPx; y++)
+            for (int y = 0; y < rgbImage.GetLength(1); y++)
             {
-                for (int x = 0; x < MSensorWidthPx; x++)
+                for (int x = 0; x < rgbImage.GetLength(0); x++)
                 {
                     rgbImage[x, y, 0] = scale * rgbImage[x, y, 0];
                     rgbImage[x, y, 1] = scale * rgbImage[x, y, 1];
@@ -1199,10 +1202,10 @@ namespace ASCOM.PentaxKP
         {
             object result = null;
             //Bitmap _bmp;
-            int MSensorWidthPx = DriverCommon.Settings.Info.ImageWidthPixels;
-            int MSensorHeightPx = DriverCommon.Settings.Info.ImageHeightPixels;
+            //int MSensorWidthPx = DriverCommon.Settings.Info.ImageWidthPixels;
+            //int MSensorHeightPx = DriverCommon.Settings.Info.ImageHeightPixels;
             // TODO: Should be returned based on image size
-            int[,] rgbImage = new int[MSensorWidthPx, MSensorHeightPx]; // Assuming this is declared and initialized elsewhere.
+            int[,] rgbImage;// = new int[MSensorWidthPx, MSensorHeightPx]; // Assuming this is declared and initialized elsewhere.
 
 
             // Wait for the file to be closed and available.
@@ -1215,9 +1218,9 @@ namespace ASCOM.PentaxKP
                 DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RGGB)
                 scale = 4;
 
-            for (int y = 0; y < MSensorHeightPx; y++)
+            for (int y = 0; y < rgbImage.GetLength(1); y++)
             {
-                for (int x = 0; x < MSensorWidthPx; x++)
+                for (int x = 0; x < rgbImage.GetLength(0); x++)
                 {
                     rgbImage[x, y] = scale * rgbImage[x, y];
                 }
@@ -1232,10 +1235,8 @@ namespace ASCOM.PentaxKP
         {
             object result = null;
             Bitmap _bmp;
-            int MSensorWidthPx = DriverCommon.Settings.Info.ImageWidthPixels;
-            int MSensorHeightPx = DriverCommon.Settings.Info.ImageHeightPixels;
-            // TODO: Should be returned based on image size
-            int[,,] _cameraImageArray= new int[MSensorWidthPx, MSensorHeightPx, 3]; // Assuming this is declared and initialized elsewhere.
+            //int MSensorWidthPx = DriverCommon.Settings.Info.ImageWidthPixels;
+            //int MSensorHeightPx = DriverCommon.Settings.Info.ImageHeightPixels;
 
             // Wait for the file to be closed and available.
                 while (!IsFileClosed(MNewFile)) { }
@@ -1251,7 +1252,10 @@ namespace ASCOM.PentaxKP
                 int stride = bmpData.Stride;
                 int width = _bmp.Width;
                 int height = _bmp.Height;
-            
+
+            // TODO: Should be returned based on image size
+            int[,,] _cameraImageArray = new int[width, height, 3]; // Assuming this is declared and initialized elsewhere.
+
             for (int y = 0; y < height; y++)
                 {
                     for (int x = 0; x < width; x++)
@@ -2277,17 +2281,21 @@ namespace ASCOM.PentaxKP
 
         internal static object Resize(object array, int rank, int startX, int startY, int width, int height)
         {
+            // TODO: Test the new Resize
+            // TODO: make touch n stars to work and make user guide
 
             if (rank == 2)
             {
                 int[,] input = (int[,])array;
                 DriverCommon.LogCameraMessage(0, "Resize", string.Format("rank={0}, startX={1}, startY={2}, width={3}, height={4} owidth={5} oheight={6}", rank, startX, startY, width, height, input.GetLength(0).ToString(), input.GetLength(1).ToString()));
 
-                if (startX == 0 && startY == 0 && width >= input.GetLength(0) && height >= input.GetLength(1))
+                if (startX + width >= input.GetLength(0) || startY + height >= input.GetLength(1))
                 {
                     DriverCommon.LogCameraMessage(0, "Resize", "returning original values");
                     return input;
                 }
+
+                // TODO: what if width and height are greater than GetLength?
 
                 int[,] output = new int[width, height];
 
@@ -2307,7 +2315,7 @@ namespace ASCOM.PentaxKP
 
                 DriverCommon.LogCameraMessage(0, "Resize", string.Format("rank={0}, startX={1}, startY={2}, width={3}, height={4} owidth={5} oheight={6}", rank, startX, startY, width, height, input.GetLength(0).ToString(), input.GetLength(1).ToString()));
 
-                if (startX == 0 && startY == 0 && width >= input.GetLength(0) && height >= input.GetLength(1))
+                if (startX + width >= input.GetLength(0) || startY + height >= input.GetLength(1))
                 {
                     DriverCommon.LogCameraMessage(0,"Resize","returning original values");
                     return input;

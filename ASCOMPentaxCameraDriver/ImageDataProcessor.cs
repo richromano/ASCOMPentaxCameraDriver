@@ -72,8 +72,8 @@ namespace ASCOM.PentaxKP.Classes
             if (colorsStr != "RGBG")
                 throw new NotImplementedException();
 
-            int xoffs = 0;
-            int yoffs = 0;
+            //int xoffs = 0;
+            //int yoffs = 0;
 
             string cameraPattern = "";
             cameraPattern += colorsStr[NativeMethods.libraw_COLOR(data, 0, 0)];
