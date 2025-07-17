@@ -441,10 +441,13 @@ namespace ASCOM.PentaxKP
 
                             DriverCommon.LogCameraMessage(0,"Connected", "Connecting...");
                             List<CameraDevice> detectedCameraDevices = CameraDeviceDetector.Detect(Ricoh.CameraController.DeviceInterface.USB);
- //                           System.Windows.Forms.MessageBox.Show("Number of detected cameras "+detectedCameraDevices.Count.ToString()+" "+DriverCommon.Settings.DeviceIndex.ToString());
+//                            Thread.Sleep(500);
+//                            detectedCameraDevices = CameraDeviceDetector.Detect(Ricoh.CameraController.DeviceInterface.USB);
+                            DriverCommon.LogCameraMessage(0, "Connected", "Number of detected cameras " + detectedCameraDevices.Count.ToString()+" "+DriverCommon.Settings.DeviceId.ToString());
 
                             foreach (CameraDevice camera in detectedCameraDevices)
                             {
+                                DriverCommon.LogCameraMessage(0, "Connected", "Checking " + camera.Model.ToString() + " " + DriverCommon.Settings.DeviceId.ToString());
                                 if (camera.Model == DriverCommon.Settings.DeviceId)
                                 {
                                     DriverCommon.m_camera = camera;
@@ -463,7 +466,7 @@ namespace ASCOM.PentaxKP
                                     bool connect = DriverCommon.m_camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB);
                                     if (!connect)
                                     {
-                                        System.Windows.Forms.MessageBox.Show("Connect seems to have failed");
+                                        //System.Windows.Forms.MessageBox.Show("Connect seems to have failed");
                                         DriverCommon.LogCameraMessage(0, "Connected", "IsConnected false");
                                     }
 
@@ -489,6 +492,7 @@ namespace ASCOM.PentaxKP
 
                                     while (true)
                                     {
+                                        DriverCommon.LogCameraMessage(0, "Connect", "Checking Exposure Program settings");
                                         DriverCommon.m_camera.GetCaptureSettings(
                                             new List<CaptureSetting>() { exposureProgram });
 
@@ -533,12 +537,14 @@ namespace ASCOM.PentaxKP
                                 }
                                 else
                                 {
-                                    DriverCommon.LogCameraMessage(0,"Connected", "Connection is failed.");
+                                    DriverCommon.LogCameraMessage(0,"Connected", "Connection failed.");
+                                    throw new ASCOM.DriverException("Connection failed.");
                                 }
                             }
                             else
                             {
-                                DriverCommon.LogCameraMessage(0,"Connected", "Device has not found.");
+                                DriverCommon.LogCameraMessage(0,"Connected", "Device not found.");
+                                throw new ASCOM.DriverException("Device not found.");
                             }
                         }
                     }
