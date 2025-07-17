@@ -22,7 +22,7 @@ namespace ASCOM.PentaxKP
         public bool EnableLogging = false;
         public int DebugLevel = 0;
         public string DeviceId = "";
-        public int DeviceIndex = -1;
+        public int DeviceIndex = 0;
         public short DefaultReadoutMode = PentaxKPProfile.OUTPUTFORMAT_RAWBGR;
         public bool UseLiveview = true;
         public int Personality = PERSONALITY_SHARPCAP;

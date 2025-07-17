@@ -218,6 +218,15 @@ namespace ASCOM.PentaxKP
                 return;
             }
 
+            if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "SharpCap")
+            {
+                DriverCommon.Settings.Personality = PentaxKPProfile.PERSONALITY_SHARPCAP;
+            }
+            else
+            {
+                DriverCommon.Settings.Personality = PentaxKPProfile.PERSONALITY_NINA;
+            }
+
             using (SetupDialogForm F = new SetupDialogForm())
             {
                 var result = F.ShowDialog();
@@ -425,8 +434,10 @@ namespace ASCOM.PentaxKP
 
                         if (DriverCommon.m_camera == null)
                         {
-                            if(DriverCommon.Settings.DeviceIndex==-1)
-    	                        SetupDialog();
+                            if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "SharpCap")
+                            {
+                                SetupDialog();
+                            }
 
                             DriverCommon.LogCameraMessage(0,"Connected", "Connecting...");
                             List<CameraDevice> detectedCameraDevices = CameraDeviceDetector.Detect(Ricoh.CameraController.DeviceInterface.USB);
