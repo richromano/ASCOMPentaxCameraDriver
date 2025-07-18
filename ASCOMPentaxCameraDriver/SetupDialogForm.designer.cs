@@ -509,7 +509,7 @@ namespace ASCOM.PentaxKP
             this.Name = "SetupDialogForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Pentax KP/K1/K1ii/645Z Setup Version 7/15/2025";
+            this.Text = "Pentax KP/K1/K1ii/645Z Setup Version 7/17/2025";
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).EndInit();
             this.tabControl1.ResumeLayout(false);
             this.selectCameraTab.ResumeLayout(false);
