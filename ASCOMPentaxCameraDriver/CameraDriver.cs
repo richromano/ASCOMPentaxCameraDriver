@@ -434,7 +434,12 @@ namespace ASCOM.PentaxKP
 
                         if (DriverCommon.m_camera == null)
                         {
-                            //if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "SharpCap")
+                            if (System.Diagnostics.Process.GetCurrentProcess().ProcessName == "SharpCap")
+                            {
+                                SetupDialog();
+                            }
+
+                            if (DriverCommon.Settings.DeviceId == "")
                             {
                                 SetupDialog();
                             }
@@ -463,6 +468,17 @@ namespace ASCOM.PentaxKP
                                 {
                                     DriverCommon.LogCameraMessage(0,"Connected", "Connected. Model: " + DriverCommon.m_camera.Model + ", SerialNumber:" + DriverCommon.m_camera.SerialNumber);
                                     DriverCommon.Settings.DeviceId = DriverCommon.m_camera.Model;
+
+                                    LiveViewSpecification liveViewSpecification = new LiveViewSpecification();
+                                    DriverCommon.m_camera.GetCameraDeviceSettings(
+                                        new List<CameraDeviceSetting>() { liveViewSpecification }); ;
+                                    LiveViewSpecificationValue liveViewSpecificationValue =
+                                        (LiveViewSpecificationValue)liveViewSpecification.Value;
+
+                                    /*LiveViewImage liveViewImage = liveViewSpecificationValue.Get();
+                                    info.ImageWidthPixels = (int)liveViewImage.Width;
+                                    info.ImageHeightPixels = (int)liveViewImage.Height;*/
+
                                     bool connect = DriverCommon.m_camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB);
                                     if (!connect)
                                     {
@@ -544,6 +560,7 @@ namespace ASCOM.PentaxKP
                             else
                             {
                                 DriverCommon.LogCameraMessage(0,"Connected", "Device not found.");
+                                DriverCommon.Settings.DeviceId = "";
                                 throw new ASCOM.DriverException("Device not found.");
                             }
                         }
