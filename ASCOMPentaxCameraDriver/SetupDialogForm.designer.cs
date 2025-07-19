@@ -510,7 +510,7 @@ namespace ASCOM.PentaxKP
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(114, 13);
             this.label14.TabIndex = 23;
-            this.label14.Text = "Version 7/17/2025";
+            this.label14.Text = "Version 7/20/2025";
             // 
             // pictureBox1
             // 
@@ -574,7 +574,7 @@ namespace ASCOM.PentaxKP
             this.Name = "SetupDialogForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Pentax KP/K1/K1ii/645Z Setup Version 7/17/2025";
+            this.Text = "Pentax KP/K1/K1ii/645Z Setup Version 7/20/2025";
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).EndInit();
             this.tabControl1.ResumeLayout(false);
             this.selectCameraTab.ResumeLayout(false);
