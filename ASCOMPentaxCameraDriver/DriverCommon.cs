@@ -123,7 +123,7 @@ namespace ASCOM.PentaxKP
              new CameraInfo ("PENTAX KF", 2, 6000, 4000, 720, 480, 3.88, 3.88),
              new CameraInfo ("PENTAX K-1 Mark II", 3, 7360, 4912, 720, 480, 4.86, 4.86),
              new CameraInfo ("PENTAX K-1", 4, 7360, 4912, 720, 480, 4.86, 4.86),
-//             new CameraInfo ("PENTAX K-3III", 5, 6192, 4128, 720, 480, 3.75, 3.75),
+             new CameraInfo ("PENTAX K-3 Mark III", 5, 6192, 4128, 1080, 720, 3.75, 3.75),
              new CameraInfo ("PENTAX 645Z", 6, 8256, 6192, 720, 480, 5.32, 5.32)
             });
 

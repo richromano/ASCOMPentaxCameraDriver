@@ -2101,9 +2101,9 @@ namespace ASCOM.PentaxKP
 
 
                 StartCaptureResponse response = DriverCommon.m_camera.StartCapture(false);
-                lastCaptureResponse=response.Capture.ID;
                 if (response.Result == Result.OK)
                 {
+                    lastCaptureResponse = response.Capture.ID;
                     previousDuration = Duration;
                     lastCaptureStartTime = DateTime.Now;
                     // Make sure we don't change a reading to exposing
@@ -2112,6 +2112,7 @@ namespace ASCOM.PentaxKP
                 }
                 else
                 {
+                   lastCaptureResponse = "None";
                    m_captureState = CameraStates.cameraError;
                    DriverCommon.LogCameraMessage(0, "StartExposure", "Call to StartExposure SDK not successful: Disconnect camera USB and make sure you can take a picture with shutter button");
                    throw new ASCOM.InvalidOperationException("Call to StartExposure SDK not successful: Disconnect camera USB and make sure you can take a picture with shutter button");
