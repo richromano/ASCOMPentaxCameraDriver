@@ -500,17 +500,32 @@ namespace ASCOM.PentaxKP
                                     //ExposureProgram ep = new ExposureProgram();
                                     //ep = Ricoh.CameraController.ExposureProgram.Bulb;
                                     //DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { ep });
-                                    DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sw });
-                                    DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { siq });
-                                    DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sicf });
+                                    try
+                                    {
+                                        DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sw });
+                                        DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { siq });
+                                        DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sicf });
+                                    }
+                                    catch
+                                    {
+                                        throw new ASCOM.DriverException("Can't set capture settings.");
+                                    }
 
                                     ExposureProgram exposureProgram = new ExposureProgram();
 
                                     while (true)
                                     {
                                         DriverCommon.LogCameraMessage(0, "Connect", "Checking Exposure Program settings");
-                                        DriverCommon.m_camera.GetCaptureSettings(
-                                            new List<CaptureSetting>() { exposureProgram });
+
+                                        try
+                                        {
+                                            DriverCommon.m_camera.GetCaptureSettings(
+                                                new List<CaptureSetting>() { exposureProgram });
+                                        }
+                                        catch
+                                        {
+                                            throw new ASCOM.DriverException("Can't get capture settings.");
+                                        }
 
                                         if (DriverCommon.Settings.BulbModeEnable)
                                         {
