@@ -469,6 +469,15 @@ namespace ASCOM.PentaxKP
                                     DriverCommon.LogCameraMessage(0,"Connected", "Connected. Model: " + DriverCommon.m_camera.Model + ", SerialNumber:" + DriverCommon.m_camera.SerialNumber);
                                     DriverCommon.Settings.DeviceId = DriverCommon.m_camera.Model;
 
+                                    bool k3m3 = false;
+
+                                    if (DriverCommon.m_camera.Model.StartsWith("PENTAX K-3 Mark III"))
+                                    {
+                                        DriverCommon.LogCameraMessage(0, "Connect", "Bulb mode not supported on K-3 Mark III");
+                                        k3m3 = true;
+                                        DriverCommon.Settings.BulbModeEnable = false;
+                                    }
+
                                     LiveViewSpecification liveViewSpecification = new LiveViewSpecification();
                                     DriverCommon.m_camera.GetCameraDeviceSettings(
                                         new List<CameraDeviceSetting>() { liveViewSpecification }); ;
@@ -478,38 +487,6 @@ namespace ASCOM.PentaxKP
                                     /*LiveViewImage liveViewImage = liveViewSpecificationValue.Get();
                                     info.ImageWidthPixels = (int)liveViewImage.Width;
                                     info.ImageHeightPixels = (int)liveViewImage.Height;*/
-
-                                    bool connect = DriverCommon.m_camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB);
-                                    if (!connect)
-                                    {
-                                        //System.Windows.Forms.MessageBox.Show("Connect seems to have failed");
-                                        DriverCommon.LogCameraMessage(0, "Connected", "IsConnected false");
-                                    }
-
-                                    StorageWriting sw = new StorageWriting();
-                                    sw=Ricoh.CameraController.StorageWriting.False;
-                                    StillImageCaptureFormat sicf = new StillImageCaptureFormat();
-
-                                    sicf = Ricoh.CameraController.StillImageCaptureFormat.JPEG;
-                                    if(DriverCommon.Settings.DefaultReadoutMode==PentaxKPProfile.OUTPUTFORMAT_RAWBGR
-                                        || DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RGGB)
-                                        sicf = Ricoh.CameraController.StillImageCaptureFormat.DNG;
-                                    StillImageQuality siq = new StillImageQuality();
-                                    siq=Ricoh.CameraController.StillImageQuality.LargeBest;
-
-                                    //ExposureProgram ep = new ExposureProgram();
-                                    //ep = Ricoh.CameraController.ExposureProgram.Bulb;
-                                    //DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { ep });
-                                    try
-                                    {
-                                        DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sw });
-                                        DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { siq });
-                                        DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sicf });
-                                    }
-                                    catch
-                                    {
-                                        throw new ASCOM.DriverException("Can't set capture settings.");
-                                    }
 
                                     ExposureProgram exposureProgram = new ExposureProgram();
 
@@ -541,6 +518,38 @@ namespace ASCOM.PentaxKP
                                             else
                                                 System.Windows.Forms.MessageBox.Show("Set the Camera Exposure Program to MANUAL");
                                         }
+                                    }
+
+                                    bool connect = DriverCommon.m_camera.IsConnected(Ricoh.CameraController.DeviceInterface.USB);
+                                    if (!connect)
+                                    {
+                                        //System.Windows.Forms.MessageBox.Show("Connect seems to have failed");
+                                        DriverCommon.LogCameraMessage(0, "Connected", "IsConnected false");
+                                    }
+
+                                    StorageWriting sw = new StorageWriting();
+                                    sw=Ricoh.CameraController.StorageWriting.False;
+                                    StillImageCaptureFormat sicf = new StillImageCaptureFormat();
+
+                                    sicf = Ricoh.CameraController.StillImageCaptureFormat.JPEG;
+                                    if(DriverCommon.Settings.DefaultReadoutMode==PentaxKPProfile.OUTPUTFORMAT_RAWBGR
+                                        || DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RGGB)
+                                        sicf = Ricoh.CameraController.StillImageCaptureFormat.DNG;
+                                    StillImageQuality siq = new StillImageQuality();
+                                    siq=Ricoh.CameraController.StillImageQuality.LargeBest;
+
+                                    //ExposureProgram ep = new ExposureProgram();
+                                    //ep = Ricoh.CameraController.ExposureProgram.Bulb;
+                                    //DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { ep });
+                                    try
+                                    {
+                                        DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sw });
+                                        DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { siq });
+                                        DriverCommon.m_camera.SetCaptureSettings(new List<CaptureSetting>() { sicf });
+                                    }
+                                    catch
+                                    {
+                                        throw new ASCOM.DriverException("Can't set capture settings.");
                                     }
 
                                     DriverCommon.LogCameraMessage(0, "Connect", "Driver Version: 7/25/2025");
