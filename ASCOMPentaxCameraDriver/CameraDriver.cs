@@ -553,7 +553,7 @@ namespace ASCOM.PentaxKP
                                         throw new ASCOM.DriverException("Can't set capture settings.");
                                     }
 
-                                    DriverCommon.LogCameraMessage(0, "Connect", "Driver Version: 7/25/2025");
+                                    DriverCommon.LogCameraMessage(0, "Connect", "Driver Version: 7/29/2025");
                                     DriverCommon.LogCameraMessage(0, "Bulb mode", DriverCommon.Settings.BulbModeEnable.ToString()+" mode "+exposureProgram.ToString());
 
                                     // Sleep to let the settings take effect
