@@ -559,7 +559,11 @@ namespace ASCOM.PentaxKP
                                     // Sleep to let the settings take effect
                                     Thread.Sleep(1000);
                                     if (DriverCommon.Settings.UseLiveview)
+                                    {
                                         DriverCommon.m_camera.StartLiveView();
+                                        DriverCommon.m_camera.StopLiveView();
+                                        DriverCommon.m_camera.StartLiveView();
+                                    }
 
                                     string deviceModel = DriverCommon.Settings.DeviceId;
                                     DriverCommon.Settings.assignCamera(deviceModel);
