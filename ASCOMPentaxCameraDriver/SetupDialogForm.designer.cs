@@ -32,7 +32,6 @@ namespace ASCOM.PentaxKP
             this.cmdOK = new System.Windows.Forms.Button();
             this.cmdCancel = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
-            this.picASCOM = new System.Windows.Forms.PictureBox();
             this.label2 = new System.Windows.Forms.Label();
             this.chkTrace = new System.Windows.Forms.CheckBox();
             this.comboBoxCamera = new System.Windows.Forms.ComboBox();
@@ -74,7 +73,8 @@ namespace ASCOM.PentaxKP
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.pictureBox4 = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
+            this.picASCOM = new System.Windows.Forms.PictureBox();
+            this.pictureBox5 = new System.Windows.Forms.PictureBox();
             this.tabControl1.SuspendLayout();
             this.selectCameraTab.SuspendLayout();
             this.cameraPersonalityTab.SuspendLayout();
@@ -86,6 +86,8 @@ namespace ASCOM.PentaxKP
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).BeginInit();
             this.SuspendLayout();
             // 
             // cmdOK
@@ -121,20 +123,6 @@ namespace ASCOM.PentaxKP
             this.label1.Text = "Please select the camera you\'d like to work with. (Only devices currently connect" +
     "ed and recognized by Windows are listed)";
             // 
-            // picASCOM
-            // 
-            this.picASCOM.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.picASCOM.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.picASCOM.Image = global::ASCOM.PentaxKP.Properties.Resources.ASCOM;
-            this.picASCOM.Location = new System.Drawing.Point(12, 307);
-            this.picASCOM.Name = "picASCOM";
-            this.picASCOM.Size = new System.Drawing.Size(55, 60);
-            this.picASCOM.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.picASCOM.TabIndex = 3;
-            this.picASCOM.TabStop = false;
-            this.picASCOM.Click += new System.EventHandler(this.BrowseToAscom);
-            this.picASCOM.DoubleClick += new System.EventHandler(this.BrowseToAscom);
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -156,7 +144,7 @@ namespace ASCOM.PentaxKP
             // 
             // comboBoxCamera
             // 
-            this.comboBoxCamera.AccessibleName = "Pentax KP/K1/645Z Camera Selection";
+            this.comboBoxCamera.AccessibleName = "Pentax KP/K1/645Z/K3III Camera Selection";
             this.comboBoxCamera.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxCamera.FormattingEnabled = true;
             this.comboBoxCamera.Location = new System.Drawing.Point(73, 70);
@@ -336,7 +324,7 @@ namespace ASCOM.PentaxKP
             this.tabControl1.Margin = new System.Windows.Forms.Padding(1);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(525, 291);
+            this.tabControl1.Size = new System.Drawing.Size(525, 218);
             this.tabControl1.TabIndex = 21;
             // 
             // selectCameraTab
@@ -348,7 +336,7 @@ namespace ASCOM.PentaxKP
             this.selectCameraTab.Margin = new System.Windows.Forms.Padding(1);
             this.selectCameraTab.Name = "selectCameraTab";
             this.selectCameraTab.Padding = new System.Windows.Forms.Padding(1);
-            this.selectCameraTab.Size = new System.Drawing.Size(517, 265);
+            this.selectCameraTab.Size = new System.Drawing.Size(517, 192);
             this.selectCameraTab.TabIndex = 0;
             this.selectCameraTab.Text = "Select Camera";
             this.selectCameraTab.UseVisualStyleBackColor = true;
@@ -364,7 +352,7 @@ namespace ASCOM.PentaxKP
             this.cameraPersonalityTab.Margin = new System.Windows.Forms.Padding(1);
             this.cameraPersonalityTab.Name = "cameraPersonalityTab";
             this.cameraPersonalityTab.Padding = new System.Windows.Forms.Padding(1);
-            this.cameraPersonalityTab.Size = new System.Drawing.Size(517, 202);
+            this.cameraPersonalityTab.Size = new System.Drawing.Size(517, 192);
             this.cameraPersonalityTab.TabIndex = 1;
             this.cameraPersonalityTab.Text = "App Settings";
             this.cameraPersonalityTab.UseVisualStyleBackColor = true;
@@ -379,7 +367,7 @@ namespace ASCOM.PentaxKP
             this.driverSettingsTab.Location = new System.Drawing.Point(4, 22);
             this.driverSettingsTab.Margin = new System.Windows.Forms.Padding(1);
             this.driverSettingsTab.Name = "driverSettingsTab";
-            this.driverSettingsTab.Size = new System.Drawing.Size(517, 202);
+            this.driverSettingsTab.Size = new System.Drawing.Size(517, 192);
             this.driverSettingsTab.TabIndex = 4;
             this.driverSettingsTab.Text = "Driver Settings";
             this.driverSettingsTab.UseVisualStyleBackColor = true;
@@ -445,7 +433,7 @@ namespace ASCOM.PentaxKP
             this.extrasTab.Location = new System.Drawing.Point(4, 22);
             this.extrasTab.Margin = new System.Windows.Forms.Padding(1);
             this.extrasTab.Name = "extrasTab";
-            this.extrasTab.Size = new System.Drawing.Size(517, 202);
+            this.extrasTab.Size = new System.Drawing.Size(517, 192);
             this.extrasTab.TabIndex = 2;
             this.extrasTab.Text = "Extras";
             this.extrasTab.UseVisualStyleBackColor = true;
@@ -552,12 +540,36 @@ namespace ASCOM.PentaxKP
             this.pictureBox4.TabIndex = 27;
             this.pictureBox4.TabStop = false;
             // 
+            // picASCOM
+            // 
+            this.picASCOM.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.picASCOM.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.picASCOM.Image = global::ASCOM.PentaxKP.Properties.Resources.ASCOM;
+            this.picASCOM.Location = new System.Drawing.Point(16, 231);
+            this.picASCOM.Name = "picASCOM";
+            this.picASCOM.Size = new System.Drawing.Size(55, 60);
+            this.picASCOM.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.picASCOM.TabIndex = 28;
+            this.picASCOM.TabStop = false;
+            // 
+            // pictureBox5
+            // 
+            this.pictureBox5.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox5.Image")));
+            this.pictureBox5.Location = new System.Drawing.Point(10, 307);
+            this.pictureBox5.Name = "pictureBox5";
+            this.pictureBox5.Size = new System.Drawing.Size(112, 59);
+            this.pictureBox5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox5.TabIndex = 29;
+            this.pictureBox5.TabStop = false;
+            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(541, 422);
+            this.Controls.Add(this.pictureBox5);
+            this.Controls.Add(this.picASCOM);
             this.Controls.Add(this.pictureBox4);
             this.Controls.Add(this.pictureBox3);
             this.Controls.Add(this.pictureBox2);
@@ -565,7 +577,6 @@ namespace ASCOM.PentaxKP
             this.Controls.Add(this.label14);
             this.Controls.Add(this.label11);
             this.Controls.Add(this.tabControl1);
-            this.Controls.Add(this.picASCOM);
             this.Controls.Add(this.cmdCancel);
             this.Controls.Add(this.cmdOK);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -574,8 +585,7 @@ namespace ASCOM.PentaxKP
             this.Name = "SetupDialogForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Pentax KP/K1/K1ii/645Z Setup Version 7/25/2025";
-            ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).EndInit();
+            this.Text = "Pentax KP/K1/K1ii/645Z/K3iii Setup Version 7/25/2025";
             this.tabControl1.ResumeLayout(false);
             this.selectCameraTab.ResumeLayout(false);
             this.selectCameraTab.PerformLayout();
@@ -591,6 +601,8 @@ namespace ASCOM.PentaxKP
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -601,7 +613,6 @@ namespace ASCOM.PentaxKP
         private System.Windows.Forms.Button cmdOK;
         private System.Windows.Forms.Button cmdCancel;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.PictureBox picASCOM;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox chkTrace;
         private System.Windows.Forms.ComboBox comboBoxCamera;
@@ -645,5 +656,7 @@ namespace ASCOM.PentaxKP
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.PictureBox pictureBox3;
         private System.Windows.Forms.PictureBox pictureBox4;
+        private System.Windows.Forms.PictureBox picASCOM;
+        private System.Windows.Forms.PictureBox pictureBox5;
     }
 }

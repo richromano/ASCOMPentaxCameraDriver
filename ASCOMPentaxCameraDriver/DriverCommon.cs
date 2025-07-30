@@ -173,14 +173,14 @@ namespace ASCOM.PentaxKP
         // CameraDriverName **cannot** change, the APT software recognizes this name specifically and enables fast-readout
         // for preview mode.
         // "Pentax KP Camera"
-        public static string CameraDriverName = "Pentax KP/K1/645Z Camera";
+        public static string CameraDriverName = "Pentax KP/K1/645Z/K3III Camera";
         public static string CameraDriverId = "ASCOM.PentaxKP.Camera";
-        public static string CameraDriverDescription = "Pentax KP/K1/645Z Camera";
-        public static string CameraDriverInfo = $"Camera control for Pentax KP/K1/645Z cameras. Version: {DriverVersion}";
+        public static string CameraDriverDescription = "Pentax KP/K1/645Z/K3III Camera";
+        public static string CameraDriverInfo = $"Camera control for Pentax KP/K1/645Z/K3III cameras. Version: {DriverVersion}";
 
-        public static string FocuserDriverName = "Pentax KP/K1/645Z Lens Focuser";
+        public static string FocuserDriverName = "Pentax KP/K1/645Z/K3III Lens Focuser";
         public static string FocuserDriverId = "ASCOM.PentaxKP.Focuser";
-        public static string FocuserDriverDescription = "Pentax KP/K1/645Z Camera Focuser";
+        public static string FocuserDriverDescription = "Pentax KP/K1/645Z/K3III Camera Focuser";
         public static string FocuserDriverInfo = $"Focuser  that allows connection to a camera-controlled autofocus lens. Version: {DriverVersion}";
 
         public static PentaxKPProfile Settings = new PentaxKPProfile();

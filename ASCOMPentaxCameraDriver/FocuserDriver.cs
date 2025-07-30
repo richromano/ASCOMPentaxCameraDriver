@@ -1,9 +1,9 @@
 //tabs=4
 // --------------------------------------------------------------------------------
 //
-// ASCOM Focuser driver for Pentax KP/K1/645Z Camera
+// ASCOM Focuser driver for Pentax KP/K1/645Z/K3III Camera
 //
-// Description:	Implements ASCOM driver for Pentax KP/K1/645Z Camera.
+// Description:	Implements ASCOM driver for Pentax KP/K1/645Z/K3III Camera.
 //
 // Implements:	ASCOM Focuser interface version: 3
 // Author:		(2025) Richard Romano

@@ -489,6 +489,7 @@ namespace ASCOM.PentaxKP
                                     info.ImageHeightPixels = (int)liveViewImage.Height;*/
 
                                     ExposureProgram exposureProgram = new ExposureProgram();
+                                    DriverCommon.Settings.BulbModeEnable = true;
 
                                     while (true)
                                     {
