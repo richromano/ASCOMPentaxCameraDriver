@@ -469,14 +469,14 @@ namespace ASCOM.PentaxKP
                                     DriverCommon.LogCameraMessage(0,"Connected", "Connected. Model: " + DriverCommon.m_camera.Model + ", SerialNumber:" + DriverCommon.m_camera.SerialNumber);
                                     DriverCommon.Settings.DeviceId = DriverCommon.m_camera.Model;
 
-                                    bool k3m3 = false;
+                                    /*bool k3m3 = false;
 
                                     if (DriverCommon.m_camera.Model.StartsWith("PENTAX K-3 Mark III"))
                                     {
                                         DriverCommon.LogCameraMessage(0, "Connect", "Bulb mode not supported on K-3 Mark III");
                                         k3m3 = true;
                                         DriverCommon.Settings.BulbModeEnable = false;
-                                    }
+                                    }*/
 
                                     LiveViewSpecification liveViewSpecification = new LiveViewSpecification();
                                     DriverCommon.m_camera.GetCameraDeviceSettings(
@@ -489,7 +489,6 @@ namespace ASCOM.PentaxKP
                                     info.ImageHeightPixels = (int)liveViewImage.Height;*/
 
                                     ExposureProgram exposureProgram = new ExposureProgram();
-                                    DriverCommon.Settings.BulbModeEnable = true;
 
                                     while (true)
                                     {

@@ -93,7 +93,8 @@ namespace ASCOM.PentaxKP
         private void InitUI()
         {
             InInit = true;
-            FocusProcess(System.Diagnostics.Process.GetCurrentProcess().ProcessName);
+            if(DriverCommon.Settings.Personality == PentaxKPProfile.PERSONALITY_NINA)
+                FocusProcess(System.Diagnostics.Process.GetCurrentProcess().ProcessName);
             chkTrace.Checked = DriverCommon.Settings.EnableLogging;
             PentaxKPCameraEnumerator enumerator = new PentaxKPCameraEnumerator();
             String selected = "";
