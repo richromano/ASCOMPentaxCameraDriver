@@ -75,6 +75,8 @@ namespace ASCOM.PentaxKP
             this.pictureBox4 = new System.Windows.Forms.PictureBox();
             this.picASCOM = new System.Windows.Forms.PictureBox();
             this.pictureBox5 = new System.Windows.Forms.PictureBox();
+            this.comboBoxSerialRelay = new System.Windows.Forms.ComboBox();
+            this.label15 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.selectCameraTab.SuspendLayout();
             this.cameraPersonalityTab.SuspendLayout();
@@ -159,7 +161,7 @@ namespace ASCOM.PentaxKP
             // checkBoxUseLiveview
             // 
             this.checkBoxUseLiveview.AutoSize = true;
-            this.checkBoxUseLiveview.Location = new System.Drawing.Point(11, 64);
+            this.checkBoxUseLiveview.Location = new System.Drawing.Point(11, 72);
             this.checkBoxUseLiveview.Margin = new System.Windows.Forms.Padding(1);
             this.checkBoxUseLiveview.Name = "checkBoxUseLiveview";
             this.checkBoxUseLiveview.Size = new System.Drawing.Size(225, 17);
@@ -359,6 +361,8 @@ namespace ASCOM.PentaxKP
             // 
             // driverSettingsTab
             // 
+            this.driverSettingsTab.Controls.Add(this.label15);
+            this.driverSettingsTab.Controls.Add(this.comboBoxSerialRelay);
             this.driverSettingsTab.Controls.Add(this.linkLabel1);
             this.driverSettingsTab.Controls.Add(this.label13);
             this.driverSettingsTab.Controls.Add(this.label12);
@@ -375,7 +379,7 @@ namespace ASCOM.PentaxKP
             // linkLabel1
             // 
             this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(39, 77);
+            this.linkLabel1.Location = new System.Drawing.Point(39, 93);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(112, 13);
             this.linkLabel1.TabIndex = 25;
@@ -389,9 +393,9 @@ namespace ASCOM.PentaxKP
             this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label13.Location = new System.Drawing.Point(51, 24);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(358, 13);
+            this.label13.Size = new System.Drawing.Size(430, 13);
             this.label13.TabIndex = 24;
-            this.label13.Text = " or Bulb mode if you have a separate shutter cable connected";
+            this.label13.Text = " or Bulb mode if you have a separate Serial Relay shutter cable connected";
             // 
             // label12
             // 
@@ -406,7 +410,7 @@ namespace ASCOM.PentaxKP
             // checkBoxKeepInterimFiles
             // 
             this.checkBoxKeepInterimFiles.AutoSize = true;
-            this.checkBoxKeepInterimFiles.Location = new System.Drawing.Point(12, 95);
+            this.checkBoxKeepInterimFiles.Location = new System.Drawing.Point(12, 113);
             this.checkBoxKeepInterimFiles.Margin = new System.Windows.Forms.Padding(2);
             this.checkBoxKeepInterimFiles.Name = "checkBoxKeepInterimFiles";
             this.checkBoxKeepInterimFiles.Size = new System.Drawing.Size(234, 17);
@@ -417,12 +421,12 @@ namespace ASCOM.PentaxKP
             // checkBoxBulbMode
             // 
             this.checkBoxBulbMode.AutoSize = true;
-            this.checkBoxBulbMode.Location = new System.Drawing.Point(12, 58);
+            this.checkBoxBulbMode.Location = new System.Drawing.Point(12, 72);
             this.checkBoxBulbMode.Margin = new System.Windows.Forms.Padding(2);
             this.checkBoxBulbMode.Name = "checkBoxBulbMode";
-            this.checkBoxBulbMode.Size = new System.Drawing.Size(362, 17);
+            this.checkBoxBulbMode.Size = new System.Drawing.Size(354, 17);
             this.checkBoxBulbMode.TabIndex = 1;
-            this.checkBoxBulbMode.Text = "Use BULB mode (must use N.I.N.A. and have a separate shutter cable)";
+            this.checkBoxBulbMode.Text = "Use BULB mode (must use Serial Relay with a separate shutter cable)";
             this.checkBoxBulbMode.UseVisualStyleBackColor = true;
             // 
             // extrasTab
@@ -562,6 +566,23 @@ namespace ASCOM.PentaxKP
             this.pictureBox5.TabIndex = 29;
             this.pictureBox5.TabStop = false;
             // 
+            // comboBoxSerialRelay
+            // 
+            this.comboBoxSerialRelay.FormattingEnabled = true;
+            this.comboBoxSerialRelay.Location = new System.Drawing.Point(129, 45);
+            this.comboBoxSerialRelay.Name = "comboBoxSerialRelay";
+            this.comboBoxSerialRelay.Size = new System.Drawing.Size(121, 21);
+            this.comboBoxSerialRelay.TabIndex = 26;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(10, 49);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(112, 13);
+            this.label15.TabIndex = 27;
+            this.label15.Text = "Serial Relay COM Port";
+            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -658,5 +679,7 @@ namespace ASCOM.PentaxKP
         private System.Windows.Forms.PictureBox pictureBox4;
         private System.Windows.Forms.PictureBox picASCOM;
         private System.Windows.Forms.PictureBox pictureBox5;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.ComboBox comboBoxSerialRelay;
     }
 }

@@ -43,6 +43,7 @@ namespace ASCOM.PentaxKP
             DriverCommon.Settings.UseLiveview = checkBoxUseLiveview.Checked;
             //DriverCommon.Settings.AutoLiveview = checkBoxAutoLiveview.Checked;
             DriverCommon.Settings.Personality = comboBoxPersonality.SelectedIndex;
+            DriverCommon.Settings.SerialPort = comboBoxSerialRelay.SelectedIndex+1;
             DriverCommon.Settings.BulbModeEnable = checkBoxBulbMode.Checked;
             //DriverCommon.Settings.BulbModeTime = short.Parse(textBoxBulbMode.Text.Trim());
             DriverCommon.Settings.KeepInterimFiles = checkBoxKeepInterimFiles.Checked;
@@ -137,7 +138,6 @@ namespace ASCOM.PentaxKP
             Dictionary<int, string> personalities = new Dictionary<int, string>();
 
             //Commenting out makes it crash
-//            personalities.Add(PentaxKPCommon.PERSONALITY_APT, "APT");
             personalities.Add(PentaxKPProfile.PERSONALITY_SHARPCAP, "SharpCap");
             personalities.Add(PentaxKPProfile.PERSONALITY_NINA, "N.I.N.A");
 
@@ -148,6 +148,30 @@ namespace ASCOM.PentaxKP
             comboBoxPersonality.SelectedIndex = DriverCommon.Settings.Personality;
             numericUpDown1.Value=DriverCommon.Settings.DebugLevel;
 
+            Dictionary<int, string> comports = new Dictionary<int, string>();
+
+            //Commenting out makes it crash
+            comports.Add(1, "COM1");
+            comports.Add(2, "COM2");
+            comports.Add(3, "COM3");
+            comports.Add(4, "COM4");
+            comports.Add(5, "COM5");
+            comports.Add(6, "COM6");
+            comports.Add(7, "COM7");
+            comports.Add(8, "COM8");
+            comports.Add(9, "COM9");
+            comports.Add(10, "COM10");
+            comports.Add(11, "COM11");
+            comports.Add(12, "COM12");
+            comports.Add(13, "COM13");
+            comports.Add(14, "COM14");
+            comports.Add(15, "COM15");
+            comports.Add(16, "COM16");
+
+            comboBoxSerialRelay.DataSource = new BindingSource(comports, null);
+            comboBoxSerialRelay.DisplayMember = "Value";
+            comboBoxSerialRelay.ValueMember = "Key";
+            comboBoxSerialRelay.SelectedIndex = DriverCommon.Settings.SerialPort-1;
 
             checkBoxBulbMode.Checked = DriverCommon.Settings.BulbModeEnable;
             //textBoxBulbMode.Text = DriverCommon.Settings.BulbModeTime.ToString();
@@ -253,15 +277,15 @@ namespace ASCOM.PentaxKP
                     //checkBoxUseLiveview.Enabled = true;
                     //checkBoxUseLiveview.Checked = true;
                     comboBoxOutputFormat.Enabled = true;
-                    checkBoxBulbMode.Checked = false;
-                    checkBoxBulbMode.Enabled = false;
+                    //checkBoxBulbMode.Checked = false;
+                    //checkBoxBulbMode.Enabled = false;
                     break;
                 case PentaxKPProfile.PERSONALITY_NINA:
                     // NINA only supports RGGB, so we need to preset format and disable liveview
                     comboBoxOutputFormat.SelectedValue = PentaxKPProfile.OUTPUTFORMAT_RGGB;
                     comboBoxOutputFormat.Enabled = false;
-                    checkBoxBulbMode.Enabled = true;
-                    checkBoxBulbMode.Enabled = false;
+                    //checkBoxBulbMode.Enabled = true;
+                    //checkBoxBulbMode.Enabled = false;
                     break;
             }
         }

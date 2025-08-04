@@ -28,6 +28,7 @@ namespace ASCOM.PentaxKP
         public int Personality = PERSONALITY_SHARPCAP;
         public bool BulbModeEnable = false;
         public bool KeepInterimFiles = false;
+        public int SerialPort = 1;
 
         public void assignCamera(int index)
         {
@@ -203,6 +204,8 @@ namespace ASCOM.PentaxKP
         internal static string useLiveviewDefault = "true";
         internal static string personalityProfileName = "Personality";
         internal static string personalityDefault = "0";
+        internal static string serialPortProfileName = "SerialPort";
+        internal static string serialPortDefault = "1";
         internal static string bulbModeEnableProfileName = "Bulb Mode Enable";
         internal static string bulbModeEnableDefault = "false";
         internal static string keepInterimFilesProfileName = "Keep Interim Files";
@@ -310,6 +313,7 @@ namespace ASCOM.PentaxKP
                 Settings.DefaultReadoutMode = Convert.ToInt16(driverProfile.GetValue(CameraDriverId, readoutModeDefaultProfileName, string.Empty, readoutModeDefault));
                 Settings.UseLiveview = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, useLiveviewProfileName, string.Empty, useLiveviewDefault));
                 Settings.Personality = Convert.ToInt16(driverProfile.GetValue(CameraDriverId, personalityProfileName, string.Empty, personalityDefault));
+                Settings.SerialPort = Convert.ToInt16(driverProfile.GetValue(CameraDriverId, serialPortProfileName, string.Empty, serialPortDefault));
                 Settings.BulbModeEnable = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, bulbModeEnableProfileName, string.Empty, bulbModeEnableDefault));
                 Settings.KeepInterimFiles = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, keepInterimFilesProfileName, string.Empty, keepInterimFilesDefault));
             }
@@ -328,6 +332,7 @@ namespace ASCOM.PentaxKP
 
             Log($"DeviceID:                            {Settings.DeviceId}", "ReadProfile");
             Log($"Personality:                         {Settings.Personality}", "ReadProfile");
+            Log($"Serial Port:                         {Settings.SerialPort}", "ReadProfile");
             Log($"Default Readout Mode:                {Settings.DefaultReadoutMode}", "ReadProfile");
             Log($"Use Liveview:                        {Settings.UseLiveview}", "ReadProfile");
             //Log($"AutoLiveview @ 0.0s:                 {Settings.AutoLiveview}", "ReadProfile");
@@ -351,6 +356,7 @@ namespace ASCOM.PentaxKP
                 driverProfile.WriteValue(CameraDriverId, readoutModeDefaultProfileName, Settings.DefaultReadoutMode.ToString());
                 driverProfile.WriteValue(CameraDriverId, useLiveviewProfileName, Settings.UseLiveview.ToString());
                 driverProfile.WriteValue(CameraDriverId, personalityProfileName, Settings.Personality.ToString());
+                driverProfile.WriteValue(CameraDriverId, serialPortProfileName, Settings.SerialPort.ToString());
                 driverProfile.WriteValue(CameraDriverId, bulbModeEnableProfileName, Settings.BulbModeEnable.ToString());
                 driverProfile.WriteValue(CameraDriverId, keepInterimFilesProfileName, Settings.KeepInterimFiles.ToString());
 

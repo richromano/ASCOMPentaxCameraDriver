@@ -6,7 +6,7 @@
 // Description:	Implements ASCOM driver for Pentax KP camera.
 //				Communicates using USB connection.
 //
-// Implements:	ASCOM Camera interface version: 2
+// Implements:	ASCOM Camera interface version: 4
 // Author:		(2025) Richard Romano
 //
 #define Camera
@@ -27,6 +27,8 @@ using System.Windows.Media.Imaging;
 using System.Drawing;
 using System.Drawing.Imaging;
 using ASCOM.PentaxKP.Classes;
+using NINA.Utility;
+//using Microsoft.VisualStudio.Threading;
 
 namespace ASCOM.PentaxKP
 {
@@ -50,6 +52,7 @@ namespace ASCOM.PentaxKP
         /// Private variable to hold an ASCOM Utilities object
         /// </summary>
         private Util utilities;
+        private SerialRelayInteraction serialRelayInteraction;
 
         /// <summary>
         /// Private variable to hold an ASCOM AstroUtilities object to provide the Range method
@@ -69,6 +72,7 @@ namespace ASCOM.PentaxKP
         internal static int MaxImageHeightPixels = 0;//4000;
         internal static Queue<String> imagesToProcess = new Queue<string>();
         internal static Queue<BitmapImage> bitmapsToProcess = new Queue<BitmapImage>();
+        //internal static AsyncManualResetEvent _requestTermination = new AsyncManualResetEvent(false);
         private ImageDataProcessor _imageDataProcessor;
         // Index to the current ISO level
         internal short gainIndex;
@@ -689,6 +693,8 @@ namespace ASCOM.PentaxKP
 
                 if (!DriverCommon.Settings.BulbModeEnable)
                     canceledCaptureResponse = lastCaptureResponse;
+                else
+                    bulbCompletionCTS.Cancel();
 
                 /*if (previousDuration > 5)
                 {
@@ -699,7 +705,8 @@ namespace ASCOM.PentaxKP
                 }*/
                 //Response response =DriverCommon.m_camera.StopCapture();
 
-                while(m_captureState==CameraStates.cameraExposing)
+
+                while (m_captureState==CameraStates.cameraExposing)
                 {
                     Thread.Sleep(100);
                     DriverCommon.LogCameraMessage(0, "AbortExposure", "Waiting for capture to finish.");
@@ -1823,16 +1830,94 @@ namespace ASCOM.PentaxKP
             }
         }
 
-/*        private async void btnStopCaptureOnClick(object sender, RoutedEventArgs e)
+        /*        private async void btnStopCaptureOnClick(object sender, RoutedEventArgs e)
+                {
+                    if (camera == null) { return; }
+                    progress.Report("StopCapture.");
+                    await Task.Run(() =>
+                    {
+                        camera.StopCapture();
+                        progress.Report("Capture has been stopped.");
+                    });
+                } */
+
+
+        private void OpenSerialRelay()
         {
-            if (camera == null) { return; }
-            progress.Report("StopCapture.");
-            await Task.Run(() =>
+            string SerialPortName = "COM" + DriverCommon.Settings.SerialPort.ToString();
+            if (serialRelayInteraction?.PortName != SerialPortName)
             {
-                camera.StopCapture();
-                progress.Report("Capture has been stopped.");
-            });
-        } */
+                serialRelayInteraction = new SerialRelayInteraction(SerialPortName);
+            }
+            if (!serialRelayInteraction.Open())
+            {
+                throw new Exception("Unable to open SerialPort " + DriverCommon.Settings.SerialPort);
+            }
+        }
+
+        private void StartSerialRelayCapture()
+        {
+            DriverCommon.LogCameraMessage(0,"","Serial relay start of exposure");
+            OpenSerialRelay();
+            serialRelayInteraction.Send(new byte[] { 0xFF, 0x01, 0x01 });
+        }
+
+        private void StopSerialRelayCapture()
+        {
+            DriverCommon.LogCameraMessage(0, "", "Serial relay stop of exposure");
+            OpenSerialRelay();
+            serialRelayInteraction.Send(new byte[] { 0xFF, 0x01, 0x00 });
+        }
+
+        /*private void BulbCapture(double exposureTime, Action capture, Action stopCapture)
+        {
+            DriverCommon.LogCameraMessage(0, "", "Starting bulb capture");
+            capture();
+
+            _requestTermination.Reset();
+
+            Task.Run(async () =>
+            {
+                await _requestTermination.((int)(exposureTime * 1000));
+                stopCapture();
+            }
+        }*/
+
+        private CancellationTokenSource bulbCompletionCTS = null;
+
+        public static async Task<TimeSpan> Wait(TimeSpan t, CancellationToken token = default(CancellationToken))
+        {
+            TimeSpan elapsed = new TimeSpan(0L);
+            TimeSpan increment = new TimeSpan(0,0,0,0,100);
+            while (elapsed < t)
+            {
+                DriverCommon.LogCameraMessage(0, "", "Waiting "+elapsed.Milliseconds.ToString()+" "+t.Milliseconds.ToString());
+
+                await Task.Delay(100);
+                if (token.IsCancellationRequested)
+                    return elapsed;
+                elapsed=elapsed.Add(increment);
+            }
+
+            return elapsed;
+        }
+
+        private void BulbCapture(double exposureTime, Action capture, Action stopCapture)
+        {
+            DriverCommon.LogCameraMessage(0, "", "Starting bulb capture");
+            capture();
+
+            /**Stop Exposure after exposure time or upon cancellation*/
+            try { bulbCompletionCTS?.Cancel(); } catch { }
+            bulbCompletionCTS = new CancellationTokenSource();
+            Task.Run(async () => {
+                await Wait(TimeSpan.FromSeconds(exposureTime), bulbCompletionCTS.Token);
+                //if (!bulbCompletionCTS.IsCancellationRequested)
+                {
+                    stopCapture();
+                }
+            }, bulbCompletionCTS.Token);
+        }
 
         public async void StartExposure(double Duration, bool Light)
         {
@@ -1852,6 +1937,7 @@ namespace ASCOM.PentaxKP
                     throw new InvalidValueException("StartExposure", "CameraState", "Not idle");
 
                 imagesToProcess.Clear();
+                BulbCapture(Duration, StartSerialRelayCapture, StopSerialRelayCapture);
                 m_captureState = CameraStates.cameraExposing;
                 return;
             }
@@ -1978,8 +2064,12 @@ namespace ASCOM.PentaxKP
                     shutterSpeed = ShutterSpeed.SS1_5;
                 if (Duration > 1.0 / 4.0 - 0.000001)
                     shutterSpeed = ShutterSpeed.SS1_4;
+                if (Duration > 3.0 / 10.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS3_10;
                 if (Duration > 1.0 / 3.0 - 0.000001)
                     shutterSpeed = ShutterSpeed.SS1_3;
+                if (Duration > 4.0 / 10.0 - 0.000001)
+                    shutterSpeed = ShutterSpeed.SS4_10;
                 if (Duration > 1.0 / 2.0 - 0.000001)
                     shutterSpeed = ShutterSpeed.SS1_2;
                 if (Duration > 6.0 / 10.0 - 0.000001)
@@ -2002,8 +2092,6 @@ namespace ASCOM.PentaxKP
                 //public static readonly ShutterSpeed SS10_25;
                 //public static readonly ShutterSpeed SS25_10;
                 //public static readonly ShutterSpeed SS32_10;
-                //public static readonly ShutterSpeed SS3_10;
-                //public static readonly ShutterSpeed SS4_10;
                 //public static readonly ShutterSpeed SS5_10;
                 if (Duration > 1.99)
                     shutterSpeed = ShutterSpeed.SS2;
