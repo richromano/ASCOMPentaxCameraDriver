@@ -473,15 +473,6 @@ namespace ASCOM.PentaxKP
                                     DriverCommon.LogCameraMessage(0,"Connected", "Connected. Model: " + DriverCommon.m_camera.Model + ", SerialNumber:" + DriverCommon.m_camera.SerialNumber);
                                     DriverCommon.Settings.DeviceId = DriverCommon.m_camera.Model;
 
-                                    /*bool k3m3 = false;
-
-                                    if (DriverCommon.m_camera.Model.StartsWith("PENTAX K-3 Mark III"))
-                                    {
-                                        DriverCommon.LogCameraMessage(0, "Connect", "Bulb mode not supported on K-3 Mark III");
-                                        k3m3 = true;
-                                        DriverCommon.Settings.BulbModeEnable = false;
-                                    }*/
-
                                     LiveViewSpecification liveViewSpecification = new LiveViewSpecification();
                                     DriverCommon.m_camera.GetCameraDeviceSettings(
                                         new List<CameraDeviceSetting>() { liveViewSpecification }); ;
@@ -508,19 +499,24 @@ namespace ASCOM.PentaxKP
                                             throw new ASCOM.DriverException("Can't get capture settings.");
                                         }
 
-                                        if (DriverCommon.Settings.BulbModeEnable)
+                                        //if (DriverCommon.Settings.BulbModeEnable)
                                         {
                                             if (exposureProgram.Equals(Ricoh.CameraController.ExposureProgram.Bulb))
+                                            {
+                                                DriverCommon.Settings.BulbModeEnable = true;
                                                 break;
-                                            else
-                                                System.Windows.Forms.MessageBox.Show("Set the Camera Exposure Program to BULB");
+                                            }
+//                                            else
+//                                                System.Windows.Forms.MessageBox.Show("Set the Camera Exposure Program to BULB");
                                         }
-                                        else
+                                        //else
                                         {
                                             if (exposureProgram.Equals(Ricoh.CameraController.ExposureProgram.Manual))
+                                            {
+                                                DriverCommon.Settings.BulbModeEnable = false;
                                                 break;
-                                            else
-                                                System.Windows.Forms.MessageBox.Show("Set the Camera Exposure Program to MANUAL");
+                                            }
+                                            System.Windows.Forms.MessageBox.Show("Set the Camera Exposure Program to MANUAL or BULB");
                                         }
                                     }
 
@@ -1855,6 +1851,33 @@ namespace ASCOM.PentaxKP
             }
         }
 
+        private void StartBulbCapture()
+        {
+            DriverCommon.LogCameraMessage(0, "", "Bulb start of exposure");
+            StartCaptureResponse response = DriverCommon.m_camera.StartCapture(false);
+            if (response.Result == Result.OK)
+            {
+                lastCaptureResponse = response.Capture.ID;
+                lastCaptureStartTime = DateTime.Now;
+                // Make sure we don't change a reading to exposing
+                if (m_captureState == CameraStates.cameraWaiting)
+                    m_captureState = CameraStates.cameraExposing;
+            }
+            else
+            {
+                lastCaptureResponse = "None";
+                m_captureState = CameraStates.cameraError;
+                DriverCommon.LogCameraMessage(0, "StartExposure", "Call to StartExposure SDK not successful: Disconnect camera USB and make sure you can take a picture with shutter button");
+                throw new ASCOM.InvalidOperationException("Call to StartExposure SDK not successful: Disconnect camera USB and make sure you can take a picture with shutter button");
+            }
+        }
+
+        private void StopBulbCapture()
+        {
+            DriverCommon.LogCameraMessage(0, "", "Bulb stop of exposure");
+            DriverCommon.m_camera.StopCapture();
+        }
+
         private void StartSerialRelayCapture()
         {
             DriverCommon.LogCameraMessage(0,"","Serial relay start of exposure");
@@ -1868,20 +1891,6 @@ namespace ASCOM.PentaxKP
             OpenSerialRelay();
             serialRelayInteraction.Send(new byte[] { 0xFF, 0x01, 0x00 });
         }
-
-        /*private void BulbCapture(double exposureTime, Action capture, Action stopCapture)
-        {
-            DriverCommon.LogCameraMessage(0, "", "Starting bulb capture");
-            capture();
-
-            _requestTermination.Reset();
-
-            Task.Run(async () =>
-            {
-                await _requestTermination.((int)(exposureTime * 1000));
-                stopCapture();
-            }
-        }*/
 
         private CancellationTokenSource bulbCompletionCTS = null;
 
@@ -1931,18 +1940,6 @@ namespace ASCOM.PentaxKP
                 throw new InvalidValueException("StartExposure", "Duration", " > 0");
             }
 
-            if(DriverCommon.Settings.BulbModeEnable)
-            {
-                if(m_captureState != CameraStates.cameraIdle)
-                    throw new InvalidValueException("StartExposure", "CameraState", "Not idle");
-
-                imagesToProcess.Clear();
-                BulbCapture(Duration, StartSerialRelayCapture, StopSerialRelayCapture);
-                m_captureState = CameraStates.cameraExposing;
-                return;
-            }
-
-
             // Light or dark frame
             // TODO:  I think we need to update the state back and forth for LastSetFastReadout
             //          using (new DriverCommon.SerializedAccess("StartExposure()"))
@@ -1964,6 +1961,14 @@ namespace ASCOM.PentaxKP
                     }
 
                     m_captureState = CameraStates.cameraExposing;
+                    previousDuration = Duration;
+                    return;
+                }
+
+                if (DriverCommon.Settings.BulbModeEnable)
+                {
+                    BulbCapture(Duration, StartBulbCapture, StopBulbCapture);
+                    //                BulbCapture(Duration, StartSerialRelayCapture, StopSerialRelayCapture);
                     previousDuration = Duration;
                     return;
                 }

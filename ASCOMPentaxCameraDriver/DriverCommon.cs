@@ -314,7 +314,7 @@ namespace ASCOM.PentaxKP
                 Settings.UseLiveview = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, useLiveviewProfileName, string.Empty, useLiveviewDefault));
                 Settings.Personality = Convert.ToInt16(driverProfile.GetValue(CameraDriverId, personalityProfileName, string.Empty, personalityDefault));
                 Settings.SerialPort = Convert.ToInt16(driverProfile.GetValue(CameraDriverId, serialPortProfileName, string.Empty, serialPortDefault));
-                Settings.BulbModeEnable = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, bulbModeEnableProfileName, string.Empty, bulbModeEnableDefault));
+                //Settings.BulbModeEnable = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, bulbModeEnableProfileName, string.Empty, bulbModeEnableDefault));
                 Settings.KeepInterimFiles = Convert.ToBoolean(driverProfile.GetValue(CameraDriverId, keepInterimFilesProfileName, string.Empty, keepInterimFilesDefault));
             }
 
@@ -357,7 +357,7 @@ namespace ASCOM.PentaxKP
                 driverProfile.WriteValue(CameraDriverId, useLiveviewProfileName, Settings.UseLiveview.ToString());
                 driverProfile.WriteValue(CameraDriverId, personalityProfileName, Settings.Personality.ToString());
                 driverProfile.WriteValue(CameraDriverId, serialPortProfileName, Settings.SerialPort.ToString());
-                driverProfile.WriteValue(CameraDriverId, bulbModeEnableProfileName, Settings.BulbModeEnable.ToString());
+                //driverProfile.WriteValue(CameraDriverId, bulbModeEnableProfileName, Settings.BulbModeEnable.ToString());
                 driverProfile.WriteValue(CameraDriverId, keepInterimFilesProfileName, Settings.KeepInterimFiles.ToString());
 
                 if (Settings.DeviceId != null && Settings.DeviceId != "")

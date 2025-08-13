@@ -44,7 +44,7 @@ namespace ASCOM.PentaxKP
             //DriverCommon.Settings.AutoLiveview = checkBoxAutoLiveview.Checked;
             DriverCommon.Settings.Personality = comboBoxPersonality.SelectedIndex;
             DriverCommon.Settings.SerialPort = comboBoxSerialRelay.SelectedIndex+1;
-            DriverCommon.Settings.BulbModeEnable = checkBoxBulbMode.Checked;
+            //DriverCommon.Settings.BulbModeEnable = checkBoxBulbMode.Checked;
             //DriverCommon.Settings.BulbModeTime = short.Parse(textBoxBulbMode.Text.Trim());
             DriverCommon.Settings.KeepInterimFiles = checkBoxKeepInterimFiles.Checked;
             //DriverCommon.Settings.UsingCameraLens = checkBoxUsingCameraLens.Checked;
@@ -279,6 +279,8 @@ namespace ASCOM.PentaxKP
                     comboBoxOutputFormat.Enabled = true;
                     //checkBoxBulbMode.Checked = false;
                     //checkBoxBulbMode.Enabled = false;
+                    comboBoxSerialRelay.Enabled = false;
+                    checkBoxBulbMode.Enabled = false;
                     break;
                 case PentaxKPProfile.PERSONALITY_NINA:
                     // NINA only supports RGGB, so we need to preset format and disable liveview
@@ -286,6 +288,8 @@ namespace ASCOM.PentaxKP
                     comboBoxOutputFormat.Enabled = false;
                     //checkBoxBulbMode.Enabled = true;
                     //checkBoxBulbMode.Enabled = false;
+                    comboBoxSerialRelay.Enabled = false;
+                    checkBoxBulbMode.Enabled = false;
                     break;
             }
         }

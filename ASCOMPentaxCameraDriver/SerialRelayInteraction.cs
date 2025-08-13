@@ -43,14 +43,14 @@ namespace NINA.Utility {
 
         public bool Open() {
             bool success = false;
-//            try {
+            try {
                 if (!port.IsOpen) {
                     port.Open();
                 }
                 success = true;
- /*           } catch (Exception ex) {
-                throw new 
-            }*/
+            } catch (Exception ex) {
+                throw new ASCOM.DriverException("Could not open COM port"); 
+            }
             return success;
         }
 
