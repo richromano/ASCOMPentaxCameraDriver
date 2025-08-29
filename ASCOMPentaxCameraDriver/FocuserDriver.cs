@@ -297,11 +297,14 @@ namespace ASCOM.PentaxKP
             DriverCommon.LogFocuserMessage(0,"Move", Position.ToString());
             if (rezero<=0)
             {
+                System.Windows.Forms.MessageBox.Show("Move focus to infinity before pressing OK");
+
                 focuserPosition = 10000;
-                DriverCommon.m_camera.Focus(-10000);
-                Thread.Sleep(200);
-                DriverCommon.m_camera.Focus(-10000);
-                Thread.Sleep(200);
+                for (int i = 0; i < 2; i++)
+                {
+                    DriverCommon.m_camera.Focus(-10000);
+                    Thread.Sleep(200);
+                }
             }
 
             if (Position > 10000)

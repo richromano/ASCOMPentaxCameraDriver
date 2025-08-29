@@ -559,9 +559,9 @@ namespace ASCOM.PentaxKP
                                     Thread.Sleep(1000);
                                     if (DriverCommon.Settings.UseLiveview)
                                     {
-                                        DriverCommon.m_camera.StartLiveView();
+                                        DriverCommon.m_camera.StartLiveView(0);
                                         DriverCommon.m_camera.StopLiveView();
-                                        DriverCommon.m_camera.StartLiveView();
+                                        DriverCommon.m_camera.StartLiveView(0);
                                     }
 
                                     string deviceModel = DriverCommon.Settings.DeviceId;
@@ -1066,7 +1066,7 @@ namespace ASCOM.PentaxKP
                             bitmapsToProcess.Clear();
                             //imagesToProcess.Clear();
                             if (DriverCommon.Settings.UseLiveview)
-                                DriverCommon.m_camera.StartLiveView();
+                                DriverCommon.m_camera.StartLiveView(0);
                         }
                         //else
                         //In FastReadout we don't do any real captures so cancel the current one
@@ -1076,7 +1076,7 @@ namespace ASCOM.PentaxKP
                     {
                         if (value)
                         {
-                            DriverCommon.m_camera.StartLiveView();
+                            DriverCommon.m_camera.StartLiveView(0);
                             // Need to clear because the expected format has changed
                             //StopThreadCapture();
                             imagesToProcess.Clear();
@@ -1731,7 +1731,7 @@ namespace ASCOM.PentaxKP
                                 FastReadout = false;
                                 m_readoutmode = 0;
                                 if(DriverCommon.Settings.UseLiveview)
-                                          DriverCommon.m_camera.StartLiveView();
+                                          DriverCommon.m_camera.StartLiveView(0);
                                 MaxImageWidthPixels = DriverCommon.Settings.Info.ImageWidthPixels; // Constants to define the ccd pixel dimenstion
                                 MaxImageHeightPixels = DriverCommon.Settings.Info.ImageHeightPixels;
                                 //StartX = 0;
