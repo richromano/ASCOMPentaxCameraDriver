@@ -552,16 +552,16 @@ namespace ASCOM.PentaxKP
                                         throw new ASCOM.DriverException("Can't set capture settings.");
                                     }
 
-                                    DriverCommon.LogCameraMessage(0, "Connect", "Driver Version: 7/29/2025");
+                                    DriverCommon.LogCameraMessage(0, "Connect", "Driver Version: 8/30/2025");
                                     DriverCommon.LogCameraMessage(0, "Bulb mode", DriverCommon.Settings.BulbModeEnable.ToString()+" mode "+exposureProgram.ToString());
 
                                     // Sleep to let the settings take effect
                                     Thread.Sleep(1000);
                                     if (DriverCommon.Settings.UseLiveview)
                                     {
-                                        DriverCommon.m_camera.StartLiveView(0);
+                                        DriverCommon.m_camera.StartLiveView();
                                         DriverCommon.m_camera.StopLiveView();
-                                        DriverCommon.m_camera.StartLiveView(0);
+                                        DriverCommon.m_camera.StartLiveView();
                                     }
 
                                     string deviceModel = DriverCommon.Settings.DeviceId;
