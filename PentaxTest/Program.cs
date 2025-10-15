@@ -76,7 +76,7 @@ namespace ASCOM.PentaxKP
                 GC.Collect();
             }
 
-            device.ReadoutMode = 1;
+            device.ReadoutMode = 0;
 
             Console.WriteLine(device.Gain);
             device.Gain = 0;

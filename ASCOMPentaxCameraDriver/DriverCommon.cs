@@ -29,6 +29,7 @@ namespace ASCOM.PentaxKP
         public bool BulbModeEnable = false;
         public bool KeepInterimFiles = false;
         public int SerialPort = 1;
+        public bool UseFile = false;
 
         public void assignCamera(int index)
         {

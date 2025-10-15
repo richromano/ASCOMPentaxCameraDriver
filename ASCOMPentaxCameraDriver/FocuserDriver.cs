@@ -295,6 +295,10 @@ namespace ASCOM.PentaxKP
         public void Move(int Position)
         {
             DriverCommon.LogFocuserMessage(0,"Move", Position.ToString());
+
+            if (DriverCommon.Settings.UseFile)
+                return;
+
             if (rezero<=0)
             {
                 System.Windows.Forms.MessageBox.Show("Move focus to infinity before pressing OK");

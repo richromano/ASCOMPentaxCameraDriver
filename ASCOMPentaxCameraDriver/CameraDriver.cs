@@ -151,6 +151,23 @@ namespace ASCOM.PentaxKP
             // Capture Complete
             public override void CaptureComplete(CameraDevice sender, Capture capture)
             {
+                if (DriverCommon.Settings.UseFile)
+                {
+                    CameraImage image = sender.Images[0];
+                    using (FileStream fs = new FileStream(
+                        System.IO.Path.GetTempPath() + System.IO.Path.DirectorySeparatorChar + image.Name,
+                        FileMode.Create, FileAccess.Write))
+                    {
+                        Response imageGetResponse = image.GetData(fs);
+                        DriverCommon.LogCameraMessage(0, "", "Get Image has " +
+                            (imageGetResponse.Result == Result.OK ?
+                                "SUCCEED." : "FAILED."));
+                        // TODO: save to memory instead MemoryStream
+                        DriverCommon.LogCameraMessage(0, "", System.IO.Path.GetTempPath() + System.IO.Path.DirectorySeparatorChar +
+                        image.Name);
+                        imagesToProcess.Enqueue(System.IO.Path.GetTempPath() + System.IO.Path.DirectorySeparatorChar + image.Name);
+                    }
+                }
                 m_captureState = CameraStates.cameraIdle;
                 DriverCommon.LogCameraMessage(0,"","Capture Complete. Capture ID: "+capture.ID.ToString()+" tracking "+lastCaptureResponse.ToString()+" "+canceledCaptureResponse.ToString());
             }
@@ -479,10 +496,8 @@ namespace ASCOM.PentaxKP
                                     LiveViewSpecificationValue liveViewSpecificationValue =
                                         (LiveViewSpecificationValue)liveViewSpecification.Value;
 
-                                    /*LiveViewImage liveViewImage = liveViewSpecificationValue.Get();
-                                    info.ImageWidthPixels = (int)liveViewImage.Width;
-                                    info.ImageHeightPixels = (int)liveViewImage.Height;*/
-
+                                    LiveViewImage liveViewImage = liveViewSpecificationValue.Get();
+                                    DriverCommon.LogCameraMessage(0, "Connected", "LiveView Size (X,Y): " + liveViewImage.Width.ToString() + ", " + liveViewImage.Height.ToString());
                                     ExposureProgram exposureProgram = new ExposureProgram();
 
                                     while (true)
@@ -527,8 +542,17 @@ namespace ASCOM.PentaxKP
                                         DriverCommon.LogCameraMessage(0, "Connected", "IsConnected false");
                                     }
 
+                                    DriverCommon.Settings.UseFile = false;
                                     StorageWriting sw = new StorageWriting();
-                                    sw=Ricoh.CameraController.StorageWriting.False;
+                                    sw = Ricoh.CameraController.StorageWriting.False;
+                                    if (DriverCommon.m_camera.Model.StartsWith("PENTAX K-70") || DriverCommon.m_camera.Model.StartsWith("PENTAX KF"))
+                                    {
+                                        sw = Ricoh.CameraController.StorageWriting.True;
+                                        DriverCommon.Settings.UseFile = true;
+                                        DriverCommon.Settings.UseLiveview = false;
+                                        DriverCommon.Settings.DefaultReadoutMode = PentaxKPProfile.OUTPUTFORMAT_RGGB;
+                                    }
+
                                     StillImageCaptureFormat sicf = new StillImageCaptureFormat();
 
                                     sicf = Ricoh.CameraController.StillImageCaptureFormat.JPEG;
@@ -552,7 +576,7 @@ namespace ASCOM.PentaxKP
                                         throw new ASCOM.DriverException("Can't set capture settings.");
                                     }
 
-                                    DriverCommon.LogCameraMessage(0, "Connect", "Driver Version: 8/30/2025");
+                                    DriverCommon.LogCameraMessage(0, "Connect", "Driver Version: 10/9/2025");
                                     DriverCommon.LogCameraMessage(0, "Bulb mode", DriverCommon.Settings.BulbModeEnable.ToString()+" mode "+exposureProgram.ToString());
 
                                     // Sleep to let the settings take effect
@@ -897,6 +921,8 @@ namespace ASCOM.PentaxKP
                 //using (new SerializedAccess(this, "get_CanFastReadout"))
                 {
                     DriverCommon.LogCameraMessage(0,"", "get_CanFastReadout");
+                    if (DriverCommon.Settings.UseFile)
+                        return false;
                     return true;
 				}
             }
@@ -1424,6 +1450,7 @@ namespace ASCOM.PentaxKP
                     }
                 }
 
+
                 // Unlock the bits.
                 _bmp.UnlockBits(bmpData);
                 DriverCommon.LogCameraMessage(0,"Image", "Resize2");
@@ -1771,7 +1798,8 @@ namespace ASCOM.PentaxKP
                     ArrayList modes = new ArrayList();
 
                     modes.Add(String.Format("Full Resolution ({0} x {1})", DriverCommon.Settings.Info.ImageWidthPixels, DriverCommon.Settings.Info.ImageHeightPixels));
-                    modes.Add(String.Format("LiveView ({0} x {1})", DriverCommon.Settings.Info.LiveViewWidthPixels, DriverCommon.Settings.Info.LiveViewHeightPixels));
+                    if(!DriverCommon.Settings.UseFile)
+                        modes.Add(String.Format("LiveView ({0} x {1})", DriverCommon.Settings.Info.LiveViewWidthPixels, DriverCommon.Settings.Info.LiveViewHeightPixels));
 
                     return modes;
 				}
