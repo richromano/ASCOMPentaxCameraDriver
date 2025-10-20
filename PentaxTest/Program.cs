@@ -33,11 +33,13 @@ namespace ASCOM.PentaxKP
 #else
             // this can be replaced by this code, it avoids the chooser and creates the driver class directly.
             ASCOM.DriverAccess.Camera device = new ASCOM.DriverAccess.Camera("ASCOM.PentaxKP.Camera");
+            ASCOM.DriverAccess.Focuser focuser = new ASCOM.DriverAccess.Focuser("ASCOM.PentaxKP.Focuser");
 #endif
 
             device.SetupDialog();
             device.SetupDialog();
             device.Connected = true;
+            focuser.Connected = true;
             // now run some tests, adding code to your driver so that the tests will pass.
             // these first tests are common to all drivers.
             Console.WriteLine("name " + device.Name);
@@ -59,8 +61,85 @@ namespace ASCOM.PentaxKP
             Console.WriteLine(device.Gains.ToString());
             Console.WriteLine(device.MaxADU.ToString());
 
-           for(int j=0;j<1;j++)
-              {
+            for (int j = 0; j < 10; j++)
+            {
+                int p = 10000;
+                for (p = 10000; p > 2000; p = p - 200) {
+                    focuser.Move(p);
+                    Thread.Sleep(100);
+                    Console.Write(".");
+                }
+                Console.WriteLine(".");
+                for (p = 2000; p < 10000; p = p + 200)
+                {
+                    focuser.Move(p);
+                    Thread.Sleep(100);
+                    Console.Write(".");
+                }
+                Console.WriteLine(".");
+            }
+
+            for (int j = 0; j < 10; j++)
+            {
+                int p = 10000;
+                for (p = 10000; p > 2000; p = p - 400)
+                {
+                    focuser.Move(p);
+                    Thread.Sleep(100);
+                    Console.Write(".");
+                }
+                Console.WriteLine(".");
+                for (p = 2000; p < 10000; p = p + 400)
+                {
+                    focuser.Move(p);
+                    Thread.Sleep(100);
+                    Console.Write(".");
+                }
+                Console.WriteLine(".");
+            }
+
+            for (int j = 0; j < 10; j++)
+            {
+                int p = 10000;
+                for (p = 10000; p > 2000; p = p - 800)
+                {
+                    focuser.Move(p);
+                    Thread.Sleep(100);
+                    Console.Write(".");
+                }
+                Console.WriteLine(".");
+                for (p = 2000; p < 10000; p = p + 800)
+                {
+                    focuser.Move(p);
+                    Thread.Sleep(100);
+                    Console.Write(".");
+                }
+                Console.WriteLine(".");
+            }
+
+            for (int j = 0; j < 10; j++)
+            {
+                int p = 10000;
+                for (p = 10000; p > 2000; p = p - 1600)
+                {
+                    focuser.Move(p);
+                    Thread.Sleep(100);
+                    Console.Write(".");
+                }
+                Console.WriteLine(".");
+                for (p = 2000; p < 10000; p = p + 1600)
+                {
+                    focuser.Move(p);
+                    Thread.Sleep(100);
+                    Console.Write(".");
+                }
+                Console.WriteLine(".");
+            }
+
+            return;
+
+            for (int j=0;j<1;j++)
+            {
                 device.StartExposure(3, true);
                 Thread.Sleep(1000);
                 //                device.AbortExposure();
