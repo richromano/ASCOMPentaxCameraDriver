@@ -37,7 +37,7 @@ namespace ASCOM.PentaxKP
 #endif
 
             device.SetupDialog();
-            device.SetupDialog();
+//            device.SetupDialog();
             device.Connected = true;
             focuser.Connected = true;
             // now run some tests, adding code to your driver so that the tests will pass.
@@ -61,7 +61,7 @@ namespace ASCOM.PentaxKP
             Console.WriteLine(device.Gains.ToString());
             Console.WriteLine(device.MaxADU.ToString());
 
-            for (int j = 0; j < 10; j++)
+            for (int j = 0; j < 3; j++)
             {
                 int p = 10000;
                 for (p = 10000; p > 2000; p = p - 200) {
@@ -79,7 +79,7 @@ namespace ASCOM.PentaxKP
                 Console.WriteLine(".");
             }
 
-            for (int j = 0; j < 10; j++)
+            for (int j = 0; j < 2; j++)
             {
                 int p = 10000;
                 for (p = 10000; p > 2000; p = p - 400)
@@ -98,7 +98,7 @@ namespace ASCOM.PentaxKP
                 Console.WriteLine(".");
             }
 
-            for (int j = 0; j < 10; j++)
+            for (int j = 0; j < 2; j++)
             {
                 int p = 10000;
                 for (p = 10000; p > 2000; p = p - 800)
@@ -117,7 +117,7 @@ namespace ASCOM.PentaxKP
                 Console.WriteLine(".");
             }
 
-            for (int j = 0; j < 10; j++)
+            for (int j = 0; j < 2; j++)
             {
                 int p = 10000;
                 for (p = 10000; p > 2000; p = p - 1600)
@@ -128,6 +128,25 @@ namespace ASCOM.PentaxKP
                 }
                 Console.WriteLine(".");
                 for (p = 2000; p < 10000; p = p + 1600)
+                {
+                    focuser.Move(p);
+                    Thread.Sleep(100);
+                    Console.Write(".");
+                }
+                Console.WriteLine(".");
+            }
+
+            for (int j = 0; j < 2; j++)
+            {
+                int p = 10000;
+                for (p = 10000; p > 2000; p = p - 3200)
+                {
+                    focuser.Move(p);
+                    Thread.Sleep(100);
+                    Console.Write(".");
+                }
+                Console.WriteLine(".");
+                for (p = 2000; p < 10000; p = p + 3200)
                 {
                     focuser.Move(p);
                     Thread.Sleep(100);
