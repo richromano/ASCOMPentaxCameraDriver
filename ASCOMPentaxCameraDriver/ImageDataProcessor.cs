@@ -72,8 +72,8 @@ namespace ASCOM.PentaxKP.Classes
             if (colorsStr != "RGBG")
                 throw new NotImplementedException();
 
-            //int xoffs = 0;
-            //int yoffs = 0;
+            int xoffs = 0;
+            int yoffs = 0;
 
             string cameraPattern = "";
             cameraPattern += colorsStr[NativeMethods.libraw_COLOR(data, 0, 0)];
@@ -85,14 +85,14 @@ namespace ASCOM.PentaxKP.Classes
             {
                 case "RGGB":
                     break;
-/*                case "GRBG":
-                    xoffs = 1;
-                    break;
+//                case "GRBG":
+//                    xoffs = 1;
+//                    break;
                 case "BGGR":
                     xoffs = 1;
                     yoffs = 1;
                     break;
-                case "GBRG":
+/*                case "GBRG":
                     yoffs = 1;
                     break;*/
                 default:
@@ -116,19 +116,38 @@ namespace ASCOM.PentaxKP.Classes
                 int row = rc / width;
                 int col = rc - width * row;
 
-                if (row % 2 == 0 && col % 2 == 0)
-                    // Red
-                    pixels[col, row] = r;
-                if (row % 2 == 0 && col % 2 == 1)
-                    // Green
-                    pixels[col, row] = g;
-                if (row % 2 == 1 && col % 2 == 0)
-                    // Green
-                    pixels[col, row] = g2;
-                if (row % 2 == 1 && col % 2 == 1)
-                    // Blue
-                    pixels[col, row] = b;
-            };
+                if (xoffs == 0)
+                {
+                    if (row % 2 == 0 && col % 2 == 0)
+                        // Red
+                        pixels[col, row] = r;
+                    if (row % 2 == 0 && col % 2 == 1)
+                        // Green
+                        pixels[col, row] = g;
+                    if (row % 2 == 1 && col % 2 == 0)
+                        // Green
+                        pixels[col, row] = g2;
+                    if (row % 2 == 1 && col % 2 == 1)
+                        // Blue
+                        pixels[col, row] = b;
+                }
+                else
+                {
+                    if (row % 2 == 0 && col % 2 == 0)
+                        // Blue
+                        pixels[col, row] = b;
+                    if (row % 2 == 0 && col % 2 == 1)
+                        // Green
+                        pixels[col, row] = g2;
+                    if (row % 2 == 1 && col % 2 == 0)
+                        // Green
+                        pixels[col, row] = g;
+                    if (row % 2 == 1 && col % 2 == 1)
+                        // Red
+                        pixels[col, row] = r;
+                }
+            }
+            ;
 
 /*            for (int y=0; y<height - yoffs; y++)
             {

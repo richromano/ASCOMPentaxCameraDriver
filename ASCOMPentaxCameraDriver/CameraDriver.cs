@@ -369,7 +369,7 @@ namespace ASCOM.PentaxKP
         public async void Connect()
         {
             DriverCommon.LogCameraMessage(0, "Connect", "async Connect not supported");
-            await Task.Run(() => {
+/*            await Task.Run(() => {
                 DriverCommon.m_camera = CameraDeviceDetector.Detect(Ricoh.CameraController.DeviceInterface.USB).FirstOrDefault();
                 if (DriverCommon.m_camera != null)
                 {
@@ -392,6 +392,7 @@ namespace ASCOM.PentaxKP
                     DriverCommon.LogCameraMessage(0, "Connect", "Device not found.");
                 }
             });
+*/
         }
 
         public bool Connecting
@@ -894,8 +895,8 @@ namespace ASCOM.PentaxKP
                     //                    if (m_captureState != CameraStates.cameraExposing)
                     //                        return false;
 
-                    if (DriverCommon.Settings.Personality == PentaxKPProfile.PERSONALITY_NINA)
-                        return true;
+                    //if (DriverCommon.Settings.Personality == PentaxKPProfile.PERSONALITY_NINA)
+                    //    return true;
 
                     return true;
 				}
@@ -1277,7 +1278,7 @@ namespace ASCOM.PentaxKP
 
 
             // Wait for the file to be closed and available.
-            while (!IsFileClosed(MNewFile)) { }
+            while (!IsFileClosed(MNewFile)) { Thread.Sleep(100); }
             rgbImage = _imageDataProcessor.ReadRawPentax(MNewFile);
             int scale = 1;
 
@@ -1311,7 +1312,7 @@ namespace ASCOM.PentaxKP
 
 
             // Wait for the file to be closed and available.
-            while (!IsFileClosed(MNewFile)) { }
+            while (!IsFileClosed(MNewFile)) { Thread.Sleep(100); }
             rgbImage = _imageDataProcessor.ReadRBBGPentax(MNewFile);
 
             int scale = 1;
@@ -1341,7 +1342,7 @@ namespace ASCOM.PentaxKP
             //int MSensorHeightPx = DriverCommon.Settings.Info.ImageHeightPixels;
 
             // Wait for the file to be closed and available.
-                while (!IsFileClosed(MNewFile)) { }
+                while (!IsFileClosed(MNewFile)) { Thread.Sleep(100); }
 
                 _bmp = (Bitmap)Image.FromFile(MNewFile); // Load the newly discovered file
 
@@ -1492,8 +1493,9 @@ namespace ASCOM.PentaxKP
                         if (imageName.Substring(imageName.Length - 3) == "JPG")
                         {
                             DriverCommon.LogCameraMessage(0,"", "Calling ReadImageFileQuick");
+                            while (!IsFileClosed(imageName)) { Thread.Sleep(100); }
                             result = ReadImageFileQuick(imageName);
-                            while (!IsFileClosed(imageName)) { }
+                            while (!IsFileClosed(imageName)) { Thread.Sleep(100); }
                             if(!DriverCommon.Settings.KeepInterimFiles)
                                 File.Delete(imageName);
                             if (imagesToProcess.Count == 0)
@@ -1505,8 +1507,9 @@ namespace ASCOM.PentaxKP
                             if (DriverCommon.Settings.DefaultReadoutMode == PentaxKPProfile.OUTPUTFORMAT_RAWBGR)
                             {
                                 DriverCommon.LogCameraMessage(0,"", "Calling ReadImageFileRAW");
+                                while (!IsFileClosed(imageName)) { Thread.Sleep(100); }
                                 result = ReadImageFileRaw(imageName);
-                                while (!IsFileClosed(imageName)) { }
+                                while (!IsFileClosed(imageName)) { Thread.Sleep(100); }
                                 if (!DriverCommon.Settings.KeepInterimFiles)
                                     File.Delete(imageName);
                                 if (imagesToProcess.Count == 0)
@@ -1515,8 +1518,9 @@ namespace ASCOM.PentaxKP
                             else
                             {
                                 DriverCommon.LogCameraMessage(0,"", "Calling ReadImageFileRGGB");
+                                while (!IsFileClosed(imageName)) { Thread.Sleep(100); }
                                 result = ReadImageFileRGGB(imageName);
-                                while (!IsFileClosed(imageName)) { }
+                                while (!IsFileClosed(imageName)) { Thread.Sleep(100); }
                                 if (!DriverCommon.Settings.KeepInterimFiles)
                                     File.Delete(imageName);
                                 if (imagesToProcess.Count == 0)
@@ -1525,9 +1529,11 @@ namespace ASCOM.PentaxKP
 
                         }
 
+                        DriverCommon.LogCameraMessage(0, "Wrong file extension", imageName);
                         throw new ASCOM.PropertyNotImplementedException("ImageArray", false);
                     }
 
+                    DriverCommon.LogCameraMessage(0, "", "no images");
                     throw new ASCOM.PropertyNotImplementedException("ImageArray", false);
 
                 }

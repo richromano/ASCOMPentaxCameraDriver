@@ -60,7 +60,7 @@ namespace ASCOM.PentaxKP
             device.Gain = 0;
             Console.WriteLine(device.Gains.ToString());
             Console.WriteLine(device.MaxADU.ToString());
-
+            /*
             for (int j = 0; j < 3; j++)
             {
                 int p = 10000;
@@ -156,7 +156,7 @@ namespace ASCOM.PentaxKP
             }
 
             return;
-
+            */
             for (int j=0;j<1;j++)
             {
                 device.StartExposure(3, true);
@@ -168,9 +168,13 @@ namespace ASCOM.PentaxKP
                     Console.WriteLine(device.CameraState.ToString());
                 }
 
-                object o = device.ImageArray;
-                count++;
-                Console.WriteLine("Got an image #" + count.ToString());
+                object o;
+                if (device.ImageReady)
+                {
+                    o = device.ImageArray;
+                    count++;
+                    Console.WriteLine("Got an image #" + count.ToString());
+                }
                 GC.Collect();
             }
 
@@ -187,10 +191,19 @@ namespace ASCOM.PentaxKP
                 for (int i = 0; i < 100 && !device.ImageReady; i++)
                     Thread.Sleep(250);
 
-                object o = device.ImageArray;
-                count++;
-                Console.WriteLine("Got an image #" + count.ToString());
-                GC.Collect();
+
+                if (device.ImageReady)
+                {
+                    object o = device.ImageArray;
+                    count++;
+                    Console.WriteLine("Got an image #" + count.ToString());
+                    GC.Collect();
+                }
+                else
+                {
+                    Console.WriteLine("Never got an image #");
+                    GC.Collect();
+                }
             }
 
             device.ReadoutMode = 0;
@@ -206,10 +219,18 @@ namespace ASCOM.PentaxKP
                 for (int i = 0; i < 100 && !device.ImageReady; i++)
                     Thread.Sleep(250);
 
-                object o = device.ImageArray;
-                count++;
-                Console.WriteLine("Got an image #" + count.ToString());
-                GC.Collect();
+                if (device.ImageReady)
+                {
+                    object o = device.ImageArray;
+                    count++;
+                    Console.WriteLine("Got an image #" + count.ToString());
+                    GC.Collect();
+                }
+                else
+                {
+                    Console.WriteLine("Never got an image #");
+                    GC.Collect();
+                }
             }
 
             Console.WriteLine(device.CCDTemperature);
