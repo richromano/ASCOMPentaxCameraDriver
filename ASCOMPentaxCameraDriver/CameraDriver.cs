@@ -1344,7 +1344,11 @@ namespace ASCOM.PentaxKP
             // Wait for the file to be closed and available.
                 while (!IsFileClosed(MNewFile)) { Thread.Sleep(100); }
 
-                _bmp = (Bitmap)Image.FromFile(MNewFile); // Load the newly discovered file
+            using (Image img = Image.FromFile(MNewFile))
+            {
+
+                //_bmp = (Bitmap)Image.FromFile(MNewFile); // Load the newly discovered file
+                _bmp = (Bitmap)img;
 
                 // Lock the bitmap's bits.
                 Rectangle rect = new Rectangle(0, 0, _bmp.Width, _bmp.Height);
@@ -1356,22 +1360,23 @@ namespace ASCOM.PentaxKP
                 int width = _bmp.Width;
                 int height = _bmp.Height;
 
-            // TODO: Should be returned based on image size
-            int[,,] _cameraImageArray = new int[width, height, 3]; // Assuming this is declared and initialized elsewhere.
+                // TODO: Should be returned based on image size
+                int[,,] _cameraImageArray = new int[width, height, 3]; // Assuming this is declared and initialized elsewhere.
 
-            for (int y = 0; y < height; y++)
+                for (int y = 0; y < height; y++)
                 {
                     for (int x = 0; x < width; x++)
                     {
-                        _cameraImageArray[x, y, 0] = Marshal.ReadByte(ptr, (stride * y) + (3 * x))*1;
-                        _cameraImageArray[x, y, 1] = Marshal.ReadByte(ptr + 1, (stride * y) + (3 * x))*1;
-                        _cameraImageArray[x, y, 2] = Marshal.ReadByte(ptr + 2, (stride * y) + (3 * x))*1;
+                        _cameraImageArray[x, y, 0] = Marshal.ReadByte(ptr, (stride * y) + (3 * x)) * 1;
+                        _cameraImageArray[x, y, 1] = Marshal.ReadByte(ptr + 1, (stride * y) + (3 * x)) * 1;
+                        _cameraImageArray[x, y, 2] = Marshal.ReadByte(ptr + 2, (stride * y) + (3 * x)) * 1;
                     }
                 }
- 
-            // Unlock the bits.
-            _bmp.UnlockBits(bmpData);
-            result = Resize(_cameraImageArray, 3, StartX, StartY, NumX, NumY);
+
+                // Unlock the bits.
+                _bmp.UnlockBits(bmpData);
+                result = Resize(_cameraImageArray, 3, StartX, StartY, NumX, NumY);
+            }
             return result;
         }
 
