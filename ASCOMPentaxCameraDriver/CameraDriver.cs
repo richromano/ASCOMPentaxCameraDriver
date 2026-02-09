@@ -830,6 +830,7 @@ namespace ASCOM.PentaxKP
                         DriverCommon.LogCameraMessage(0, "", $"get_CameraState {DriverCommon.m_camera.Status.CurrentCapture.State.ToString()}");
                     if (m_captureState==CameraStates.cameraReading)
                     {
+                        // TODO: Fix this
                         if ((DriverCommon.m_camera.Status.CurrentCapture != null)&&(DriverCommon.m_camera.Status.CurrentCapture.Equals(Ricoh.CameraController.CaptureState.Complete)))
                         {
                             DriverCommon.LogCameraMessage(0, "", "Setting capture to idle");
@@ -1105,7 +1106,6 @@ namespace ASCOM.PentaxKP
                         {
                             DriverCommon.m_camera.StartLiveView(0);
                             // Need to clear because the expected format has changed
-                            //StopThreadCapture();
                             imagesToProcess.Clear();
                         }
                     }
