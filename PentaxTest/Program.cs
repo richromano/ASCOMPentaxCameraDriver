@@ -60,7 +60,7 @@ namespace ASCOM.PentaxKP
             device.Gain = 0;
             Console.WriteLine(device.Gains.ToString());
             Console.WriteLine(device.MaxADU.ToString());
-            /*
+            
             for (int j = 0; j < 3; j++)
             {
                 int p = 10000;
@@ -156,7 +156,7 @@ namespace ASCOM.PentaxKP
             }
 
             return;
-            */
+            
             for (int j=0;j<1;j++)
             {
                 device.StartExposure(3, true);
